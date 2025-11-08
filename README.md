@@ -1,6 +1,8 @@
-# Superpowers
+# 1337-skills
 
-A comprehensive skills library of proven techniques, patterns, and workflows for AI coding assistants.
+A forked and evolving skills library for Claude Code - iterating towards custom cognitive patterns and workflows.
+
+**Original:** Forked from [obra/superpowers](https://github.com/obra/superpowers) v3.4.1
 
 ## What You Get
 
@@ -11,28 +13,19 @@ A comprehensive skills library of proven techniques, patterns, and workflows for
 - **Meta Skills** - Creating, testing, and sharing skills
 
 Plus:
-- **Slash Commands** - `/superpowers:brainstorm`, `/superpowers:write-plan`, `/superpowers:execute-plan`
+- **Slash Commands** - `/1337-skills:brainstorm`, `/1337-skills:write-plan`, `/1337-skills:execute-plan`
 - **Automatic Integration** - Skills activate automatically when relevant
-- **Consistent Workflows** - Systematic approaches to common engineering tasks
-
-## Learn More
-
-Read the introduction: [Superpowers for Claude Code](https://blog.fsck.com/2025/10/09/superpowers/)
+- **Evolving Workflows** - Customize and iterate towards your preferred patterns
 
 ## Installation
 
-### Claude Code (via Plugin Marketplace)
+### Local Installation
 
-In Claude Code, register the marketplace first:
-
-```bash
-/plugin marketplace add obra/superpowers-marketplace
-```
-
-Then install the plugin from this marketplace:
+Clone this repository to your Claude Code plugins directory:
 
 ```bash
-/plugin install superpowers@superpowers-marketplace
+cd ~/.claude/plugins/local
+git clone https://github.com/j10t-dev/1337-skills.git
 ```
 
 ### Verify Installation
@@ -45,16 +38,10 @@ Check that commands appear:
 
 ```
 # Should see:
-# /superpowers:brainstorm - Interactive design refinement
-# /superpowers:write-plan - Create implementation plan
-# /superpowers:execute-plan - Execute plan in batches
+# /1337-skills:brainstorm - Interactive design refinement
+# /1337-skills:write-plan - Create implementation plan
+# /1337-skills:execute-plan - Execute plan in batches
 ```
-
-### Codex (Experimental)
-
-**Note:** Codex support is experimental and may require refinement based on user feedback.
-
-Tell Codex to fetch https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.codex/INSTALL.md and follow the instructions.
 
 ## Quick Start
 
@@ -62,17 +49,17 @@ Tell Codex to fetch https://raw.githubusercontent.com/obra/superpowers/refs/head
 
 **Brainstorm a design:**
 ```
-/superpowers:brainstorm
+/1337-skills:brainstorm
 ```
 
 **Create an implementation plan:**
 ```
-/superpowers:write-plan
+/1337-skills:write-plan
 ```
 
 **Execute the plan:**
 ```
-/superpowers:execute-plan
+/1337-skills:execute-plan
 ```
 
 ### Automatic Skill Activation
@@ -127,7 +114,7 @@ All commands are thin wrappers that activate the corresponding skill:
 1. **SessionStart Hook** - Loads the `using-superpowers` skill at session start
 2. **Skills System** - Uses Claude Code's first-party skills system
 3. **Automatic Discovery** - Claude finds and uses relevant skills for your task
-4. **Mandatory Workflows** - When a skill exists for your task, using it becomes required
+4. **Iterative Evolution** - Modify skills directly, test immediately, iterate towards your preferred patterns
 
 ## Philosophy
 
@@ -137,31 +124,33 @@ All commands are thin wrappers that activate the corresponding skill:
 - **Evidence over claims** - Verify before declaring success
 - **Domain over implementation** - Work at problem level, not solution level
 
-## Contributing
+## Tracking Upstream
 
-Skills live directly in this repository. To contribute:
-
-1. Fork the repository
-2. Create a branch for your skill
-3. Follow the `writing-skills` skill for creating new skills
-4. Use the `testing-skills-with-subagents` skill to validate quality
-5. Submit a PR
-
-See `skills/meta/writing-skills/SKILL.md` for the complete guide.
-
-## Updating
-
-Skills update automatically when you update the plugin:
+This is a fork - you can selectively pull interesting changes from upstream:
 
 ```bash
-/plugin update superpowers
+# See what's new in upstream
+git fetch upstream
+git log upstream/main --oneline --since="1 month ago"
+
+# Examine interesting changes
+git show upstream/main:skills/some-skill/SKILL.md
+
+# Cherry-pick if useful
+git cherry-pick <commit-hash>
 ```
+
+## Philosophy
+
+- **Iterate towards better** - Modify, test, iterate based on actual use
+- **Your patterns** - Evolve skills to match your thinking, not dogma
+- **Selective upstream** - Mine upstream for ideas, not obligations
 
 ## License
 
 MIT License - see LICENSE file for details
 
-## Support
+## Links
 
-- **Issues**: https://github.com/obra/superpowers/issues
-- **Marketplace**: https://github.com/obra/superpowers-marketplace
+- **This Fork**: https://github.com/j10t-dev/1337-skills
+- **Original**: https://github.com/obra/superpowers
