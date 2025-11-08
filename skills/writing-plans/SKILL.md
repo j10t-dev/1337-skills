@@ -15,7 +15,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
-**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
+**Save plans to:** `PLAN.md` in the worktree root
 
 ## Bite-Sized Task Granularity
 
@@ -40,6 +40,16 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 **Architecture:** [2-3 sentences about approach]
 
 **Tech Stack:** [Key technologies/libraries]
+
+**Skills to Use:**
+- 1337-skills:test-driven-development
+- 1337-skills:verification-before-completion
+- [Other relevant skills]
+
+**Required Files:** (executor will auto-read these)
+- @path/to/file1.py
+- @path/to/file2.ts
+- [Files the executor needs context from]
 
 ---
 ```

@@ -9,6 +9,8 @@ Execute plan by dispatching fresh subagent per task, with code review after each
 
 **Core principle:** Fresh subagent per task + review between tasks = high quality, fast iteration
 
+**Model:** Implementation subagents should use Haiku for cost-effective execution
+
 ## Overview
 
 **vs. Executing Plans (parallel session):**
@@ -31,7 +33,7 @@ Execute plan by dispatching fresh subagent per task, with code review after each
 
 ### 1. Load Plan
 
-Read plan file, create TodoWrite with all tasks.
+Read PLAN.md (Required Files with @ syntax are already in context), note skills from "Skills to Use:" section, create TodoWrite with all tasks.
 
 ### 2. Execute Task with Subagent
 
@@ -40,13 +42,16 @@ For each task:
 **Dispatch fresh subagent:**
 ```
 Task tool (general-purpose):
+  model: "haiku"
   description: "Implement Task N: [task name]"
   prompt: |
-    You are implementing Task N from [plan-file].
+    You are implementing Task N from PLAN.md.
 
-    Read that task carefully. Your job is to:
+    Read that task carefully. Apply skills from "Skills to Use:" section.
+
+    Your job is to:
     1. Implement exactly what the task specifies
-    2. Write tests (following TDD if task says to)
+    2. Apply specified skills (e.g., test-driven-development)
     3. Verify implementation works
     4. Commit your work
     5. Report back

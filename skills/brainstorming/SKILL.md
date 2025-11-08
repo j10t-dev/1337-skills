@@ -9,6 +9,8 @@ description: Use when creating or developing, before writing code or implementat
 
 Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
 
+**Model:** This skill should use Sonnet for planning and architectural thinking.
+
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design in small sections (200-300 words), checking after each section whether it looks right so far.
 
 ## The Process

@@ -1,19 +1,19 @@
 {
-  "name": "superpowers-dev",
-  "description": "Development marketplace for Superpowers core skills library",
+  "name": "1337-skills-dev",
+  "description": "Development marketplace for 1337-skills library",
   "owner": {
-    "name": "Jesse Vincent",
-    "email": "jesse@fsck.com"
+    "name": "j10t-dev",
+    "email": "j10t@j10t.dev"
   },
   "plugins": [
     {
-      "name": "superpowers",
-      "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques",
-      "version": "3.4.0",
+      "name": "1337-skills",
+      "description": "Forked skills library for evolving Claude Code thinking patterns: TDD, debugging, collaboration, and custom workflows",
+      "version": "1.0.0",
       "source": "./",
       "author": {
-        "name": "Jesse Vincent",
-        "email": "jesse@fsck.com"
+        "name": "j10t-dev",
+        "email": "j10t@j10t.dev"
       }
     }
   ]

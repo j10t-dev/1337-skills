@@ -99,7 +99,7 @@ Skills activate automatically when relevant. For example:
 - **writing-skills** - Create new skills following best practices
 - **sharing-skills** - Contribute skills back via branch and PR
 - **testing-skills-with-subagents** - Validate skill quality
-- **using-superpowers** - Introduction to the skills system
+- **using-skills** - Introduction to the skills system
 
 ### Commands
 
@@ -111,7 +111,7 @@ All commands are thin wrappers that activate the corresponding skill:
 
 ## How It Works
 
-1. **SessionStart Hook** - Loads the `using-superpowers` skill at session start
+1. **SessionStart Hook** - Loads the `using-skills` skill at session start
 2. **Skills System** - Uses Claude Code's first-party skills system
 3. **Automatic Discovery** - Claude finds and uses relevant skills for your task
 4. **Iterative Evolution** - Modify skills directly, test immediately, iterate towards your preferred patterns
