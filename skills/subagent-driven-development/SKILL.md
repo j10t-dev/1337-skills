@@ -9,7 +9,7 @@ Execute plan by dispatching fresh subagent per task, with code review after each
 
 **Core principle:** Fresh subagent per task + review between tasks = high quality, fast iteration
 
-**Model:** Implementation subagents should use Haiku for cost-effective execution
+**Announce at start:** "I'm using the subagent-driven-development skill to execute this plan."
 
 ## Overview
 
@@ -25,9 +25,9 @@ Execute plan by dispatching fresh subagent per task, with code review after each
 - Want continuous progress with quality gates
 
 **When NOT to use:**
-- Need to review plan first (use executing-plans)
+- Need to review plan first (use executing-plans skill)
 - Tasks are tightly coupled (manual execution better)
-- Plan needs revision (brainstorm first)
+- Plan needs revision (use brainstorming skill first)
 
 ## The Process
 
@@ -53,8 +53,7 @@ Task tool (general-purpose):
     1. Implement exactly what the task specifies
     2. Apply specified skills (e.g., test-driven-development)
     3. Verify implementation works
-    4. Commit your work
-    5. Report back
+    4. Report back
 
     Work from: [directory]
 
@@ -71,11 +70,12 @@ Task tool (1337-skills:code-reviewer):
   Use template at requesting-code-review/code-reviewer.md
 
   WHAT_WAS_IMPLEMENTED: [from subagent's report]
-  PLAN_OR_REQUIREMENTS: Task N from [plan-file]
-  BASE_SHA: [commit before task]
-  HEAD_SHA: [current commit]
+  PLAN_OR_REQUIREMENTS: Task N from PLAN.md
+  FILES_CHANGED: [comma-separated list from subagent report]
   DESCRIPTION: [task summary]
 ```
+
+**Subagent must report which files it modified** in its final report.
 
 **Code reviewer returns:** Strengths, Issues (Critical/Important/Minor), Assessment
 
@@ -123,7 +123,7 @@ Task 1: Hook installation script
 [Dispatch implementation subagent]
 Subagent: Implemented install-hook with tests, 5/5 passing
 
-[Get git SHAs, dispatch code-reviewer]
+[Get git diff, dispatch code-reviewer]
 Reviewer: Strengths: Good test coverage. Issues: None. Ready.
 
 [Mark Task 1 complete]

@@ -30,133 +30,62 @@ Tests failing (<N> failures). Must fix before completing:
 
 [Show failures]
 
-Cannot proceed with merge/PR until tests pass.
+Cannot proceed until tests pass.
 ```
 
 Stop. Don't proceed to Step 2.
 
 **If tests pass:** Continue to Step 2.
 
-### Step 2: Determine Base Branch
+### Step 2: Optional Code Review
 
-```bash
-# Try common base branches
-git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null
+**Ask user if they want code review:**
+
+Use AskUserQuestion tool:
+```
+Question: "Tests pass. Want code review before finishing?"
+Options:
+  - "Yes, review changes" → Dispatch code-reviewer
+  - "No, skip review" → Proceed to Step 3
 ```
 
-Or ask: "This branch split from main - is that correct?"
+**If user wants review:**
 
-### Step 3: Present Options
-
-Present exactly these 4 options:
-
+Dispatch code-reviewer in auto-detect mode:
 ```
-Implementation complete. What would you like to do?
+Task tool (1337-skills:code-reviewer):
+  description: "Review branch completion"
+  prompt: |
+    You are reviewing code changes for production readiness.
 
-1. Merge back to <base-branch> locally
-2. Push and create a Pull Request
-3. Keep the branch as-is (I'll handle it later)
-4. Discard this work
+    Use auto-detect mode:
+    - Run git status to check for uncommitted changes
+    - If uncommitted: review via git diff
+    - If clean: review via git diff main..HEAD
 
-Which option?
-```
+    Review against: PLAN.md requirements (if exists) or general code quality
 
-**Don't add explanation** - keep options concise.
-
-### Step 4: Execute Choice
-
-#### Option 1: Merge Locally
-
-```bash
-# Switch to base branch
-git checkout <base-branch>
-
-# Pull latest
-git pull
-
-# Merge feature branch
-git merge <feature-branch>
-
-# Verify tests on merged result
-<test command>
-
-# If tests pass
-git branch -d <feature-branch>
+    Follow review checklist from code-reviewer.md template
 ```
 
-Then: Cleanup worktree (Step 5)
+**After review:**
+- Fix Critical issues immediately
+- Fix Important issues before proceeding
+- Note Minor issues
 
-#### Option 2: Push and Create PR
+**If user skips review:**
+- Continue to Step 3
 
-```bash
-# Push branch
-git push -u origin <feature-branch>
+### Step 3: Report Completion
 
-# Create PR
-gh pr create --title "<title>" --body "$(cat <<'EOF'
-## Summary
-<2-3 bullets of what changed>
+Inform user:
+```
+Work complete, all tests passing.
 
-## Test Plan
-- [ ] <verification steps>
-EOF
-)"
+Ready for your git workflow (commit, PR, merge, etc).
 ```
 
-Then: Cleanup worktree (Step 5)
-
-#### Option 3: Keep As-Is
-
-Report: "Keeping branch <name>. Worktree preserved at <path>."
-
-**Don't cleanup worktree.**
-
-#### Option 4: Discard
-
-**Confirm first:**
-```
-This will permanently delete:
-- Branch <name>
-- All commits: <commit-list>
-- Worktree at <path>
-
-Type 'discard' to confirm.
-```
-
-Wait for exact confirmation.
-
-If confirmed:
-```bash
-git checkout <base-branch>
-git branch -D <feature-branch>
-```
-
-Then: Cleanup worktree (Step 5)
-
-### Step 5: Cleanup Worktree
-
-**For Options 1, 2, 4:**
-
-Check if in worktree:
-```bash
-git worktree list | grep $(git branch --show-current)
-```
-
-If yes:
-```bash
-git worktree remove <worktree-path>
-```
-
-**For Option 3:** Keep worktree.
-
-## Quick Reference
-
-| Option | Merge | Push | Keep Worktree | Cleanup Branch |
-|--------|-------|------|---------------|----------------|
-| 1. Merge locally | ✓ | - | - | ✓ |
-| 2. Create PR | - | ✓ | ✓ | - |
-| 3. Keep as-is | - | - | ✓ | - |
-| 4. Discard | - | - | - | ✓ (force) |
+**Do not perform git operations** - user controls commits and merges.
 
 ## Common Mistakes
 
@@ -168,33 +97,15 @@ git worktree remove <worktree-path>
 - **Problem:** "What should I do next?" → ambiguous
 - **Fix:** Present exactly 4 structured options
 
-**Automatic worktree cleanup**
-- **Problem:** Remove worktree when might need it (Option 2, 3)
-- **Fix:** Only cleanup for Options 1 and 4
-
-**No confirmation for discard**
-- **Problem:** Accidentally delete work
-- **Fix:** Require typed "discard" confirmation
-
 ## Red Flags
 
 **Never:**
 - Proceed with failing tests
-- Merge without verifying tests on result
 - Delete work without confirmation
 - Force-push without explicit request
 
 **Always:**
 - Verify tests before offering options
-- Present exactly 4 options
-- Get typed confirmation for Option 4
-- Clean up worktree for Options 1 & 4 only
 
 ## Integration
 
-**Called by:**
-- **subagent-driven-development** (Step 7) - After all tasks complete
-- **executing-plans** (Step 5) - After all batches complete
-
-**Pairs with:**
-- **using-git-worktrees** - Cleans up worktree created by that skill

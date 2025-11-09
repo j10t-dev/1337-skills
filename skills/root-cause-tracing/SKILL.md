@@ -38,7 +38,7 @@ digraph when_to_use {
 
 ### 1. Observe the Symptom
 ```
-Error: git init failed in /Users/jesse/project/packages/core
+Error: git init failed in /Users/j10t/project/packages/core
 ```
 
 ### 2. Find Immediate Cause
@@ -158,6 +158,20 @@ digraph principle {
 
 **NEVER fix just where the error appears.** Trace back to find the original trigger.
 
+## Red Flags
+
+**Never:**
+- Fix where the error appears without tracing back
+- Assume you know the root cause without investigation
+- Stop tracing after one level ("close enough")
+- Add workarounds at the symptom location
+
+**Always:**
+- Trace back through full call chain
+- Find the original trigger
+- Fix at the source, not the symptom
+- Add defense-in-depth validation at each layer after fixing
+
 ## Stack Trace Tips
 
 **In tests:** Use `console.error()` not logger - logger may be suppressed
@@ -165,10 +179,3 @@ digraph principle {
 **Include context:** Directory, cwd, environment variables, timestamps
 **Capture stack:** `new Error().stack` shows complete call chain
 
-## Real-World Impact
-
-From debugging session (2025-10-03):
-- Found root cause through 5-level trace
-- Fixed at source (getter validation)
-- Added 4 layers of defense
-- 1847 tests passed, zero pollution

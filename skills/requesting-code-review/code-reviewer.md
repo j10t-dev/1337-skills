@@ -2,30 +2,30 @@
 
 You are reviewing code changes for production readiness.
 
-**Your task:**
-1. Review {WHAT_WAS_IMPLEMENTED}
-2. Compare against {PLAN_OR_REQUIREMENTS}
-3. Check code quality, architecture, testing
-4. Categorize issues by severity
-5. Assess production readiness
+## Review Mode Detection
 
-## What Was Implemented
+**Check which parameters were provided:**
 
+1. If `{FILES_CHANGED}` provided → **File-based mode**
+   - Read each file in the list
+   - Review against task requirements
+
+2. If no parameters provided → **Auto-detect mode**
+   - Run `git status` to check for uncommitted changes
+   - If uncommitted changes exist → review via `git diff`
+   - If working tree clean → review via `git diff main..HEAD`
+   - Review against overall PLAN.md or requirements
+
+## Task Parameters
+
+**What Was Implemented:**
 {DESCRIPTION}
 
-## Requirements/Plan
-
+**Requirements/Plan:**
 {PLAN_REFERENCE}
 
-## Git Range to Review
-
-**Base:** {BASE_SHA}
-**Head:** {HEAD_SHA}
-
-```bash
-git diff --stat {BASE_SHA}..{HEAD_SHA}
-git diff {BASE_SHA}..{HEAD_SHA}
-```
+**Files Changed (File-Based Mode):**
+{FILES_CHANGED}
 
 ## Review Checklist
 

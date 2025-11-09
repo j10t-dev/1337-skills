@@ -23,7 +23,6 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 **Exceptions (ask your human partner):**
 - Throwaway prototypes
-- Generated code
 - Configuration files
 
 Thinking "skip TDD just this once"? Stop. That's rationalization.
@@ -75,17 +74,12 @@ Write one minimal test showing what should happen.
 <Good>
 ```typescript
 test('retries failed operations 3 times', async () => {
-  let attempts = 0;
-  const operation = () => {
-    attempts++;
-    if (attempts < 3) throw new Error('fail');
-    return 'success';
-  };
 
+  const retryOperations = new RetryOperation();
   const result = await retryOperation(operation);
 
-  expect(result).toBe('success');
-  expect(attempts).toBe(3);
+  expect(result.value).toBe('success');
+  expect(result.attempts).toBe(3);
 });
 ```
 Clear name, tests real behavior, one thing
@@ -94,21 +88,21 @@ Clear name, tests real behavior, one thing
 <Bad>
 ```typescript
 test('retry works', async () => {
-  const mock = jest.fn()
+  const mockRetry = jest.fn()
     .mockRejectedValueOnce(new Error())
     .mockRejectedValueOnce(new Error())
     .mockResolvedValueOnce('success');
-  await retryOperation(mock);
-  expect(mock).toHaveBeenCalledTimes(3);
+  await mockRetry();
+  expect(mockRetry).toHaveBeenCalledTimes(3);
 });
 ```
-Vague name, tests mock not code
+Vague name, tests mock setup not code
 </Bad>
 
 **Requirements:**
 - One behavior
 - Clear name
-- Real code (no mocks unless unavoidable)
+- Real code (only mock dependencies)
 
 ### Verify RED - Watch It Fail
 
@@ -326,6 +320,8 @@ Extract validation for multiple fields if needed.
 
 ## Verification Checklist
 
+**IMPORTANT:** Per using-skills mandate, create TodoWrite todos for each item below.
+
 Before marking work complete:
 
 - [ ] Every new function/method has a test
@@ -362,3 +358,10 @@ Otherwise → not TDD
 ```
 
 No exceptions without your human partner's permission.
+
+## Integration with Other Skills
+
+**Complementary skills:**
+- **verification-before-completion** - Verify tests pass before claiming complete
+- **systematic-debugging** - Bug fixes require TDD cycle
+- **testing-anti-patterns** - What NOT to do in tests

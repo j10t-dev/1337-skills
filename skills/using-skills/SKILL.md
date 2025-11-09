@@ -27,7 +27,7 @@ Before responding to ANY user message, you MUST complete this checklist:
 
 ## Critical Rules
 
-1. **Follow mandatory workflows.** Brainstorming before coding. Check for relevant skills before ANY task.
+1. **Follow mandatory workflows.** Brainstorming before coding. Writing plans before implementaiton. Reading plans before code changes. Check for relevant skills before ANY task.
 
 2. Execute skills with the Skill tool
 

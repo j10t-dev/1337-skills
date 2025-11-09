@@ -155,6 +155,20 @@ Agent 3 → Fix tool-approval-race-conditions.test.ts
 
 **Time saved:** 3 problems solved in parallel vs sequentially
 
+## Red Flags
+
+**Never:**
+- Run agents serially when failures are independent
+- Dispatch parallel agents for dependent/coupled problems
+- Skip verification after agents complete
+- Assume agents won't conflict (always check)
+
+**Always:**
+- Verify failures are truly independent before dispatching
+- Run full test suite after all agents complete
+- Review each agent's changes for conflicts
+- Check that combined fixes work together
+
 ## Key Benefits
 
 1. **Parallelization** - Multiple investigations happen simultaneously
