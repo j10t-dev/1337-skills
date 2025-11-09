@@ -7,9 +7,9 @@ description: Use when writing or changing tests, adding mocks, or tempted to add
 
 ## Overview
 
-Tests must verify real behavior, not mock behavior. Mocks are a means to isolate, not the thing being tested.
+Tests must verify real behavior, not mock behavior. Mocks are a means to isolate and provide necessary dependencies, not the thing being tested.
 
-**Core principle:** Test what the code does, not what the mocks do.
+**Core principle:** Test what the code does, not your mock configuration. 
 
 **Following strict TDD prevents these anti-patterns.**
 

@@ -4,10 +4,17 @@
   "version": "1.0.0",
   "author": {
     "name": "j10t-dev",
-    "email": "your@email.com"
+    "email": "j10t@j10t.dev"
   },
   "homepage": "https://github.com/j10t-dev/1337-skills",
   "repository": "https://github.com/j10t-dev/1337-skills",
   "license": "MIT",
-  "keywords": ["skills", "tdd", "debugging", "collaboration", "workflows", "fork"]
+  "keywords": [
+    "skills",
+    "tdd",
+    "debugging",
+    "collaboration",
+    "workflows",
+    "fork"
+  ]
 }

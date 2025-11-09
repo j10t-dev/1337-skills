@@ -13,6 +13,8 @@ Random fixes waste time and create new bugs. Quick patches mask underlying issue
 
 **Violating the letter of this process is violating the spirit of debugging.**
 
+**Announce at start:** "I'm using the systematic-debugging skill to find the root cause."
+
 ## The Iron Law
 
 ```

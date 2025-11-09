@@ -116,6 +116,20 @@ Bug: Empty `projectDir` caused `git init` in source code
 
 **Result:** All 1847 tests passed, bug impossible to reproduce
 
+## Red Flags
+
+**Never:**
+- Validate only at one layer ("entry point is enough")
+- Trust that upstream validation happened
+- Skip validation because "this should never be called with bad data"
+- Remove defensive checks after fixing the bug
+
+**Always:**
+- Validate at every layer data passes through
+- Make invalid states unrepresentable
+- Keep all layers even after fixing immediate bug
+- Add validation when touching code that processes external data
+
 ## Key Insight
 
 All four layers were necessary. During testing, each layer caught bugs the others missed:

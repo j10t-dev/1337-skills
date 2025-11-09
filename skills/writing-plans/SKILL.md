@@ -7,24 +7,58 @@ description: Use when design is complete and you need detailed implementation ta
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
-**Context:** This should be run in a dedicated worktree (created by brainstorming skill).
-
 **Save plans to:** `PLAN.md` in the worktree root
 
-## Bite-Sized Task Granularity
+## Plan Structure: Tasks and Subtasks
 
-**Each step is one action (2-5 minutes):**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
-- "Commit" - step
+**PLAN.md = Feature/Overall Change**
+- The big picture: "User CSV Export", "Code Review Workflow Simplification"
+
+**Task = Unit of work for one subagent**
+- One subagent dispatched per Task
+- Sized based on coupling, dependencies, file conflicts, and logical coherence (see Task Boundaries below)
+
+**Subtask = Logical phase within a task**
+- Contains specific steps for the subagent to execute
+
+**Step = Individual action (2-5 minutes)**
+- Granular instruction with exact commands and expected output
+
+## Task Boundaries - What Makes a Good Task?
+
+Consider multiple factors when defining Task boundaries:
+
+**Coupling & Dependencies:**
+- Tightly coupled changes → same Task
+- If B depends on A's output → consider combining into one Task
+- Can run independently? → separate Tasks
+
+**File Conflicts:**
+- Multiple Tasks editing same files → will conflict in parallel execution
+- Related edits to same file group → same Task
+
+**Logical Coherence:**
+- Does this make sense as a reviewable unit?
+- Natural boundary: service layer, API endpoint, UI component, documentation set
+
+**Subagent Efficiency:**
+- Justify context transfer overhead (10min-1hr of work per Task)
+- Avoid micro-Tasks that are pure overhead
+
+**Independence for Parallel Execution:**
+- Can Tasks 1, 2, 3 be dispatched simultaneously?
+- If they must be sequential, consider if they should be one Task
+
+**Rule of thumb:**
+- 1-5 Tasks per PLAN typically
+- Each Task = 10min-2hr of work
+- Simple Task might have 1 Subtask, complex Task might have 5-10 Subtasks
 
 ## Plan Document Header
 
@@ -57,14 +91,16 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 ## Task Structure
 
 ```markdown
-### Task N: [Component Name]
+## Task N: [Component Name]
 
 **Files:**
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
 - Test: `tests/exact/path/to/test.py`
 
-**Step 1: Write the failing test**
+### Subtask N.1: Write and verify failing test
+
+**Step 1:** Write the failing test
 
 ```python
 def test_specific_behavior():
@@ -72,29 +108,24 @@ def test_specific_behavior():
     assert result == expected
 ```
 
-**Step 2: Run test to verify it fails**
+**Step 2:** Run test to verify it fails
 
 Run: `pytest tests/path/test.py::test_name -v`
 Expected: FAIL with "function not defined"
 
-**Step 3: Write minimal implementation**
+### Subtask N.2: Implement and verify solution
+
+**Step 1:** Write minimal implementation
 
 ```python
 def function(input):
     return expected
 ```
 
-**Step 4: Run test to verify it passes**
+**Step 2:** Run test to verify it passes
 
 Run: `pytest tests/path/test.py::test_name -v`
 Expected: PASS
-
-**Step 5: Commit**
-
-```bash
-git add tests/path/test.py src/path/file.py
-git commit -m "feat: add specific feature"
-```
 ```
 
 ## Remember
@@ -102,17 +133,17 @@ git commit -m "feat: add specific feature"
 - Complete code in plan (not "add validation")
 - Exact commands with expected output
 - Reference relevant skills with @ syntax
-- DRY, YAGNI, TDD, frequent commits
+- DRY, YAGNI, TDD
 
 ## Execution Handoff
 
 After saving the plan, offer execution choice:
 
-**"Plan complete and saved to `docs/plans/<filename>.md`. Two execution options:**
+**"Plan complete and saved to `PLAN.md`. Two execution options:**
 
 **1. Subagent-Driven (this session)** - I dispatch fresh subagent per task, review between tasks, fast iteration
 
-**2. Parallel Session (separate)** - Open new session with executing-plans, batch execution with checkpoints
+**2. Parallel Session (separate)** - Open new session with executing-plans, executes all tasks
 
 **Which approach?"**
 

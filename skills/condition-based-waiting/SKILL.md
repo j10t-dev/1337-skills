@@ -111,10 +111,16 @@ await new Promise(r => setTimeout(r, 200));   // Then: wait for timed behavior
 2. Based on known timing (not guessing)
 3. Comment explaining WHY
 
-## Real-World Impact
+## Red Flags
 
-From debugging session (2025-10-03):
-- Fixed 15 flaky tests across 3 files
-- Pass rate: 60% → 100%
-- Execution time: 40% faster
-- No more race conditions
+**Never:**
+- Use `sleep()` or `setTimeout()` without checking a condition first
+- Guess at timeout durations ("1000ms should be enough")
+- Add arbitrary delays to "fix" flaky tests
+- Wait for time when you should wait for state
+
+**Always:**
+- Poll for the condition you're actually waiting for
+- Document why timing-based waits are needed (if unavoidable)
+- Use condition checks as primary strategy
+
