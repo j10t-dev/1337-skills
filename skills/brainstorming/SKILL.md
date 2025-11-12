@@ -35,7 +35,7 @@ Start by understanding the current project context, then ask questions via the A
 ## After the Design
 
 **Documentation:**
-- Write the validated design to `PLAN.md`
+- Write the validated design to `DESIGN.md`
 
 **Implementation (if continuing):**
 - Ask: "Ready to proceed to implementation planning?"
