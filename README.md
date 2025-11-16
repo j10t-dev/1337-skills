@@ -73,33 +73,33 @@ Skills activate automatically when relevant. For example:
 
 ### Skills Library
 
-**Testing** (`skills/testing/`)
-- **test-driven-development** - RED-GREEN-REFACTOR cycle
-- **condition-based-waiting** - Async test patterns
-- **testing-anti-patterns** - Common pitfalls to avoid
+All skills are located in `skills/` (flat structure), organised here by function:
 
-**Debugging** (`skills/debugging/`)
-- **systematic-debugging** - 4-phase root cause process
-- **root-cause-tracing** - Find the real problem
-- **verification-before-completion** - Ensure it's actually fixed
-- **defense-in-depth** - Multiple validation layers
+**Testing**
+- **test-driven-development** - Write test first, watch fail, write minimal code to pass
+- **condition-based-waiting** - Replace arbitrary timeouts with condition polling for reliable async tests
+- **testing-anti-patterns** - Prevent testing mock behaviour, production pollution, mocking without understanding
 
-**Collaboration** (`skills/collaboration/`)
-- **brainstorming** - Socratic design refinement
-- **writing-plans** - Detailed implementation plans
-- **executing-plans** - Batch execution with checkpoints
-- **dispatching-parallel-agents** - Concurrent subagent workflows
-- **requesting-code-review** - Pre-review checklist
-- **receiving-code-review** - Responding to feedback
-- **using-git-worktrees** - Parallel development branches
-- **finishing-a-development-branch** - Merge/PR decision workflow
-- **subagent-driven-development** - Fast iteration with quality gates
+**Debugging**
+- **systematic-debugging** - Four-phase framework ensuring understanding before attempting fixes
+- **root-cause-tracing** - Trace bugs backward through call stack to find original trigger
+- **verification-before-completion** - Run verification commands before claiming work complete
+- **defense-in-depth** - Validate at every layer to make bugs structurally impossible
 
-**Meta** (`skills/meta/`)
-- **writing-skills** - Create new skills following best practices
-- **sharing-skills** - Contribute skills back via branch and PR
-- **testing-skills-with-subagents** - Validate skill quality
-- **using-skills** - Introduction to the skills system
+**Workflow & Collaboration**
+- **brainstorming** - Refine rough ideas through collaborative questioning before coding
+- **writing-plans** - Create comprehensive implementation plans with exact paths and code examples
+- **executing-plans** - Load plan, review critically, execute tasks, report completion
+- **subagent-driven-development** - Dispatch fresh subagent per task with code review between tasks
+- **dispatching-parallel-agents** - Investigate and fix 3+ independent failures concurrently
+- **requesting-code-review** - Dispatch code-reviewer subagent before merging
+- **receiving-code-review** - Technical rigor and verification, not performative agreement
+- **finishing-a-development-branch** - Structured options for merge, PR, or cleanup
+
+**Meta**
+- **using-skills** - Mandatory workflows for finding and using skills (loaded at session start)
+- **writing-skills** - Apply TDD to process documentation, test with subagents before deployment
+- **testing-skills-with-subagents** - Verify skills work under pressure and resist rationalisation
 
 ### Commands
 
@@ -115,14 +115,6 @@ All commands are thin wrappers that activate the corresponding skill:
 2. **Skills System** - Uses Claude Code's first-party skills system
 3. **Automatic Discovery** - Claude finds and uses relevant skills for your task
 4. **Iterative Evolution** - Modify skills directly, test immediately, iterate towards your preferred patterns
-
-## Philosophy
-
-- **Test-Driven Development** - Write tests first, always
-- **Systematic over ad-hoc** - Process over guessing
-- **Complexity reduction** - Simplicity as primary goal
-- **Evidence over claims** - Verify before declaring success
-- **Domain over implementation** - Work at problem level, not solution level
 
 ## Tracking Upstream
 
