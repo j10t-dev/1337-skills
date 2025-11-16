@@ -15,6 +15,8 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Save plans to:** `PLAN.md` in the worktree root
 
+**File cleanup:** If PLAN.md or DESIGN.md already exist and are unchanged since last commit (check with `git diff --quiet <file>`), remove them. Write tool requires clean slate; files are safely in git history.
+
 **Before writing:** Read `DESIGN.md` to understand the architecture and design decisions. Include an architecture summary in PLAN.md header.
 
 ## Plan Structure: Tasks and Subtasks
