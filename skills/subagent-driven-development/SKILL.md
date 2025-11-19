@@ -81,15 +81,42 @@ Task tool (1337-skills:code-reviewer):
 
 ### 4. Apply Review Feedback
 
-**If issues found:**
-- Fix Critical issues immediately
-- Fix Important issues before next task
-- Note Minor issues
+**If Critical or Important issues found:**
+1. Dispatch fix subagent to address issues
+2. **Re-review after fixes:**
+   - Dispatch code-reviewer again on same files
+   - Check fixes actually resolved issues
+   - Loop until no Critical/Important issues remain
+3. **Only then proceed to Step 5**
 
-**Dispatch follow-up subagent if needed:**
+**Dispatch fix subagent:**
 ```
-"Fix issues from code review: [list issues]"
+Task tool (general-purpose):
+  model: "haiku"
+  description: "Fix code review issues"
+  prompt: |
+    Fix these issues from code review:
+    [list Critical and Important issues]
+
+    Files affected: [files from review]
+
+    Report: What you fixed, verification tests run, results
 ```
+
+**After fix completes, re-review:**
+```
+Task tool (1337-skills:code-reviewer):
+  Use same template as Step 3
+
+  WHAT_WAS_IMPLEMENTED: Fixes for [list issues]
+  PLAN_OR_REQUIREMENTS: Original Task N from PLAN.md
+  FILES_CHANGED: [same files as before]
+  DESCRIPTION: Code review fix validation
+```
+
+**If re-review finds more Critical/Important issues:** Repeat from step 1
+
+**If only Minor issues remain:** Note them and proceed to Step 5
 
 ### 5. Mark Complete, Next Task
 
@@ -139,7 +166,10 @@ Reviewer: Strengths: Solid. Issues (Important): Missing progress reporting
 [Dispatch fix subagent]
 Fix subagent: Added progress every 100 conversations
 
-[Verify fix, mark Task 2 complete]
+[Re-review after fix]
+Reviewer: Fix verified. Progress reporting working. No remaining Critical/Important issues.
+
+[Mark Task 2 complete]
 
 ...
 
@@ -170,6 +200,8 @@ Done!
 
 **Never:**
 - Skip code review between tasks
+- Skip re-review after applying fixes
+- Mark task complete while Critical/Important issues remain
 - Proceed with unfixed Critical issues
 - Dispatch multiple implementation subagents in parallel (conflicts)
 - Implement without reading plan task

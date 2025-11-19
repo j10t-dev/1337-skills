@@ -40,8 +40,9 @@ Dispatch 1337-skills:code-reviewer subagent to catch issues before they cascade.
 Use Task tool with 1337-skills:code-reviewer type, fill template at `code-reviewer.md`
 
 **3. Act on feedback:**
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
+- Fix Critical/Important issues
+- **Re-review after fixes** to verify they worked
+- Only proceed when no Critical/Important issues remain
 - Note Minor issues for later
 - Push back if reviewer is wrong (with reasoning)
 
@@ -63,9 +64,21 @@ You: Let me request code review before proceeding.
   Issues:
     Important: Missing progress indicators
     Minor: Magic number (100) for reporting interval
-  Assessment: Ready to proceed
+  Assessment: Ready with fixes
 
 You: [Fix progress indicators]
+
+[Dispatch code-reviewer again to verify fix]
+  WHAT_WAS_IMPLEMENTED: Fixed progress reporting
+  PLAN_OR_REQUIREMENTS: Task 2 from PLAN.md
+  FILES_CHANGED: src/index-verifier.ts,src/index-repairer.ts
+  DESCRIPTION: Verification of progress indicator fix
+
+[Subagent returns]:
+  Strengths: Progress reporting now working correctly
+  Issues: Minor: Magic number remains (acceptable)
+  Assessment: Ready to proceed
+
 [Continue to Task 3]
 ```
 
@@ -88,8 +101,10 @@ You: [Fix progress indicators]
 
 **Never:**
 - Skip review because "it's simple"
+- Skip re-review after fixing issues
 - Ignore Critical issues
-- Proceed with unfixed Important issues
+- Proceed with unfixed Critical/Important issues
+- Proceed without verifying fixes worked
 - Argue with valid technical feedback
 
 **If reviewer wrong:**

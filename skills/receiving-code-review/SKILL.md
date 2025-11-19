@@ -108,6 +108,7 @@ FOR multi-item feedback:
      - Complex fixes (refactoring, logic)
   3. Test each fix individually
   4. Verify no regressions
+  5. Request re-review to confirm fixes worked (especially for Critical/Important issues)
 ```
 
 ## When To Push Back
@@ -172,6 +173,7 @@ State the correction factually and move on.
 | Avoiding pushback | Technical correctness > comfort |
 | Partial implementation | Clarify all items first |
 | Can't verify, proceed anyway | State limitation, ask for direction |
+| Skipping re-review after fixes | Request re-review to verify fixes worked |
 
 ## Real Examples
 
