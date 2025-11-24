@@ -13,11 +13,16 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
-**Save plans to:** `PLAN.md` in the worktree root
+**Determine filenames from current branch:**
+- Get current branch: `git branch --show-current`
+- If on semantic branch (feat/*, fix/*, refactor/*, docs/*, chore/*):
+  - Design file: `docs/${branch//\//-}-DESIGN.md`
+  - Plan file: `docs/${branch//\//-}-PLAN.md`
+- If on main or non-semantic branch: Ask user for feature name and offer to create branch
 
-**File cleanup:** If PLAN.md or DESIGN.md already exist and are unchanged since last commit (check with `git diff --quiet <file>`), remove them. Write tool requires clean slate; files are safely in git history.
-
-**Before writing:** Read `DESIGN.md` to understand the architecture and design decisions. Include an architecture summary in PLAN.md header.
+**Before writing:**
+- Read design file to understand architecture and design decisions
+- Include architecture summary in plan header
 
 ## Plan Structure: Tasks and Subtasks
 
@@ -143,7 +148,7 @@ Expected: PASS
 
 After saving the plan, offer execution choice:
 
-**"Plan complete and saved to `PLAN.md`. Two execution options:**
+**"Plan complete and saved to `<plan-file>`. Two execution options:**
 
 **1. Subagent-Driven (this session)** - I dispatch fresh subagent per task, review between tasks, fast iteration
 

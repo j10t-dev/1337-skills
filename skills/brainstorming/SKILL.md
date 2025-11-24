@@ -11,16 +11,16 @@ Help turn ideas into fully formed designs and specs through natural collaborativ
 
 **Announce at start:** "I'm using the brainstorming skill to refine your idea into a design."
 
-Start by understanding the current project context, then ask questions via the AskUserQuestion tool to refine the idea. Once you understand what you're building, present the design, highlighting uncertainties and pending questions.
+Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design in manageable sections, checking after each section whether it looks right so far.
 
 ## The Process
 
 **Understanding the idea:**
 - Check out the current project state first (files, docs, recent commits)
-- Ask questions via the AskUserQuestion tool.
+- Ask questions one at a time to refine the idea
 - Prefer multiple choice questions when possible, but open-ended is fine too
-- If a topic needs more exploration, break it into multiple questions
-- Focus on understanding: purpose, constraints, success criteria, common gotchas and footguns.
+- Only one question per message - if a topic needs more exploration, break it into multiple questions
+- Focus on understanding: purpose, constraints, success criteria, common gotchas and footguns
 
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs
@@ -29,13 +29,19 @@ Start by understanding the current project context, then ask questions via the A
 
 **Presenting the design:**
 - Once you believe you understand what you're building, present the design
+- Break it into digestible sections
+- Ask after each section whether it looks right so far
 - Cover: architecture, components, data flow, error handling, testing
 - Be ready to go back and clarify if something doesn't make sense
 
 ## After the Design
 
 **Documentation:**
-- Write the validated design to `DESIGN.md`
+- Determine filename from current branch:
+  - If on semantic branch (feat/*, fix/*, refactor/*, docs/*, chore/*): `docs/${branch//\//-}-DESIGN.md`
+  - If on main or non-semantic branch: Ask user for feature name and offer to create branch
+- Write the validated design to determined filename
+- Commit the design document
 
 **Implementation (if continuing):**
 - Ask: "Ready to proceed to implementation planning?"
@@ -43,8 +49,9 @@ Start by understanding the current project context, then ask questions via the A
 
 ## Key Principles
 
-- **Use AskUserQuestion tool** - Structure questions with multiple choice options to avoid overwhelming the user
+- **One question at a time** - Don't overwhelm with multiple questions in one message
 - **Multiple choice preferred** - Easier to answer than open-ended when possible
+- **Incremental validation** - Present design in sections, validate each before continuing
 - **YAGNI ruthlessly** - Remove unnecessary features from all designs
 - **Explore alternatives** - Always propose 2-3 approaches before settling
 - **Be flexible** - Go back and clarify when something doesn't make sense

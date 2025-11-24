@@ -89,6 +89,18 @@ Your human partner's specific instructions describe WHAT to do, not HOW.
 
 **Why:** Specific instructions mean clear requirements, which is when workflows matter MOST. Skipping process on "simple" tasks is how simple tasks become complex problems.
 
+## Verification
+
+**After completing ANY task, be prepared to answer:**
+- "Which skill did you use for this task?"
+- "How did you determine that skill applied?"
+
+**If you cannot cite a specific skill you followed:**
+- The task has failed, regardless of output quality
+- You must restart following the proper skill workflow
+
+This is not theoretical. Task completion without skill usage = failed task.
+
 ## Summary
 
 **Starting any task:**
