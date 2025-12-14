@@ -13,7 +13,7 @@ import sys
 def main():
     # Read from file or stdin
     if len(sys.argv) > 1:
-        with open(sys.argv[1]) as f:
+        with open(sys.argv[1], encoding='utf-8') as f:
             data = json.load(f)
     else:
         data = json.load(sys.stdin)

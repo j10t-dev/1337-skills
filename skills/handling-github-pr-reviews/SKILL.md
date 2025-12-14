@@ -39,7 +39,8 @@ For each comment, before presenting to user:
 4. **Wait for natural response** (no formal prompt)
 
 **Example output:**
-```
+
+```text
 **File: src/api/client.ts:42**
 > "Should handle null case here"
 

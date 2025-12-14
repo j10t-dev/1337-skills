@@ -54,6 +54,7 @@ Options:
 Dispatch code-reviewer in auto-detect mode:
 ```
 Task tool (1337-skills:code-reviewer):
+  model: "opus"
   description: "Review branch completion"
   prompt: |
     You are reviewing code changes for production readiness.

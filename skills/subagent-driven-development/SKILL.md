@@ -42,7 +42,7 @@ For each task:
 **Dispatch fresh subagent:**
 ```
 Task tool (general-purpose):
-  model: "haiku"
+  model: "sonnet"
   description: "Implement Task N: [task name]"
   prompt: |
     You are implementing Task N from PLAN.md.
@@ -67,6 +67,7 @@ Task tool (general-purpose):
 **Dispatch code-reviewer subagent:**
 ```
 Task tool (1337-skills:code-reviewer):
+  model: "opus"
   Use template at requesting-code-review/code-reviewer.md
 
   WHAT_WAS_IMPLEMENTED: [from subagent's report]
@@ -92,7 +93,7 @@ Task tool (1337-skills:code-reviewer):
 **Dispatch fix subagent:**
 ```
 Task tool (general-purpose):
-  model: "haiku"
+  model: "sonnet"
   description: "Fix code review issues"
   prompt: |
     Fix these issues from code review:
@@ -106,6 +107,7 @@ Task tool (general-purpose):
 **After fix completes, re-review:**
 ```
 Task tool (1337-skills:code-reviewer):
+  model: "opus"
   Use same template as Step 3
 
   WHAT_WAS_IMPLEMENTED: Fixes for [list issues]
