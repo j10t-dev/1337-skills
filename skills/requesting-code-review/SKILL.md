@@ -37,7 +37,7 @@ Dispatch 1337-skills:code-reviewer subagent to catch issues before they cascade.
 
 **2. Dispatch code-reviewer subagent:**
 
-Use Task tool with 1337-skills:code-reviewer type, fill template at `code-reviewer.md`
+Use Task tool with 1337-skills:code-reviewer type, model: "opus", fill template at `code-reviewer.md`
 
 **3. Act on feedback:**
 - Fix Critical/Important issues
