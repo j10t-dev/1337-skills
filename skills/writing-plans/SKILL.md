@@ -16,8 +16,8 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 **Determine filenames from current branch:**
 - Get current branch: `git branch --show-current`
 - If on semantic branch (feat/*, fix/*, refactor/*, docs/*, chore/*):
-  - Design file: `docs/${branch//\//-}-DESIGN.md`
-  - Plan file: `docs/${branch//\//-}-PLAN.md`
+  - Design file: `.claude/plans/${branch//\//-}-DESIGN.md`
+  - Plan file: `.claude/plans/${branch//\//-}-PLAN.md`
 - If on main or non-semantic branch: Ask user for feature name and offer to create branch
 
 **Before writing:**

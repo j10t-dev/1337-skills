@@ -16,7 +16,7 @@ Load plan, review critically, execute all tasks, report completion.
 ## The Process
 
 ### Step 1: Load and Review Plan
-1. Read PLAN.md
+1. Find plan file in `.claude/plans/` (named `${branch}-PLAN.md`)
 2. Note which skills to use from "Skills to Use:" section
 3. Check for any blockers or ambiguities that prevent starting
 4. If blockers: Ask specific questions using the AskUserQuestion tool before starting

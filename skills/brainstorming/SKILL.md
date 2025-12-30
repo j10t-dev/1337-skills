@@ -38,7 +38,7 @@ Start by understanding the current project context, then ask questions one at a 
 
 **Documentation:**
 - Determine filename from current branch:
-  - If on semantic branch (feat/*, fix/*, refactor/*, docs/*, chore/*): `docs/${branch//\//-}-DESIGN.md`
+  - If on semantic branch (feat/*, fix/*, refactor/*, docs/*, chore/*): `.claude/plans/${branch//\//-}-DESIGN.md`
   - If on main or non-semantic branch: Ask user for feature name and offer to create branch
 - Write the validated design to determined filename
 - Commit the design document
