@@ -21,6 +21,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 - If on main or non-semantic branch: Ask user for feature name and offer to create branch
 
 **Before writing:**
+- Create `.claude/plans/` directory if it doesn't exist
 - Read design file to understand architecture and design decisions
 - Include architecture summary in plan header
 
