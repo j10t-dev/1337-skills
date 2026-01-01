@@ -1,27 +1,22 @@
----
-name: testing-anti-patterns
-description: Use when writing or changing tests, adding mocks, or tempted to add test-only methods to production code - prevents testing mock behavior, production pollution with test-only methods, and mocking without understanding dependencies
----
-
 # Testing Anti-Patterns
 
 ## Overview
 
-Tests must verify real behavior, not mock behavior. Mocks are a means to isolate and provide necessary dependencies, not the thing being tested.
+Tests must verify real behaviour, not mock behaviour. Mocks are a means to isolate and provide necessary dependencies, not the thing being tested.
 
-**Core principle:** Test what the code does, not your mock configuration. 
+**Core principle:** Test what the code does, not your mock configuration.
 
 **Following strict TDD prevents these anti-patterns.**
 
 ## The Iron Laws
 
 ```
-1. NEVER test mock behavior
+1. NEVER test mock behaviour
 2. NEVER add test-only methods to production classes
 3. NEVER mock without understanding dependencies
 ```
 
-## Anti-Pattern 1: Testing Mock Behavior
+## Anti-Pattern 1: Testing Mock Behaviour
 
 **The violation:**
 ```typescript
@@ -35,9 +30,9 @@ test('renders sidebar', () => {
 **Why this is wrong:**
 - You're verifying the mock works, not that the component works
 - Test passes when mock is present, fails when it's not
-- Tells you nothing about real behavior
+- Tells you nothing about real behaviour
 
-**your human partner's correction:** "Are we testing the behavior of a mock?"
+**Your human partner's correction:** "Are we testing the behaviour of a mock?"
 
 **The fix:**
 ```typescript
@@ -48,19 +43,19 @@ test('renders sidebar', () => {
 });
 
 // OR if sidebar must be mocked for isolation:
-// Don't assert on the mock - test Page's behavior with sidebar present
+// Don't assert on the mock - test Page's behaviour with sidebar present
 ```
 
 ### Gate Function
 
 ```
 BEFORE asserting on any mock element:
-  Ask: "Am I testing real component behavior or just mock existence?"
+  Ask: "Am I testing real component behaviour or just mock existence?"
 
   IF testing mock existence:
     STOP - Delete the assertion or unmock the component
 
-  Test real behavior instead
+  Test real behaviour instead
 ```
 
 ## Anti-Pattern 2: Test-Only Methods in Production
@@ -136,14 +131,14 @@ test('detects duplicate server', () => {
 
 **Why this is wrong:**
 - Mocked method had side effect test depended on (writing config)
-- Over-mocking to "be safe" breaks actual behavior
+- Over-mocking to "be safe" breaks actual behaviour
 - Test passes for wrong reason or fails mysteriously
 
 **The fix:**
 ```typescript
 // ✅ GOOD: Mock at correct level
 test('detects duplicate server', () => {
-  // Mock the slow part, preserve behavior test needs
+  // Mock the slow part, preserve behaviour test needs
   vi.mock('MCPServerManager'); // Just mock slow server startup
 
   await addServer(config);  // Config written
@@ -163,7 +158,7 @@ BEFORE mocking any method:
 
   IF depends on side effects:
     Mock at lower level (the actual slow/external operation)
-    OR use test doubles that preserve necessary behavior
+    OR use test doubles that preserve necessary behaviour
     NOT the high-level method the test depends on
 
   IF unsure what test depends on:
@@ -195,7 +190,7 @@ const mockResponse = {
 - **Partial mocks hide structural assumptions** - You only mocked fields you know about
 - **Downstream code may depend on fields you didn't include** - Silent failures
 - **Tests pass but integration fails** - Mock incomplete, real API complete
-- **False confidence** - Test proves nothing about real behavior
+- **False confidence** - Test proves nothing about real behaviour
 
 **The Iron Rule:** Mock the COMPLETE data structure as it exists in reality, not just fields your immediate test uses.
 
@@ -259,7 +254,7 @@ TDD cycle:
 - Mocks missing methods real components have
 - Test breaks when mock changes
 
-**your human partner's question:** "Do we need to be using a mock here?"
+**Your human partner's question:** "Do we need to be using a mock here?"
 
 **Consider:** Integration tests with real components often simpler than complex mocks
 
@@ -267,11 +262,11 @@ TDD cycle:
 
 **Why TDD helps:**
 1. **Write test first** → Forces you to think about what you're actually testing
-2. **Watch it fail** → Confirms test tests real behavior, not mocks
+2. **Watch it fail** → Confirms test tests real behaviour, not mocks
 3. **Minimal implementation** → No test-only methods creep in
 4. **Real dependencies** → You see what the test actually needs before mocking
 
-**If you're testing mock behavior, you violated TDD** - you added mocks without watching test fail against real code first.
+**If you're testing mock behaviour, you violated TDD** - you added mocks without watching test fail against real code first.
 
 ## Quick Reference
 
@@ -297,6 +292,6 @@ TDD cycle:
 
 **Mocks are tools to isolate, not things to test.**
 
-If TDD reveals you're testing mock behavior, you've gone wrong.
+If TDD reveals you're testing mock behaviour, you've gone wrong.
 
-Fix: Test real behavior or question why you're mocking at all.
+Fix: Test real behaviour or question why you're mocking at all.

@@ -1,8 +1,3 @@
----
-name: root-cause-tracing
-description: Use when errors occur deep in execution and you need to trace back to find the original trigger - systematically traces bugs backward through call stack, adding instrumentation when needed, to identify source of invalid data or incorrect behavior
----
-
 # Root Cause Tracing
 
 ## Overview
@@ -94,7 +89,7 @@ async function gitInit(directory: string) {
 npm test 2>&1 | grep 'DEBUG git init'
 ```
 
-**Analyze stack traces:**
+**Analyse stack traces:**
 - Look for test file names
 - Find the line number triggering the call
 - Identify the pattern (same test? same parameter?)
@@ -103,7 +98,7 @@ npm test 2>&1 | grep 'DEBUG git init'
 
 If something appears during tests but you don't know which test:
 
-Use the bisection script: @find-polluter.sh
+Use the bisection script: `./find-polluter.sh`
 
 ```bash
 ./find-polluter.sh '.git' 'src/**/*.test.ts'
@@ -122,7 +117,7 @@ Runs tests one-by-one, stops at first polluter. See script for usage.
 4. Test accessed `context.tempDir` before beforeEach
 5. setupCoreTest() returns `{ tempDir: '' }` initially
 
-**Root cause:** Top-level variable initialization accessing empty value
+**Root cause:** Top-level variable initialisation accessing empty value
 
 **Fix:** Made tempDir a getter that throws if accessed before beforeEach
 
@@ -178,4 +173,3 @@ digraph principle {
 **Before operation:** Log before the dangerous operation, not after it fails
 **Include context:** Directory, cwd, environment variables, timestamps
 **Capture stack:** `new Error().stack` shows complete call chain
-

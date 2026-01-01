@@ -22,7 +22,7 @@ gh api graphql -f query='{ repository(owner:"{owner}",name:"{repo}") { pullReque
 ### 2. Extract Issues
 
 ```bash
-python3 ~/.claude/skills/handling-github-pr-reviews/extract-pr-issues.py /tmp/pr_comments.json
+python3 ~/.claude/plugins/local/1337-skills/skills/handling-github-pr-reviews/extract-pr-issues.py /tmp/pr_comments.json
 ```
 
 ### 3. Self-Evaluate Each Comment

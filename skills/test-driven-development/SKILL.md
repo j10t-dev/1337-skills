@@ -359,9 +359,16 @@ Otherwise → not TDD
 
 No exceptions without your human partner's permission.
 
+## Supporting Reference
+
+See `testing-anti-patterns.md` in this directory for common testing mistakes:
+- Testing mock behaviour instead of real behaviour
+- Adding test-only methods to production classes
+- Mocking without understanding dependencies
+- Incomplete mocks that hide structural assumptions
+
 ## Integration with Other Skills
 
 **Complementary skills:**
-- **verification-before-completion** - Verify tests pass before claiming complete
-- **systematic-debugging** - Bug fixes require TDD cycle
-- **testing-anti-patterns** - What NOT to do in tests
+- **1337-skills:verification-before-completion** - Verify tests pass before claiming complete
+- **1337-skills:systematic-debugging** - Bug fixes require TDD cycle

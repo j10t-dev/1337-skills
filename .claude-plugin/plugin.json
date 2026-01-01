@@ -1,7 +1,7 @@
 {
   "name": "1337-skills",
   "description": "Forked skills library for evolving Claude Code thinking patterns: TDD, debugging, collaboration, and custom workflows",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "j10t-dev",
     "email": "j10t@j10t.dev"

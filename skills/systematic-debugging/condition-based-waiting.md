@@ -1,8 +1,3 @@
----
-name: condition-based-waiting
-description: Use when tests have race conditions, timing dependencies, or inconsistent pass/fail behavior - replaces arbitrary timeouts with condition polling to wait for actual state changes, eliminating flaky tests from timing guesses
----
-
 # Condition-Based Waiting
 
 ## Overview
@@ -16,13 +11,13 @@ Flaky tests often guess at timing with arbitrary delays. This creates race condi
 ```dot
 digraph when_to_use {
     "Test uses setTimeout/sleep?" [shape=diamond];
-    "Testing timing behavior?" [shape=diamond];
+    "Testing timing behaviour?" [shape=diamond];
     "Document WHY timeout needed" [shape=box];
     "Use condition-based waiting" [shape=box];
 
-    "Test uses setTimeout/sleep?" -> "Testing timing behavior?" [label="yes"];
-    "Testing timing behavior?" -> "Document WHY timeout needed" [label="yes"];
-    "Testing timing behavior?" -> "Use condition-based waiting" [label="no"];
+    "Test uses setTimeout/sleep?" -> "Testing timing behaviour?" [label="yes"];
+    "Testing timing behaviour?" -> "Document WHY timeout needed" [label="yes"];
+    "Testing timing behaviour?" -> "Use condition-based waiting" [label="no"];
 }
 ```
 
@@ -33,7 +28,7 @@ digraph when_to_use {
 - Waiting for async operations to complete
 
 **Don't use when:**
-- Testing actual timing behavior (debounce, throttle intervals)
+- Testing actual timing behaviour (debounce, throttle intervals)
 - Always document WHY if using arbitrary timeout
 
 ## Core Pattern
@@ -84,7 +79,7 @@ async function waitFor<T>(
 }
 ```
 
-See @example.ts for complete implementation with domain-specific helpers (`waitForEvent`, `waitForEventCount`, `waitForEventMatch`) from actual debugging session.
+See `./condition-based-waiting-example.ts` for complete implementation with domain-specific helpers (`waitForEvent`, `waitForEventCount`, `waitForEventMatch`) from actual debugging session.
 
 ## Common Mistakes
 
@@ -102,7 +97,7 @@ See @example.ts for complete implementation with domain-specific helpers (`waitF
 ```typescript
 // Tool ticks every 100ms - need 2 ticks to verify partial output
 await waitForEvent(manager, 'TOOL_STARTED'); // First: wait for condition
-await new Promise(r => setTimeout(r, 200));   // Then: wait for timed behavior
+await new Promise(r => setTimeout(r, 200));   // Then: wait for timed behaviour
 // 200ms = 2 ticks at 100ms intervals - documented and justified
 ```
 
@@ -123,4 +118,3 @@ await new Promise(r => setTimeout(r, 200));   // Then: wait for timed behavior
 - Poll for the condition you're actually waiting for
 - Document why timing-based waits are needed (if unavoidable)
 - Use condition checks as primary strategy
-

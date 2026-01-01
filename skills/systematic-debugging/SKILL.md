@@ -113,7 +113,7 @@ You MUST complete each phase before proceeding to the next.
 
    **WHEN error is deep in call stack:**
 
-   **REQUIRED SUB-SKILL:** Use 1337-skills:root-cause-tracing for backward tracing technique
+   See `root-cause-tracing.md` in this directory for the complete backward tracing technique.
 
    **Quick version:**
    - Where does bad value originate?
@@ -178,7 +178,7 @@ You MUST complete each phase before proceeding to the next.
    - Automated test if possible
    - One-off test script if no framework
    - MUST have before fixing
-   - **REQUIRED SUB-SKILL:** Use 1337-skills:test-driven-development for writing proper failing tests
+   - Use the `1337-skills:test-driven-development` skill for writing proper failing tests
 
 2. **Implement Single Fix**
    - Address the root cause identified
@@ -277,16 +277,23 @@ If systematic investigation reveals issue is truly environmental, timing-depende
 
 **But:** 95% of "no root cause" cases are incomplete investigation.
 
+## Supporting Techniques
+
+These techniques are part of systematic debugging and available in this directory:
+
+- **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
+- **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
+- **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
+- **`find-polluter.sh`** - Bisection script to find which test creates pollution
+- **`condition-based-waiting-example.ts`** - Complete implementation from real debugging session
+
 ## Integration with Other Skills
 
-**This skill requires using:**
-- **root-cause-tracing** - REQUIRED when error is deep in call stack (see Phase 1, Step 5)
-- **test-driven-development** - REQUIRED for creating failing test case (see Phase 4, Step 1)
+**Required skills:**
+- **1337-skills:test-driven-development** - For creating failing test case (Phase 4, Step 1)
 
 **Complementary skills:**
-- **defense-in-depth** - Add validation at multiple layers after finding root cause
-- **condition-based-waiting** - Replace arbitrary timeouts identified in Phase 2
-- **verification-before-completion** - Verify fix worked before claiming success
+- **1337-skills:verification-before-completion** - Verify fix worked before claiming success
 
 ## Real-World Impact
 
