@@ -42,7 +42,7 @@ Start by understanding the current project context, then ask questions one at a 
   - If on main or non-semantic branch: Ask user for feature name and offer to create branch
 - Create `.claude/plans/` directory if it doesn't exist
 - Write the validated design to determined filename
-- Commit the design document
+- Do not commit the design document
 
 **Implementation (if continuing):**
 - Ask: "Ready to proceed to implementation planning?"

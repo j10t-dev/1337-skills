@@ -9,6 +9,26 @@ Process PR review feedback: fetch → self-evaluate → iterate → fix → repl
 
 ## Workflow
 
+### 0. Validate Branch & PR Match
+
+Before any PR operations, verify you're on the correct branch:
+
+```bash
+# If PR number provided, validate it matches current branch
+current_branch=$(git branch --show-current)
+pr_branch=$(gh pr view {N} --json headRefName -q '.headRefName')
+
+if [[ "$current_branch" != "$pr_branch" ]]; then
+    echo "ERROR: PR #{N} is for branch '$pr_branch' but you're on '$current_branch'"
+    # Stop and clarify with user before proceeding
+fi
+
+# If no PR number provided, auto-detect from current branch
+gh pr view --json number -q '.number'
+```
+
+**Never skip this step.** Wrong-PR errors waste significant time.
+
 ### 1. Fetch Comments
 
 ```bash
@@ -76,6 +96,8 @@ Repeat steps 3-6 for each comment. No summary comment at the end.
 
 | Task | Command |
 |------|---------|
+| Validate PR branch | `gh pr view {N} --json headRefName -q '.headRefName'` |
+| Auto-detect PR | `gh pr view --json number -q '.number'` |
 | Line comments | `gh api repos/{o}/{r}/pulls/{N}/comments --paginate` |
 | Reply to comment | `gh api repos/{o}/{r}/pulls/{N}/comments/{id}/replies -f body="..."` |
 | Resolve thread | GraphQL `resolveReviewThread` mutation |

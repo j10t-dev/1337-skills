@@ -82,11 +82,9 @@ Task tool (1337-skills:code-reviewer):
 Inform user:
 ```
 Work complete, all tests passing.
-
-Ready for your git workflow (commit, PR, merge, etc).
 ```
 
-**Do not perform git operations** - user controls commits and merges.
+**Do not perform git operations** (commit, push, PR, merge) - user controls all git workflow.
 
 ## Common Mistakes
 

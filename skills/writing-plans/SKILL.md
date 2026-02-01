@@ -147,7 +147,7 @@ Expected: PASS
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+**Do not git add or commit the plan.** Proceed directly to offering execution choice:
 
 **"Plan complete and saved to `<plan-file>`. Two execution options:**
 

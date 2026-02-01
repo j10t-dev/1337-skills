@@ -103,10 +103,10 @@ Output:
 
 ### With brainstorming
 
-After design doc is committed, suggest worktree creation:
+After design doc is saved, suggest worktree creation:
 
 ```
-Design committed to .claude/plans/feat-user-auth-DESIGN.md
+Design saved to .claude/plans/feat-user-auth-DESIGN.md
 
 Ready to create isolated worktree? Run:
   /worktree feat/user-auth

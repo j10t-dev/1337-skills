@@ -323,14 +323,14 @@ Find the "After the Design" section and update to include worktree suggestion:
   - If on main or non-semantic branch: Ask user for feature name and offer to create branch
 - Create `.claude/plans/` directory if it doesn't exist
 - Write the validated design to determined filename
-- Commit the design document
+- Do not commit the design document
 
 **Next Steps (offer choices):**
 
-After committing the design, present options:
+After saving the design, present options:
 
 ```
-Design committed to .claude/plans/<filename>-DESIGN.md
+Design saved to .claude/plans/<filename>-DESIGN.md
 
 Ready to create isolated worktree? Run:
   /worktree <branch-name>
@@ -350,36 +350,19 @@ Expected: Shows updated section with worktree suggestion
 
 ---
 
-## Task 4: Commit and Verify
+## Task 4: Verify
+
+**Do not commit.** User controls all git operations.
 
 **Files:**
 - All files created/modified in Tasks 1-3
 
-### Subtask 4.1: Commit changes
+### Subtask 4.1: Verify files exist
 
-**Step 1:** Check git status
+**Step 1:** Check all expected files are present
 
 Run: `git status`
-Expected: Shows new/modified files
-
-**Step 2:** Stage and commit
-
-Run:
-```bash
-git add commands/worktree.md skills/using-git-worktrees/ .claude-plugin/plugin.json skills/brainstorming/SKILL.md
-git commit -m "feat: add git worktree management
-
-- Add /worktree command (create/remove/list)
-- Add using-git-worktrees skill
-- Update brainstorming to suggest worktree after design
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
-```
-
-**Step 3:** Verify commit
-
-Run: `git log -1 --stat`
-Expected: Shows commit with all files
+Expected: Shows new/modified files from Tasks 1-3
 
 ### Subtask 4.2: Manual verification (user)
 
