@@ -41,8 +41,12 @@ gh api graphql -f query='{ repository(owner:"{owner}",name:"{repo}") { pullReque
 
 ### 2. Extract Issues
 
+Use `extract-pr-issues.py` (in this skill's directory) to parse comments:
+
 ```bash
-python3 ~/.claude/skills/1337-skills/handling-github-pr-reviews/extract-pr-issues.py /tmp/pr_comments.json
+python3 extract-pr-issues.py /tmp/pr_comments.json
+# Or pipe directly:
+gh api repos/{owner}/{repo}/pulls/{N}/comments --paginate | python3 extract-pr-issues.py
 ```
 
 ### 3. Self-Evaluate Each Comment
