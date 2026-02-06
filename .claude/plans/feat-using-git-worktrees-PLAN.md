@@ -1,6 +1,6 @@
 # Using Git Worktrees - Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use 1337-skills:executing-plans to implement this plan task-by-task.
+> **For Claude:** REQUIRED SUB-SKILL: Use executing-plans to implement this plan task-by-task.
 
 **Goal:** Add git worktree management to 1337-skills via `/worktree` slash command and supporting skill.
 
@@ -9,9 +9,9 @@
 **Tech Stack:** Claude Code plugin commands (Markdown), git worktree, Bash
 
 **Skills to Use:**
-- 1337-skills:test-driven-development
-- 1337-skills:writing-skills
-- 1337-skills:verification-before-completion
+- test-driven-development
+- writing-skills
+- verification-before-completion
 
 **Required Files:**
 - @.claude/plans/feat-using-git-worktrees-DESIGN.md
@@ -104,7 +104,7 @@ List all worktrees for current project.
 
 ## Otherwise (create new worktree)
 
-The argument is a branch name like `feat/user-auth`. Use the `1337-skills:using-git-worktrees` skill to create the worktree.
+The argument is a branch name like `feat/user-auth`. Use the `using-git-worktrees` skill to create the worktree.
 
 **REQUIRED:** Invoke the skill with the branch name provided as $1.
 ```
@@ -340,7 +340,7 @@ Or continue here to implementation planning.
 
 **Implementation (if continuing in same session):**
 - Ask: "Ready to proceed to implementation planning?"
-- **REQUIRED SUB-SKILL:** Use 1337-skills:writing-plans to create detailed implementation plan
+- **REQUIRED SUB-SKILL:** Use writing-plans to create detailed implementation plan
 ```
 
 **Step 3:** Verify change was made

@@ -1,6 +1,6 @@
 ---
 name: handling-github-pr-reviews
-description: Use when user asks to review, respond to, or resolve GitHub PR comments - fetches reviews via gh CLI, self-evaluates each comment, iterates with user, resolves threads with per-thread replies
+description: Use when user asks to review, respond to, or resolve GitHub PR comments
 ---
 
 # Handling GitHub PR Reviews
@@ -42,7 +42,7 @@ gh api graphql -f query='{ repository(owner:"{owner}",name:"{repo}") { pullReque
 ### 2. Extract Issues
 
 ```bash
-python3 ~/.claude/plugins/local/1337-skills/skills/handling-github-pr-reviews/extract-pr-issues.py /tmp/pr_comments.json
+python3 ~/.claude/skills/1337-skills/handling-github-pr-reviews/extract-pr-issues.py /tmp/pr_comments.json
 ```
 
 ### 3. Self-Evaluate Each Comment

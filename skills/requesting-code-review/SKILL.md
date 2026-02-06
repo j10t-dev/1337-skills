@@ -1,11 +1,11 @@
 ---
 name: requesting-code-review
-description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements - dispatches 1337-skills:code-reviewer subagent to review implementation against plan or requirements before proceeding
+description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
 ---
 
 # Requesting Code Review
 
-Dispatch 1337-skills:code-reviewer subagent to catch issues before they cascade.
+Dispatch code-reviewer subagent to catch issues before they cascade.
 
 **Core principle:** Review early, review often.
 
@@ -37,7 +37,7 @@ Dispatch 1337-skills:code-reviewer subagent to catch issues before they cascade.
 
 **2. Dispatch code-reviewer subagent:**
 
-Use Task tool with 1337-skills:code-reviewer type, model: "opus", fill template at `code-reviewer.md`
+Use Task tool with code-reviewer type, model: "opus", fill template at `code-reviewer.md`
 
 **3. Act on feedback:**
 - Fix Critical/Important issues
@@ -53,7 +53,7 @@ Use Task tool with 1337-skills:code-reviewer type, model: "opus", fill template 
 
 You: Let me request code review before proceeding.
 
-[Dispatch 1337-skills:code-reviewer subagent]
+[Dispatch code-reviewer subagent]
   WHAT_WAS_IMPLEMENTED: Verification and repair functions for conversation index
   PLAN_OR_REQUIREMENTS: Task 2 from PLAN.md
   FILES_CHANGED: src/index-verifier.ts,src/index-repairer.ts

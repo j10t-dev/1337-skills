@@ -13,7 +13,7 @@ A forked and evolving skills library for Claude Code - iterating towards custom 
 - **Meta Skills** - Creating, testing, and sharing skills
 
 Plus:
-- **Slash Commands** - `/1337-skills:brainstorm`, `/1337-skills:write-plan`, `/1337-skills:execute-plan`
+- **Slash Commands** - `/brainstorm`, `/write-plan`, `/execute-plan`
 - **Automatic Integration** - Skills activate automatically when relevant
 - **Evolving Workflows** - Customize and iterate towards your preferred patterns
 
@@ -38,9 +38,9 @@ Check that commands appear:
 
 ```
 # Should see:
-# /1337-skills:brainstorm - Interactive design refinement
-# /1337-skills:write-plan - Create implementation plan
-# /1337-skills:execute-plan - Execute plan in batches
+# /brainstorm - Interactive design refinement
+# /write-plan - Create implementation plan
+# /execute-plan - Execute plan in batches
 ```
 
 ## Quick Start
@@ -49,17 +49,17 @@ Check that commands appear:
 
 **Brainstorm a design:**
 ```
-/1337-skills:brainstorm
+/brainstorm
 ```
 
 **Create an implementation plan:**
 ```
-/1337-skills:write-plan
+/write-plan
 ```
 
 **Execute the plan:**
 ```
-/1337-skills:execute-plan
+/execute-plan
 ```
 
 ### Automatic Skill Activation

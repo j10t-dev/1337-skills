@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use when implementing any feature or bugfix, before writing implementation code - write the test first, watch it fail, write minimal code to pass; ensures tests actually verify behavior by requiring failure first
+description: Use when implementing any feature or bugfix, before writing implementation code
 ---
 
 # Test-Driven Development (TDD)
@@ -370,5 +370,5 @@ See `testing-anti-patterns.md` in this directory for common testing mistakes:
 ## Integration with Other Skills
 
 **Complementary skills:**
-- **1337-skills:verification-before-completion** - Verify tests pass before claiming complete
-- **1337-skills:systematic-debugging** - Bug fixes require TDD cycle
+- **verification-before-completion** - Verify tests pass before claiming complete
+- **systematic-debugging** - Bug fixes require TDD cycle
