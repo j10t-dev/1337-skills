@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: Use when creating or developing, before writing code or implementation plans - refines rough ideas into fully-formed designs through collaborative questioning, alternative exploration, and incremental validation. Don't use during clear 'mechanical' processes
+description: Use when creating or developing, before writing code or implementation plans. Not for clear 'mechanical' processes
 ---
 
 # Brainstorming Ideas Into Designs
@@ -46,7 +46,7 @@ Start by understanding the current project context, then ask questions one at a 
 
 **Implementation (if continuing):**
 - Ask: "Ready to proceed to implementation planning?"
-- **REQUIRED SUB-SKILL:** Use 1337-skills:writing-plans to create detailed implementation plan
+- **REQUIRED SUB-SKILL:** Use writing-plans to create detailed implementation plan
 
 ## Key Principles
 

@@ -1,6 +1,6 @@
 ---
 name: finishing-a-development-branch
-description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup
+description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work
 ---
 
 # Finishing a Development Branch
@@ -53,7 +53,7 @@ Options:
 
 Dispatch code-reviewer in auto-detect mode:
 ```
-Task tool (1337-skills:code-reviewer):
+Task tool (code-reviewer):
   model: "opus"
   description: "Review branch completion"
   prompt: |

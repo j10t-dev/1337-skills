@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes - four-phase framework (root cause investigation, pattern analysis, hypothesis testing, implementation) that ensures understanding before attempting solutions
+description: Use when encountering any bug, test failure, or unexpected behaviour, before proposing fixes
 ---
 
 # Systematic Debugging
@@ -178,7 +178,7 @@ You MUST complete each phase before proceeding to the next.
    - Automated test if possible
    - One-off test script if no framework
    - MUST have before fixing
-   - Use the `1337-skills:test-driven-development` skill for writing proper failing tests
+   - Use the `test-driven-development` skill for writing proper failing tests
 
 2. **Implement Single Fix**
    - Address the root cause identified
@@ -290,10 +290,10 @@ These techniques are part of systematic debugging and available in this director
 ## Integration with Other Skills
 
 **Required skills:**
-- **1337-skills:test-driven-development** - For creating failing test case (Phase 4, Step 1)
+- **test-driven-development** - For creating failing test case (Phase 4, Step 1)
 
 **Complementary skills:**
-- **1337-skills:verification-before-completion** - Verify fix worked before claiming success
+- **verification-before-completion** - Verify fix worked before claiming success
 
 ## Real-World Impact
 

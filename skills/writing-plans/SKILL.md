@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Use when design is complete and you need detailed implementation tasks for engineers with zero codebase context - creates comprehensive implementation plans with exact file paths, complete code examples, and verification steps assuming engineer has minimal domain knowledge
+description: Use when design is complete and you need detailed implementation tasks
 ---
 
 # Writing Plans
@@ -77,7 +77,7 @@ Consider multiple factors when defining Task boundaries:
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use 1337-skills:executing-plans to implement this plan task-by-task.
+> **For Claude:** REQUIRED SUB-SKILL: Use executing-plans to implement this plan task-by-task.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -86,8 +86,8 @@ Consider multiple factors when defining Task boundaries:
 **Tech Stack:** [Key technologies/libraries]
 
 **Skills to Use:**
-- 1337-skills:test-driven-development
-- 1337-skills:verification-before-completion
+- test-driven-development
+- verification-before-completion
 - [Other relevant skills]
 
 **Required Files:** (executor will auto-read these)
@@ -158,10 +158,10 @@ Expected: PASS
 **Which approach?"**
 
 **If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use 1337-skills:subagent-driven-development
+- **REQUIRED SUB-SKILL:** Use subagent-driven-development
 - Stay in this session
 - Fresh subagent per task + code review
 
 **If Parallel Session chosen:**
 - Guide them to open new session in worktree
-- **REQUIRED SUB-SKILL:** New session uses 1337-skills:executing-plans
+- **REQUIRED SUB-SKILL:** New session uses executing-plans
