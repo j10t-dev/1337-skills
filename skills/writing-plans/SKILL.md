@@ -18,7 +18,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 - If on semantic branch (feat/*, fix/*, refactor/*, docs/*, chore/*):
   - Design file: `.claude/plans/${branch//\//-}-DESIGN.md`
   - Plan file: `.claude/plans/${branch//\//-}-PLAN.md`
-- If on main or non-semantic branch: Ask user for feature name and offer to create branch
+- If on main or non-semantic branch: Ask user for feature name and offer to create branch with `gt create <branch-name>`
 
 **Before writing:**
 - Create `.claude/plans/` directory if it doesn't exist

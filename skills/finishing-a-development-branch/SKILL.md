@@ -84,12 +84,12 @@ Inform user:
 Work complete, all tests passing.
 ```
 
-**Do not perform git operations** (commit, push, PR, merge) - user controls all git workflow.
+**Do not perform git operations** (commit, push, submit, merge) - user controls all git workflow. When the user is ready to submit, prefer Graphite (`gt submit`) over `gh pr create`.
 
 ## Common Mistakes
 
 **Skipping test verification**
-- **Problem:** Merge broken code, create failing PR
+- **Problem:** Merge broken code, submit a failing PR
 - **Fix:** Always verify tests before offering options
 
 **Open-ended questions**

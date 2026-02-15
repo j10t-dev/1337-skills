@@ -116,7 +116,7 @@ Skip any step = lying, not verifying
 - ANY variation of success/completion claims
 - ANY expression of satisfaction
 - ANY positive statement about work state
-- Committing, PR creation, task completion
+- Committing, PR submission (`gt submit`), task completion
 - Moving to next task
 - Delegating to agents
 

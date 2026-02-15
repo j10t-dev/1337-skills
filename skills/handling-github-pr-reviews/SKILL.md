@@ -24,6 +24,9 @@ if [[ "$current_branch" != "$pr_branch" ]]; then
 fi
 
 # If no PR number provided, auto-detect from current branch
+# Prefer gt if available (Graphite tracks PR associations):
+gt log short  # shows current stack with PR numbers
+# Fallback:
 gh pr view --json number -q '.number'
 ```
 
@@ -101,7 +104,8 @@ Repeat steps 3-6 for each comment. No summary comment at the end.
 | Task | Command |
 |------|---------|
 | Validate PR branch | `gh pr view {N} --json headRefName -q '.headRefName'` |
-| Auto-detect PR | `gh pr view --json number -q '.number'` |
+| Auto-detect PR (Graphite) | `gt log short` |
+| Auto-detect PR (fallback) | `gh pr view --json number -q '.number'` |
 | Line comments | `gh api repos/{o}/{r}/pulls/{N}/comments --paginate` |
 | Reply to comment | `gh api repos/{o}/{r}/pulls/{N}/comments/{id}/replies -f body="..."` |
 | Resolve thread | GraphQL `resolveReviewThread` mutation |
