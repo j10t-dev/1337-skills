@@ -145,6 +145,13 @@ Expected: PASS
 - Reference relevant skills with @ syntax
 - DRY, YAGNI, TDD
 
+## Plan Review (before sharing with user)
+
+- Dispatch a plan-reviewer subagent using the template in `plan-document-reviewer-prompt.md`
+- Pass both the PLAN.md and DESIGN.md file paths so the reviewer can cross-reference
+- If issues found: fix them, re-dispatch (max 3 iterations)
+- Only present the plan to the user once the reviewer approves or iterations are exhausted
+
 ## Execution Handoff
 
 **Do not git add or commit the plan.** Proceed directly to offering execution choice:

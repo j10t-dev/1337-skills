@@ -9,9 +9,10 @@ Execute plan by dispatching fresh subagent per task, with two-stage review after
 
 **Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
 
-**REQUIRED MODELS:**
-- Implementation/fix subagents: **Sonnet**
-- Review subagents: **Opus**
+**Model selection by task complexity:**
+- Mechanical tasks (rename, move, boilerplate, simple CRUD): cheapest available model
+- Standard implementation (feature work, integration, tests): standard model
+- Architecture decisions, complex review, debugging: most capable model
 
 ## When to Use
 
@@ -85,6 +86,24 @@ digraph process {
     "Dispatch final code reviewer subagent for entire implementation" -> "Use finishing-a-development-branch";
 }
 ```
+
+## Handling Implementer Status
+
+Implementer subagents report one of four statuses. Handle each appropriately:
+
+**DONE:** Proceed to spec compliance review.
+
+**DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
+
+**NEEDS_CONTEXT:** The implementer needs information that wasn't provided. Provide the missing context and re-dispatch.
+
+**BLOCKED:** The implementer cannot complete the task. Assess the blocker:
+1. If it's a context problem, provide more context and re-dispatch with the same model
+2. If the task requires more reasoning, re-dispatch with a more capable model
+3. If the task is too large, break it into smaller pieces
+4. If the plan itself is wrong, escalate to the human
+
+**Never** ignore an escalation or force the same model to retry without changes. If the implementer said it's stuck, something needs to change.
 
 ## Prompt Templates
 

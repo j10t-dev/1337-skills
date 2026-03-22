@@ -3,6 +3,10 @@ name: using-skills
 description: Use when starting any conversation
 ---
 
+<SUBAGENT-STOP>
+If you were dispatched as a subagent for a specific task (implementation, review, etc.), STOP HERE. Do not activate the skill workflow. Execute your assigned task directly.
+</SUBAGENT-STOP>
+
 <EXTREMELY-IMPORTANT>
 If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
 
@@ -14,6 +18,8 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 ## How to Access Skills
 
 **In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.
+
+**In Codex:** Skills load natively via `~/.agents/skills/` discovery — no tool invocation needed. See `references/codex-tools.md` for tool name translations when a skill references Claude Code tools like `Task` or `TodoWrite`.
 
 # Using Skills
 

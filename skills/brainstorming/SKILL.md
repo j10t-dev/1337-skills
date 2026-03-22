@@ -9,6 +9,10 @@ description: Use when creating or developing, before writing code or implementat
 
 Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
 
+<HARD-GATE>
+Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it.
+</HARD-GATE>
+
 **Announce at start:** "I'm using the brainstorming skill to refine your idea into a design."
 
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design in manageable sections, checking after each section whether it looks right so far.
@@ -43,6 +47,11 @@ Start by understanding the current project context, then ask questions one at a 
 - Create `.claude/plans/` directory if it doesn't exist
 - Write the validated design to determined filename
 - Do not commit the design document
+
+**Design review (before sharing with user):**
+- Dispatch a design-reviewer subagent using the template in `spec-document-reviewer-prompt.md`
+- If issues found: fix them, re-dispatch (max 3 iterations)
+- Only present the design to the user once the reviewer approves or iterations are exhausted
 
 **Implementation (if continuing):**
 - Ask: "Ready to proceed to implementation planning?"
