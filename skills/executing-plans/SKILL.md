@@ -16,20 +16,23 @@ Load plan, review critically, execute all tasks, report completion.
 ## The Process
 
 ### Step 1: Load and Review Plan
-1. Find plan file in `.claude/plans/` (named `${branch}-PLAN.md`)
-2. Note which skills to use from "Skills to Use:" section
-3. Check for any blockers or ambiguities that prevent starting
-4. If blockers: Ask specific questions using the AskUserQuestion tool before starting
-5. If clear: Create TodoWrite and proceed
+1. Find the plan in the external docs repo: `$DOCS_ROOT/$projectName/plans/`
+2. Determine `$projectName` from the repo directory name unless the user specifies a different docs project name
+3. Use the agreed feature slug, jj bookmark/change description, or user-provided slug to identify the correct plan file: `$DOCS_ROOT/$projectName/plans/<slug>.md`
+4. Note which skills to use from "Skills to Use:" section
+5. Check for any blockers or ambiguities that prevent starting
+6. If blockers: Ask specific questions using the current harness's user-question mechanism before starting
+7. If clear: create a task list in the current harness's task tracker and proceed
 
 ### Step 2: Execute All Tasks
 
 For each task:
 1. Mark as in_progress
-2. Apply skills specified in "Skills to Use:" section (use Skill tool to load them)
+2. Apply skills specified in "Skills to Use:" section using the current harness's skill-loading mechanism
 3. Follow each step exactly (plan has bite-sized steps)
-4. Run verifications as specified
-5. Mark as completed
+4. Keep task work in a task-sized jj change when the plan or workflow requires local change management
+5. Run verifications as specified
+6. Mark as completed
 
 ### Step 3: Report Completion
 
@@ -41,8 +44,8 @@ After all tasks complete:
 ### Step 4: Complete Development
 
 After all tasks complete and verified:
-- Announce: "I'm using the finishing-a-development-branch skill to complete this work."
-- **REQUIRED SUB-SKILL:** Use finishing-a-development-branch
+- Announce: "I'm using the finishing-development skill to complete this work."
+- Use the `finishing-development` skill
 - Follow that skill to verify tests, present options, execute choice
 
 ## When to Stop and Ask for Help
@@ -56,7 +59,7 @@ After all tasks complete and verified:
 **Ask for clarification rather than guessing.**
 
 ## Remember
-- Load PLAN.md and note skills/files
+- Load the correct plan document from `$DOCS_ROOT/$projectName/plans/` and note skills/files
 - Apply skills specified in "Skills to Use:"
 - Follow plan steps exactly
 - Don't skip verifications
@@ -65,4 +68,4 @@ After all tasks complete and verified:
 ## Integration with Other Skills
 
 **Uses:**
-- Skills specified in "Skills to Use:" section of PLAN.md
+- Skills specified in the plan document’s "Skills to Use:" section

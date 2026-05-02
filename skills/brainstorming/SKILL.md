@@ -20,9 +20,9 @@ Start by understanding the current project context, then ask questions one at a 
 ## The Process
 
 **Understanding the idea:**
-- Check out the current project state first (files, docs, recent commits)
+- Check out the current project state first (files, docs, recent changes)
 - Ask questions one at a time to refine the idea
-- Prefer multiple choice questions when possible, but open-ended is fine too
+- Prefer open-ended questions that include 2-4 concrete suggestions or examples to help the user respond
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
 - Focus on understanding: purpose, constraints, success criteria, common gotchas and footguns
 
@@ -41,26 +41,40 @@ Start by understanding the current project context, then ask questions one at a 
 ## After the Design
 
 **Documentation:**
-- Determine filename from current branch:
-  - If on semantic branch (feat/*, fix/*, refactor/*, docs/*, chore/*): `.claude/plans/${branch//\//-}-DESIGN.md`
-  - If on main or non-semantic branch: Ask user for feature name and offer to create branch with `gt create <branch-name>`
-- Create `.claude/plans/` directory if it doesn't exist
-- Write the validated design to determined filename
-- Do not commit the design document
+- Design and plan documents always live in an external docs repo, separate from the code repo
+- `$DOCS_ROOT` is the docs repo root. Use the `DOCS_ROOT` environment variable if set; otherwise default to `~/dev/j10t-docs`
+- Designs: `$DOCS_ROOT/$projectName/designs/`
+- Plans: `$DOCS_ROOT/$projectName/plans/`
+- Determine `$projectName` from the repo directory name unless the user specifies a different docs project name
+- Determine the document slug:
+  - If the current jj bookmark or change description is a good semantic identifier, you may reuse its slug
+  - Otherwise ask the user for a feature/design slug
+- Design file: `$DOCS_ROOT/$projectName/designs/<slug>.md`
+- Create the target directory if it doesn't exist
+- Write the validated design to that filename
+- VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks
 
 **Design review (before sharing with user):**
-- Dispatch a design-reviewer subagent using the template in `spec-document-reviewer-prompt.md`
-- If issues found: fix them, re-dispatch (max 3 iterations)
-- Only present the design to the user once the reviewer approves or iterations are exhausted
+Review the design yourself before sharing it.
+
+**Inline self-review checklist:**
+- **Completeness:** Purpose, constraints, success criteria, architecture, components, data flow, error handling, and testing are covered.
+- **Internal consistency:** The design does not contradict itself across sections.
+- **Scope control:** The design is focused enough for one implementation plan; unrelated subsystems are split out or marked as future work.
+- **Ambiguity:** Open questions are explicit; assumptions are labelled.
+- **No placeholders:** Remove `TBD`, `TODO`, vague component names, and undefined references.
+- **Implementation readiness:** A plan writer can turn the design into concrete tasks without session history.
+
+Fix any issues inline before sharing the design with the user.
 
 **Implementation (if continuing):**
 - Ask: "Ready to proceed to implementation planning?"
-- **REQUIRED SUB-SKILL:** Use writing-plans to create detailed implementation plan
+- Use the `writing-plans` skill to create the detailed implementation plan
 
 ## Key Principles
 
 - **One question at a time** - Don't overwhelm with multiple questions in one message
-- **Multiple choice preferred** - Easier to answer than open-ended when possible
+- **Open-ended with concrete suggestions** - Give 2-4 examples or likely options to make answering easier
 - **Incremental validation** - Present design in sections, validate each before continuing
 - **YAGNI ruthlessly** - Remove unnecessary features from all designs
 - **Explore alternatives** - Always propose 2-3 approaches before settling
