@@ -48,7 +48,7 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 - `dispatching-parallel-agents`
 - `requesting-code-review`
 - `receiving-code-review`
-- `finishing-a-development-branch`
+- `finishing-development`
 
 **Meta**
 - `using-skills`
