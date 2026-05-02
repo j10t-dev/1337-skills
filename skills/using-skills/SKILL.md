@@ -17,9 +17,14 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 
 ## How to Access Skills
 
-**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.
+Use the current harness's native skill-loading mechanism. When a relevant skill is loaded, follow its content directly.
 
-**In Codex:** Skills load natively via `~/.agents/skills/` discovery — no tool invocation needed. See `references/codex-tools.md` for tool name translations when a skill references Claude Code tools like `Task` or `TodoWrite`.
+Harness examples:
+- Claude Code: use the `Skill` tool.
+- Codex: use native `~/.agents/skills/` discovery.
+- Pi in this environment: read the discovered `SKILL.md` path when no dedicated skill tool is exposed.
+
+See `references/harness-tools.md` for tool-name mappings across harnesses.
 
 # Using Skills
 
@@ -31,21 +36,21 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 digraph skill_flow {
     "User message received" [shape=doublecircle];
     "Might any skill apply?" [shape=diamond];
-    "Invoke Skill tool" [shape=box];
+    "Load relevant skill" [shape=box];
     "Announce: 'Using [skill] to [purpose]'" [shape=box];
     "Has checklist?" [shape=diamond];
-    "Create TodoWrite todo per item" [shape=box];
+    "Create task-tracker item per checklist item" [shape=box];
     "Follow skill exactly" [shape=box];
     "Respond (including clarifications)" [shape=doublecircle];
 
     "User message received" -> "Might any skill apply?";
-    "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
+    "Might any skill apply?" -> "Load relevant skill" [label="yes, even 1%"];
     "Might any skill apply?" -> "Respond (including clarifications)" [label="definitely not"];
-    "Invoke Skill tool" -> "Announce: 'Using [skill] to [purpose]'";
+    "Load relevant skill" -> "Announce: 'Using [skill] to [purpose]'";
     "Announce: 'Using [skill] to [purpose]'" -> "Has checklist?";
-    "Has checklist?" -> "Create TodoWrite todo per item" [label="yes"];
+    "Has checklist?" -> "Create task-tracker item per checklist item" [label="yes"];
     "Has checklist?" -> "Follow skill exactly" [label="no"];
-    "Create TodoWrite todo per item" -> "Follow skill exactly";
+    "Create task-tracker item per checklist item" -> "Follow skill exactly";
 }
 ```
 
@@ -88,15 +93,15 @@ The skill itself tells you which.
 
 ## Skills with Checklists
 
-If a skill has a checklist, YOU MUST create TodoWrite todos for EACH item.
+If a skill has a checklist, YOU MUST track EACH item using the current harness's task tracker. If the harness exposes no task-tracking tool, keep an explicit visible checklist and update it as work progresses.
 
 **Don't:**
 - Work through checklist mentally
-- Skip creating todos "to save time"
-- Batch multiple items into one todo
+- Skip tracking "to save time"
+- Batch multiple items into one item
 - Mark complete without doing them
 
-**Why:** Checklists without TodoWrite tracking = steps get skipped. Every time.
+**Why:** Checklists without visible tracking = steps get skipped. Every time.
 
 ## User Instructions
 
