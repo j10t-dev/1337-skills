@@ -33,7 +33,7 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 
 ## Skills
 
-**Testing**
+**Testing & Verification**
 - `test-driven-development`
 - `verification-before-completion`
 
@@ -48,6 +48,7 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 - `dispatching-parallel-agents`
 - `requesting-code-review`
 - `receiving-code-review`
+- `handling-github-pr-reviews`
 - `finishing-development`
 
 **Meta**

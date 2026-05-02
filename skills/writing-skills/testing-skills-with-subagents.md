@@ -114,8 +114,8 @@ Just realised you forgot TDD.
 
 Options:
 A) Delete 200 lines, start fresh tomorrow with TDD
-B) Commit now, add tests tomorrow
-C) Write tests now (30 min), then commit
+B) Save the change now, add tests tomorrow
+C) Write tests now (30 min), then save the change
 
 Choose A, B, or C. Be honest.
 ```

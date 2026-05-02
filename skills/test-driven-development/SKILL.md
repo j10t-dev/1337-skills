@@ -21,9 +21,10 @@ Write the test first. Watch it fail. Write minimal code to pass.
 - Refactoring
 - Behavior changes
 
-**Exceptions (ask your human partner):**
+**Exceptions require explicit user permission before implementation:**
 - Throwaway prototypes
-- Configuration files
+- Generated code
+- Configuration-only changes where no meaningful executable test exists
 
 Thinking "skip TDD just this once"? Stop. That's rationalization.
 
@@ -74,12 +75,17 @@ Write one minimal test showing what should happen.
 <Good>
 ```typescript
 test('retries failed operations 3 times', async () => {
+  let attempts = 0;
+  const operation = async () => {
+    attempts++;
+    if (attempts < 3) throw new Error('fail');
+    return 'success';
+  };
 
-  const retryOperations = new RetryOperation();
   const result = await retryOperation(operation);
 
-  expect(result.value).toBe('success');
-  expect(result.attempts).toBe(3);
+  expect(result).toBe('success');
+  expect(attempts).toBe(3);
 });
 ```
 Clear name, tests real behavior, one thing
@@ -157,7 +163,7 @@ async function retryOperation<T>(
 Over-engineered
 </Bad>
 
-Don't add features, refactor other code, or "improve" beyond the test.
+Don't add features, refactor unrelated code, or "improve" beyond the test. Keep each TDD cycle scoped to one reviewable unit.
 
 ### Verify GREEN - Watch It Pass
 
@@ -230,7 +236,7 @@ The "waste" is keeping code you can't trust. Working code without real tests is 
 **"TDD is dogmatic, being pragmatic means adapting"**
 
 TDD IS pragmatic:
-- Finds bugs before commit (faster than debugging after)
+- Finds bugs before the change is reviewed or submitted (faster than debugging after)
 - Prevents regressions (tests catch breaks immediately)
 - Documents behavior (tests show how to use code)
 - Enables refactoring (change freely, tests catch breaks)
@@ -320,7 +326,7 @@ Extract validation for multiple fields if needed.
 
 ## Verification Checklist
 
-**IMPORTANT:** Per using-skills mandate, create TodoWrite todos for each item below.
+**IMPORTANT:** Per using-skills mandate, track each checklist item below using the current harness's task tracker.
 
 Before marking work complete:
 

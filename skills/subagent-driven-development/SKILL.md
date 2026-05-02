@@ -43,6 +43,8 @@ digraph when_to_use {
 
 ## The Process
 
+> "Dispatch X subagent" in the diagram below means delegate to a fresh agent via the current harness's subagent/delegation mechanism. See `references/harness-tools.md` for tool-name mappings.
+
 ```dot
 digraph process {
     rankdir=TB;

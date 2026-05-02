@@ -9,7 +9,7 @@ description: Use when creating new skills, editing existing skills, or verifying
 
 **Writing skills IS Test-Driven Development applied to process documentation.**
 
-**Personal skills live in agent-specific directories (`~/.claude/skills` for Claude Code, `~/.agents/skills` for Codex)** 
+**Personal skills live in harness-specific directories; this repository's canonical location is `~/.agents/skills/`.** 
 
 You write test cases (pressure scenarios with subagents), watch them fail (baseline behavior), write the skill (documentation), watch tests pass (agents comply), and refactor (close loopholes).
 
@@ -21,7 +21,7 @@ You write test cases (pressure scenarios with subagents), watch them fail (basel
 
 ## What is a Skill?
 
-A **skill** is a reference guide for proven techniques, patterns, or tools. Skills help future Claude instances find and apply effective approaches.
+A **skill** is a reference guide for proven techniques, patterns, or tools. Skills help future agent instances find and apply effective approaches.
 
 **Skills are:** Reusable techniques, patterns, tools, reference guides
 
@@ -55,7 +55,8 @@ The entire skill creation process follows RED-GREEN-REFACTOR.
 **Don't create for:**
 - One-off solutions
 - Standard practices well-documented elsewhere
-- Project-specific conventions (put in CLAUDE.md)
+- Project-specific conventions (put in AGENTS.md or the harness-specific project instruction file)
+- Mechanical constraints that can be enforced by tests, linters, scripts, schemas, or hooks
 
 ## Skill Types
 
@@ -92,13 +93,13 @@ skills/
 ## SKILL.md Structure
 
 **Frontmatter (YAML):**
-- Only two fields supported: `name` and `description`
+- Two fields are required: `name` and `description`
 - Max 1024 characters total
 - `name`: Use letters, numbers, and hyphens only (no parentheses, special chars)
 - `description`: Triggering conditions ONLY — never summarise the skill's workflow
   - Start with "Use when..." to focus on triggering conditions
   - Include specific symptoms, situations, and contexts
-  - NEVER describe what the skill does or how it works (see CSO section)
+  - NEVER describe what the skill does or how it works (see ASO section)
   - Keep under 500 characters if possible
 
 ```markdown
@@ -136,13 +137,13 @@ Concrete results
 ```
 
 
-## Claude Search Optimization (CSO)
+## Agent Search Optimisation (ASO)
 
-**Critical for discovery:** Future Claude needs to FIND your skill
+**Critical for discovery:** Future agents need to FIND your skill
 
 ### 1. Rich Description Field
 
-**Purpose:** Claude reads description to decide which skills to load for a given task. Make it answer: "Should I read this skill right now?"
+**Purpose:** Agents read the description to decide which skills to load for a given task. Make it answer: "Should I read this skill right now?"
 
 **Format:** Start with "Use when..." — triggering conditions ONLY
 
@@ -150,11 +151,11 @@ Concrete results
 
 The description should ONLY describe triggering conditions. Do NOT summarise the skill's process or workflow in the description.
 
-**Why this matters:** Testing revealed that when a description summarises the skill's workflow, Claude may follow the description instead of reading the full skill content. A description saying "code review between tasks" caused Claude to do ONE review, even though the skill's flowchart clearly showed TWO reviews (spec compliance then code quality).
+**Why this matters:** Testing revealed that when a description summarises the skill's workflow, agents may follow the description instead of reading the full skill content. A description saying "code review between tasks" caused Claude to do ONE review, even though the skill's flowchart clearly showed TWO reviews (spec compliance then code quality).
 
-When the description was changed to just triggering conditions (no workflow summary), Claude correctly read the full skill and followed it properly.
+When the description was changed to just triggering conditions (no workflow summary), agents correctly read the full skill and followed it properly.
 
-**The trap:** Descriptions that summarise workflow create a shortcut Claude will take. The skill body becomes documentation Claude skips.
+**The trap:** Descriptions that summarise workflow create a shortcut Claude will take. The skill body becomes documentation agents skip.
 
 **Content:**
 - Use concrete triggers, symptoms, and situations that signal this skill applies
@@ -167,7 +168,7 @@ When the description was changed to just triggering conditions (no workflow summ
 # ❌ BAD: Too abstract, vague
 description: For async testing
 
-# ❌ BAD: Summarises workflow — Claude may follow this instead of reading skill
+# ❌ BAD: Summarises workflow — agents may follow this instead of reading skill
 description: Use when executing plans - dispatches subagent per task with code review between tasks
 
 # ❌ BAD: Too much process detail
@@ -185,7 +186,7 @@ description: Use when tests have race conditions, timing dependencies, or pass/f
 
 ### 2. Keyword Coverage
 
-Use words Claude would search for:
+Use words agents would search for:
 - Error messages: "Hook timed out", "ENOTEMPTY", "race condition"
 - Symptoms: "flaky", "hanging", "zombie", "pollution"
 - Synonyms: "timeout/hang/freeze", "cleanup/teardown/afterEach"
@@ -267,7 +268,7 @@ wc -w skills/path/SKILL.md
 **When writing documentation that references other skills:**
 
 Use skill name only, with explicit requirement markers:
-- ✅ Good: `**REQUIRED SUB-SKILL:** Use test-driven-development`
+- ✅ Good: `Use the test-driven-development skill`
 - ✅ Good: `**REQUIRED BACKGROUND:** You MUST understand systematic-debugging`
 - ❌ Bad: `See skills/testing/test-driven-development` (unclear if required)
 - ❌ Bad: `@skills/testing/test-driven-development/SKILL.md` (force-loads, burns context)
@@ -576,7 +577,7 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 
 ## Skill Creation Checklist (TDD Adapted)
 
-**IMPORTANT: Use TodoWrite to create todos for EACH checklist item below.**
+**IMPORTANT: Track EACH checklist item below using the current harness's task tracker.**
 
 **RED Phase - Write Failing Test:**
 - [ ] Create pressure scenarios (3+ combined pressures for discipline skills)
@@ -610,12 +611,12 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 - [ ] Supporting files only for tools or heavy reference
 
 **Deployment:**
-- [ ] Commit skill to git and push to your fork (if configured)
+- [ ] Save skill changes using the repository's configured VCS workflow, if requested
 - [ ] Consider contributing back via PR (if broadly useful)
 
 ## Discovery Workflow
 
-How future Claude finds your skill:
+How future agents find your skill:
 
 1. **Encounters problem** ("tests are flaky")
 3. **Finds SKILL** (description matches)
