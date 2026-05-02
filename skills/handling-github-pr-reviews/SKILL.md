@@ -9,26 +9,22 @@ Process PR review feedback: fetch → self-evaluate → iterate → fix → repl
 
 ## Workflow
 
-### 0. Validate Branch & PR Match
+### 0. Validate PR and Local Workspace
 
-Before any PR operations, verify you're on the correct branch:
+Before any PR operations, verify the PR number and local workspace are correct.
 
 ```bash
-# If PR number provided, validate it matches current branch
-current_branch=$(git branch --show-current)
-pr_branch=$(gh pr view {N} --json headRefName -q '.headRefName')
+# If PR number provided, inspect its head ref
+gh pr view {N} --json number,headRefName,headRepositoryOwner,title,state
 
-if [[ "$current_branch" != "$pr_branch" ]]; then
-    echo "ERROR: PR #{N} is for branch '$pr_branch' but you're on '$current_branch'"
-    # Stop and clarify with user before proceeding
-fi
-
-# If no PR number provided, auto-detect from current branch
-# Prefer gt if available (Graphite tracks PR associations):
-gt log short  # shows current stack with PR numbers
-# Fallback:
-gh pr view --json number -q '.number'
+# If no PR number provided, ask the user for the PR number.
+# Do not infer from ambient repository state.
 ```
+
+Confirm with the user before editing if:
+- the PR head ref does not correspond to the jj bookmark/change stack you are working on;
+- the local workspace has unrelated changes;
+- multiple plausible PRs could match.
 
 **Never skip this step.** Wrong-PR errors waste significant time.
 
@@ -81,6 +77,8 @@ Make the fix as agreed with user.
 
 ### 5. Reply to Thread
 
+Reply in the inline review thread. Do not post a top-level PR comment for inline review feedback.
+
 Add a brief reply explaining the action:
 - "Implemented"
 - "Added null check"
@@ -103,9 +101,9 @@ Repeat steps 3-6 for each comment. No summary comment at the end.
 
 | Task | Command |
 |------|---------|
-| Validate PR branch | `gh pr view {N} --json headRefName -q '.headRefName'` |
-| Auto-detect PR (Graphite) | `gt log short` |
-| Auto-detect PR (fallback) | `gh pr view --json number -q '.number'` |
+| Inspect PR head | `gh pr view {N} --json number,headRefName,headRepositoryOwner,title,state` |
+| Confirm local stack | Use jj status/log commands appropriate to the repository |
+| Missing PR number | Ask the user; do not infer from ambient repository state |
 | Line comments | `gh api repos/{o}/{r}/pulls/{N}/comments --paginate` |
 | Reply to comment | `gh api repos/{o}/{r}/pulls/{N}/comments/{id}/replies -f body="..."` |
 | Resolve thread | GraphQL `resolveReviewThread` mutation |

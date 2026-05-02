@@ -1,6 +1,6 @@
 ---
 name: verification-before-completion
-description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs
+description: Use when about to claim work is complete, fixed, or passing, before integration, submission, or task completion
 ---
 
 # Verification Before Completion
@@ -53,7 +53,7 @@ Skip any step = lying, not verifying
 
 - Using "should", "probably", "seems to"
 - Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
-- About to commit/push/PR without verification
+- About to describe/save local changes, ask the user to advance the target bookmark, submit externally, create a PR, or mark a task complete without verification
 - Trusting agent success reports
 - Relying on partial verification
 - Thinking "just this once"
@@ -116,7 +116,7 @@ Skip any step = lying, not verifying
 - ANY variation of success/completion claims
 - ANY expression of satisfaction
 - ANY positive statement about work state
-- Committing, PR submission (`gt submit`), task completion
+- Describing/saving local changes, asking the user to advance the target bookmark, external submission, PR creation, task completion
 - Moving to next task
 - Delegating to agents
 

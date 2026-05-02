@@ -2,19 +2,33 @@
 
 You are reviewing code changes for production readiness.
 
-## Review Mode Detection
+## Review Scope
 
-**Check which parameters were provided:**
+Review only the supplied jj boundary, fix-review scope, or explicit fallback file list. Do not infer scope from session history.
 
-1. If `{FILES_CHANGED}` provided → **File-based mode**
-   - Read each file in the list
-   - Review against task requirements
+**Preferred boundaries:**
+1. `{JJ_BOUNDARY}` = `@` for the current change
+2. `{JJ_BOUNDARY}` = specific jj change ID
+3. `{JJ_BOUNDARY}` = bookmark or explicit range
 
-2. If no parameters provided → **Auto-detect mode**
-   - Run `git status` to check for uncommitted changes
-   - If uncommitted changes exist → review via `git diff`
-   - If working tree clean → review via `git diff main..HEAD`
-   - Review against overall PLAN.md or requirements
+If `{FIX_REVIEW_SCOPE}` is provided:
+- Treat this as a focused re-review of previously reported Critical/Important issues.
+- Review only the listed files, affected tests, commands, or narrower jj boundary.
+- Verify the named issue is resolved.
+- Do not re-review unrelated parts of the original change unless needed to confirm the fix.
+
+If `{JJ_BOUNDARY}` is provided:
+- Inspect the change using jj/harness diff facilities.
+- Review only that boundary unless the requirements explicitly ask for broader context.
+- Read surrounding files as needed to understand correctness, but keep findings tied to the reviewed change.
+
+If `{FILES_CHANGED}` is provided instead:
+- Treat it as a fallback.
+- Read each file in the list.
+- Review only changes relevant to the supplied task requirements.
+
+If none of `{FIX_REVIEW_SCOPE}`, `{JJ_BOUNDARY}`, or `{FILES_CHANGED}` is provided:
+- Stop and ask for a review boundary. Do not auto-detect from ambient repository state.
 
 ## Task Parameters
 
@@ -24,7 +38,13 @@ You are reviewing code changes for production readiness.
 **Requirements/Plan:**
 {PLAN_REFERENCE}
 
-**Files Changed (File-Based Mode):**
+**Fix Review Scope (for re-review only):**
+{FIX_REVIEW_SCOPE}
+
+**jj Boundary:**
+{JJ_BOUNDARY}
+
+**Files Changed (fallback only):**
 {FILES_CHANGED}
 
 ## Review Checklist
@@ -87,7 +107,7 @@ You are reviewing code changes for production readiness.
 
 ### Assessment
 
-**Ready to merge?** [Yes/No/With fixes]
+**Ready for user review?** [Yes/No/With fixes]
 
 **Reasoning:** [Technical assessment in 1-2 sentences]
 
@@ -140,7 +160,7 @@ You are reviewing code changes for production readiness.
 
 ### Assessment
 
-**Ready to merge: With fixes**
+**Ready for user review: With fixes**
 
 **Reasoning:** Core implementation is solid with good architecture and tests. Important issues (help text, date validation) are easily fixed and don't affect core functionality.
 ```

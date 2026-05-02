@@ -14,7 +14,7 @@ Dispatch code-reviewer subagent to catch issues before they cascade.
 **Mandatory:**
 - After each task in subagent-driven development
 - After completing major feature
-- Before merge to main
+- Before asking the user to advance the target bookmark or submit externally
 
 **Optional but valuable:**
 - When stuck (fresh perspective)
@@ -23,25 +23,24 @@ Dispatch code-reviewer subagent to catch issues before they cascade.
 
 ## How to Request
 
-**1. Choose review mode based on context:**
+**1. Bound the review scope:**
 
-**File-based mode (for per-task review):**
-- Used by: subagent-driven-development
-- Input: List of files the subagent modified
-- Reviewer: Reads those files + discovers their test files automatically
+Every review request must name the smallest accurate jj boundary:
 
-**Auto-detect mode (for branch completion review):**
-- Used by: finishing-a-development-branch
-- Input: None (reviewer auto-detects uncommitted or committed changes)
-- Reviewer: Uses git status/diff to find all changes
+- **Current change:** Use `@` when reviewing the current task's change.
+- **Specific change:** Use a jj change ID when reviewing completed work that is not currently checked out.
+- **Bookmark/range:** Use a bookmark or explicit range when reviewing a larger integrated slice.
+- **File list fallback:** Use an exact file list only when the change boundary is unavailable or misleading.
+
+Assume task workflows create reliable jj changes. Do not ask the reviewer to infer scope from full session history.
 
 **2. Dispatch code-reviewer subagent:**
 
-Use Task tool with code-reviewer type, fill template at `code-reviewer.md`
+Use the current harness's subagent/delegation tool with the code-reviewer type if available, filling the template at `code-reviewer.md`
 
 **3. Act on feedback:**
 - Fix Critical/Important issues
-- **Re-review after fixes** to verify they worked
+- **Re-review Critical/Important fixes** using the smallest scope that proves the issue was resolved: specific files, affected tests, or a narrower jj boundary if appropriate
 - Only proceed when no Critical/Important issues remain
 - Note Minor issues for later
 - Push back if reviewer is wrong (with reasoning)
@@ -54,10 +53,9 @@ Use Task tool with code-reviewer type, fill template at `code-reviewer.md`
 You: Let me request code review before proceeding.
 
 [Dispatch code-reviewer subagent]
-  WHAT_WAS_IMPLEMENTED: Verification and repair functions for conversation index
-  PLAN_OR_REQUIREMENTS: Task 2 from PLAN.md
-  FILES_CHANGED: src/index-verifier.ts,src/index-repairer.ts
   DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
+  PLAN_REFERENCE: Task 2 from `$DOCS_ROOT/$projectName/plans/<slug>.md`
+  JJ_BOUNDARY: @
 
 [Subagent returns]:
   Strengths: Clean architecture, real tests
@@ -69,10 +67,15 @@ You: Let me request code review before proceeding.
 You: [Fix progress indicators]
 
 [Dispatch code-reviewer again to verify fix]
-  WHAT_WAS_IMPLEMENTED: Fixed progress reporting
-  PLAN_OR_REQUIREMENTS: Task 2 from PLAN.md
-  FILES_CHANGED: src/index-verifier.ts,src/index-repairer.ts
   DESCRIPTION: Verification of progress indicator fix
+  PLAN_REFERENCE: Task 2 from `$DOCS_ROOT/$projectName/plans/<slug>.md`
+  FIX_REVIEW_SCOPE:
+    - Verify the progress indicator issue is fixed
+    - Review only:
+      - src/index-verifier.ts
+      - src/index-repairer.ts
+      - tests/index-verifier.test.ts
+    - Confirm the relevant test command passes
 
 [Subagent returns]:
   Strengths: Progress reporting now working correctly
@@ -91,10 +94,10 @@ You: [Fix progress indicators]
 
 **Executing Plans:**
 - Review after all tasks complete
-- Final check before merging
+- Final check before asking the user to advance the target bookmark or submit externally
 
 **Ad-Hoc Development:**
-- Review before merge
+- Review before asking the user to advance the target bookmark or submit externally
 - Review when stuck
 
 ## Red Flags
