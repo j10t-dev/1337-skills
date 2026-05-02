@@ -7,15 +7,13 @@ Use this template when dispatching a code quality reviewer subagent.
 **Only dispatch after spec compliance review passes.**
 
 ```
-Task tool (1337-skills:code-reviewer):
-  model: "opus"
+Subagent/delegation tool (1337-skills:code-reviewer):
   Use template at requesting-code-review/code-reviewer.md
 
-  WHAT_WAS_IMPLEMENTED: [from implementer's report]
-  PLAN_OR_REQUIREMENTS: Task N from [plan-file]
-  BASE_SHA: [commit before task]
-  HEAD_SHA: [current commit]
-  DESCRIPTION: [task summary]
+  DESCRIPTION: [task summary / what was implemented]
+  PLAN_REFERENCE: Task N from [plan-file]
+  JJ_BOUNDARY: @
+  FILES_CHANGED: [only if jj boundary is unavailable or misleading]
 ```
 
 **Code reviewer returns:** Strengths, Issues (Critical/Important/Minor), Assessment

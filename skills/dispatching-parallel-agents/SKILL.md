@@ -57,18 +57,22 @@ Each domain is independent - fixing tool approval doesn't affect abort tests.
 
 Each agent gets:
 - **Specific scope:** One test file or subsystem
+- **Relevant context only:** Test names, error output, files, constraints, and required commands
 - **Clear goal:** Make these tests pass
-- **Constraints:** Don't change other code
-- **Expected output:** Summary of what you found and fixed
+- **Constraints:** Don't change unrelated code
+- **Expected output:** Root cause, files changed, verification run, and remaining risks
+
+Do not pass the full session history. Construct a focused prompt for each agent.
 
 ### 3. Dispatch in Parallel
 
-```typescript
-// In Claude Code / AI environment
-Task("Fix agent-tool-abort.test.ts failures")
-Task("Fix batch-completion-behavior.test.ts failures")
-Task("Fix tool-approval-race-conditions.test.ts failures")
-// All three run concurrently
+```text
+Use the current harness's subagent/delegation tool:
+- Fix agent-tool-abort.test.ts failures
+- Fix batch-completion-behavior.test.ts failures
+- Fix tool-approval-race-conditions.test.ts failures
+
+Dispatch all three concurrently when the harness supports parallel subagents.
 ```
 
 ### 4. Review and Integrate

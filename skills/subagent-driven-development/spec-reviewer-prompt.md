@@ -5,8 +5,7 @@ Use this template when dispatching a spec compliance reviewer subagent.
 **Purpose:** Verify implementer built what was requested (nothing more, nothing less)
 
 ```
-Task tool (general-purpose):
-  model: "opus"
+Subagent/delegation tool (general-purpose):
   description: "Review spec compliance for Task N"
   prompt: |
     You are reviewing whether an implementation matches its specification.
@@ -19,6 +18,10 @@ Task tool (general-purpose):
 
     [From implementer's report]
 
+    ## Review Boundary
+
+    [Use `@` if this task is the current jj change, otherwise use the relevant change ID/range from the implementer's report]
+
     ## CRITICAL: Do Not Trust the Report
 
     The implementer finished suspiciously quickly. Their report may be incomplete,
@@ -30,14 +33,14 @@ Task tool (general-purpose):
     - Accept their interpretation of requirements
 
     **DO:**
-    - Read the actual code they wrote
+    - Inspect the actual code in the review boundary
     - Compare actual implementation to requirements line by line
     - Check for missing pieces they claimed to implement
     - Look for extra features they didn't mention
 
     ## Your Job
 
-    Read the implementation code and verify:
+    Inspect the implementation within the review boundary and verify:
 
     **Missing requirements:**
     - Did they implement everything that was requested?

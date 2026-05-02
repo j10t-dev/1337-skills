@@ -9,10 +9,11 @@ Execute plan by dispatching fresh subagent per task, with two-stage review after
 
 **Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
 
-**Model selection by task complexity:**
-- Mechanical tasks (rename, move, boilerplate, simple CRUD): cheapest available model
-- Standard implementation (feature work, integration, tests): standard model
-- Architecture decisions, complex review, debugging: most capable model
+**Subagent prompt construction:**
+- Pass the task text directly; do not make the subagent rediscover the plan.
+- Include only relevant context: requirements, files, constraints, and verification commands.
+- Keep implementation tasks narrow enough that the subagent can complete them without broad session history.
+- If the subagent gets stuck because it lacks context, provide missing context and re-dispatch rather than expanding every prompt pre-emptively.
 
 ## When to Use
 
@@ -58,15 +59,15 @@ digraph process {
         "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [shape=box];
         "Code quality reviewer subagent approves?" [shape=diamond];
         "Implementer subagent fixes quality issues" [shape=box];
-        "Mark task complete in TodoWrite" [shape=box];
+        "Mark task complete in task tracker" [shape=box];
     }
 
-    "Read plan, extract all tasks with full text, note context, create TodoWrite" [shape=box];
+    "Read plan, extract all tasks with full text, note context, create task list" [shape=box];
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer subagent for entire implementation" [shape=box];
-    "Use finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
+    "Use finishing-development" [shape=box style=filled fillcolor=lightgreen];
 
-    "Read plan, extract all tasks with full text, note context, create TodoWrite" -> "Dispatch implementer subagent (./implementer-prompt.md)";
+    "Read plan, extract all tasks with full text, note context, create task list" -> "Dispatch implementer subagent (./implementer-prompt.md)";
     "Dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer subagent asks questions?";
     "Implementer subagent asks questions?" -> "Answer questions, provide context" [label="yes"];
     "Answer questions, provide context" -> "Dispatch implementer subagent (./implementer-prompt.md)";
@@ -79,11 +80,11 @@ digraph process {
     "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" -> "Code quality reviewer subagent approves?";
     "Code quality reviewer subagent approves?" -> "Implementer subagent fixes quality issues" [label="no"];
     "Implementer subagent fixes quality issues" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="re-review"];
-    "Code quality reviewer subagent approves?" -> "Mark task complete in TodoWrite" [label="yes"];
-    "Mark task complete in TodoWrite" -> "More tasks remain?";
+    "Code quality reviewer subagent approves?" -> "Mark task complete in task tracker" [label="yes"];
+    "Mark task complete in task tracker" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
-    "Dispatch final code reviewer subagent for entire implementation" -> "Use finishing-a-development-branch";
+    "Dispatch final code reviewer subagent for entire implementation" -> "Use finishing-development";
 }
 ```
 
@@ -116,9 +117,9 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 ```
 You: I'm using Subagent-Driven Development to execute this plan.
 
-[Read plan file once: .claude/plans/feature-plan.md]
+[Read plan file once from `$DOCS_ROOT/$projectName/plans/<slug>.md`]
 [Extract all 5 tasks with full text and context]
-[Create TodoWrite with all tasks]
+[Create a tracked task list with all tasks]
 
 Task 1: Hook installation script
 
@@ -138,7 +139,7 @@ Implementer: "Got it. Implementing now..."
 [Dispatch spec compliance reviewer]
 Spec reviewer: ✅ Spec compliant - all requirements met, nothing extra
 
-[Dispatch code quality reviewer]
+[Dispatch code quality reviewer for `@`]
 Code reviewer: Strengths: Good test coverage, clean. Issues: None. Approved.
 
 [Mark Task 1 complete]
@@ -165,7 +166,7 @@ Implementer: Removed --json flag, added progress reporting
 [Spec reviewer reviews again]
 Spec reviewer: ✅ Spec compliant now
 
-[Dispatch code quality reviewer]
+[Dispatch code quality reviewer for `@`]
 Code reviewer: Strengths: Solid. Issues (Important): Magic number (100)
 
 [Implementer fixes]
@@ -180,7 +181,7 @@ Code reviewer: ✅ Approved
 
 [After all tasks]
 [Dispatch final code-reviewer]
-Final reviewer: All requirements met, ready to merge
+Final reviewer: All requirements met, ready for user review
 
 Done!
 ```
@@ -252,7 +253,7 @@ Done!
 **Required workflow skills:**
 - **writing-plans** - Creates the plan this skill executes
 - **requesting-code-review** - Code review template for reviewer subagents
-- **finishing-a-development-branch** - Complete development after all tasks
+- **finishing-development** - Complete development after all tasks
 
 **Subagents should use:**
 - **test-driven-development** - Subagents follow TDD for each task

@@ -3,8 +3,7 @@
 Use this template when dispatching an implementer subagent.
 
 ```
-Task tool (general-purpose):
-  model: "sonnet"
+Subagent/delegation tool (general-purpose):
   description: "Implement Task N: [task name]"
   prompt: |
     You are implementing Task N: [task name]
@@ -31,10 +30,11 @@ Task tool (general-purpose):
 
     Once you're clear on requirements:
     1. Implement exactly what the task specifies
-    2. Write tests (following TDD if task says to)
-    3. Verify implementation works
-    4. Self-review (see below)
-    5. Report back
+    2. Keep the work scoped to this task as one coherent reviewable unit
+    3. Follow TDD: write or update the failing test first, verify it fails for the expected reason, then implement the minimal fix
+    4. Verify implementation works
+    5. Self-review (see below)
+    6. Report back
 
     Work from: [directory]
 
@@ -73,6 +73,7 @@ Task tool (general-purpose):
     When done, report:
     - What you implemented
     - What you tested and test results
+    - Review boundary (`@` if this task is the current jj change, otherwise the relevant change ID/range)
     - Files changed
     - Self-review findings (if any)
     - Any issues or concerns

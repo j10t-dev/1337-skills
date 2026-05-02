@@ -7,7 +7,7 @@ Use this template when dispatching a design document reviewer subagent.
 **Dispatch after:** Design document (DESIGN.md) is written.
 
 ```
-Task tool (general-purpose):
+Subagent/delegation tool (general-purpose):
   description: "Review design document"
   prompt: |
     You are a design document reviewer. Verify this design is complete and ready for planning.
