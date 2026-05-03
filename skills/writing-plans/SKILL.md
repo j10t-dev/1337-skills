@@ -49,6 +49,12 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Task Boundaries - What Makes a Good Task?
 
+A task is the smallest unit that carries its own test cycle and is worth a
+fresh reviewer's gate. Fold setup, configuration, scaffolding, and
+documentation steps into the task whose deliverable needs them; split only
+where a reviewer could meaningfully reject one task while approving its
+neighbour. Each task ends with an independently testable deliverable.
+
 Consider multiple factors when defining Task boundaries:
 
 **Coupling & Dependencies:**
@@ -108,6 +114,13 @@ Consider multiple factors when defining Task boundaries:
 - @path/to/file2.ts
 - [Files the executor needs context from]
 
+## Global Constraints
+
+[The spec's project-wide requirements — version floors, dependency limits,
+naming and copy rules, platform requirements — one line each, with exact
+values copied verbatim from the spec. Every task's requirements implicitly
+include this section.]
+
 ---
 ```
 
@@ -120,6 +133,12 @@ Consider multiple factors when defining Task boundaries:
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
 - Test: `tests/exact/path/to/test.py`
+
+**Interfaces:**
+- Consumes: [what this task uses from earlier tasks — exact signatures]
+- Produces: [what later tasks rely on — exact function names, parameter and
+  return types. A task's implementer sees only their own task; this block is
+  how they learn the names and types neighbouring tasks use.]
 
 ### Subtask N.1: Write and verify failing test
 

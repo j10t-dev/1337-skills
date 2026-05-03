@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Generate a review package: change list, stat summary, and the diff,
+# written to a file the reviewer reads in one call. Using the recorded
+# per-task BASE keeps multi-change tasks intact.
+#
+# Usage: review-package BASE HEAD [OUTFILE]
+# BASE and HEAD are jj revisions (change IDs, bookmarks, or `@`).
+# Default OUTFILE: <repo-root>/.superpowers/sdd/review-<base>..<head>-<ts>-<pid>.diff
+# (jj change IDs are stable across amends, so the timestamp+PID keeps a
+#  re-review after fixes from overwriting the prior package).
+set -euo pipefail
+
+if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+  echo "usage: review-package BASE HEAD [OUTFILE]" >&2
+  exit 2
+fi
+
+base=$1
+head=$2
+
+# Resolve a revset to exactly one change's short ID, or fail. In jj a revset
+# matching no changes exits 0 with empty output, and one matching several
+# would make --from/--to and the filename ambiguous — so enforce a singleton.
+resolve_one() {
+  local rev=$1 name=$2 ids n
+  ids=$(jj log --no-graph -r "$rev" -T 'change_id.short() ++ "\n"' 2>/dev/null) \
+    || { echo "bad $name: $rev (revset error)" >&2; exit 2; }
+  # awk counts non-empty lines and always exits 0; `grep -c` exits 1 on zero
+  # matches, which under `set -e` would abort before the diagnostic below.
+  n=$(printf '%s' "$ids" | awk 'NF { c++ } END { print c + 0 }')
+  [ "$n" -eq 1 ] || { echo "bad $name: $rev resolves to $n changes (need exactly 1)" >&2; exit 2; }
+  printf '%s' "$ids" | grep .
+}
+
+bs=$(resolve_one "$base" BASE)
+hs=$(resolve_one "$head" HEAD)
+
+if [ $# -eq 3 ]; then
+  out=$3
+else
+  dir=$("$(cd "$(dirname "$0")" && pwd)/sdd-workspace")
+  out="$dir/review-${bs}..${hs}-$(date +%Y%m%d%H%M%S)-$$.diff"
+fi
+
+{
+  echo "# Review package: ${bs}..${hs}"
+  echo
+  echo "## Changes"
+  jj log --no-graph -r "${bs}..${hs}" \
+    -T 'change_id.short() ++ " " ++ description.first_line() ++ "\n"'
+  echo
+  echo "## Files changed"
+  jj diff --stat --from "$bs" --to "$hs"
+  echo
+  echo "## Diff"
+  jj diff --git --from "$bs" --to "$hs"
+} > "$out"
+
+echo "wrote ${out}: $(wc -c < "$out" | tr -d ' ') bytes"

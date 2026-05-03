@@ -45,7 +45,6 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 - `writing-plans`
 - `executing-plans`
 - `subagent-driven-development`
-- `dispatching-parallel-agents`
 - `requesting-code-review`
 - `receiving-code-review`
 - `handling-github-pr-reviews`
@@ -58,10 +57,10 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 ## Upstream
 
 ```bash
-git fetch upstream
-git log upstream/main --oneline --since="1 month ago"
-git show upstream/main:skills/some-skill/SKILL.md
-git cherry-pick <commit-hash>
+jj git fetch --remote upstream
+jj log -r 'upstream/main' --limit 20
+jj diff --from @ --to 'upstream/main' -- skills/some-skill/SKILL.md
+jj new <change-id>
 ```
 
 Keep canonical skill content harness-neutral. Put harness-specific behaviour in adapter files or explicit mapping docs.
