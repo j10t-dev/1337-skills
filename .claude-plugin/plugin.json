@@ -1,7 +1,7 @@
 {
   "name": "1337-skills",
   "description": "Harness-neutral skills library with Claude Code adapter: TDD, debugging, collaboration patterns, and proven techniques",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "j10t-dev"
   },

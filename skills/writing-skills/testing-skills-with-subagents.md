@@ -1,5 +1,7 @@
 # Testing Skills With Subagents
 
+**Load this reference when:** creating or editing skills, before deployment, to verify they work under pressure and resist rationalisation.
+
 ## Overview
 
 **Testing skills is just TDD applied to process documentation.**

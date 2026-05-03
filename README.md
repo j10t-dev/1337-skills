@@ -9,11 +9,8 @@ This repository is the canonical home for the `1337-skills` collection. Parent d
 ## Layout
 
 - `skills/` - canonical skill files.
-- `commands/` - slash-command wrappers for harnesses that support them.
 - `hooks/` - hook scripts/configuration for harnesses that support them.
 - `.claude-plugin/`, `.claude/` - Claude Code adapter metadata.
-- `.codex/` - Codex adapter notes.
-- `agents/` - reusable subagent prompts where supported.
 
 ## Installed Links
 
@@ -45,7 +42,6 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 - `writing-plans`
 - `executing-plans`
 - `subagent-driven-development`
-- `dispatching-parallel-agents`
 - `requesting-code-review`
 - `receiving-code-review`
 - `handling-github-pr-reviews`
@@ -55,13 +51,28 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 - `using-skills`
 - `writing-skills`
 
+## Intentional Divergences from Upstream
+
+Deliberate deltas from obra/superpowers. Anything not listed here that differs from upstream is fair game for a sync.
+
+- **UK English** throughout skill content.
+- **jj, not git.** All VCS instructions, scripts, and examples use jj. Raw git commands are never used.
+- **Harness neutrality.** Canonical skill content avoids harness-specific tool names ("task tracker", "current harness's skill mechanism"); harness specifics live in adapter files.
+- **External docs repo.** Designs and plans live in `$DOCS_ROOT/$projectName/{designs,plans}/` (default `~/dev/j10t-docs`), not in-repo under `docs/superpowers/`.
+- **pi-review handoff (addition, not replacement).** After the inline self-review checklist, brainstorming and writing-plans hand the document to `requesting-pi-review` (on the `feat/requesting-pi-review` branch) for independent cross-harness confirmation. Self-review still runs first. Upstream's subagent document-reviewer prompts are no longer routed to.
+- **Renames:** `finishing-a-development-branch` → `finishing-development`, `using-superpowers` → `using-skills`.
+- **No git worktrees.** `using-git-worktrees` is not onboarded; jj covers the isolation need.
+- **No brainstorming visual companion.** The browser-based mockup companion is intentionally excluded.
+- **No `dispatching-parallel-agents`.** Intentionally excluded; harnesses know how to parallelise their own subagents.
+- **Trimmed skill descriptions.** Upstream description tails that summarise workflow ("- requires X; evidence before assertions always") are stripped: descriptions carry triggering conditions only, per the writing-skills SDO guidance.
+
 ## Upstream
 
 ```bash
-git fetch upstream
-git log upstream/main --oneline --since="1 month ago"
-git show upstream/main:skills/some-skill/SKILL.md
-git cherry-pick <commit-hash>
+jj git fetch --remote upstream
+jj log -r 'upstream/main' --limit 20
+jj diff --from @ --to 'upstream/main' -- skills/some-skill/SKILL.md
+jj new <change-id>
 ```
 
 Keep canonical skill content harness-neutral. Put harness-specific behaviour in adapter files or explicit mapping docs.
