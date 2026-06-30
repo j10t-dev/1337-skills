@@ -195,6 +195,16 @@ Review the plan yourself before sharing it.
 
 Fix any issues inline before sharing the plan.
 
+## Independent Review
+
+- Load the `requesting-pi-review` skill and run it on the plan document you
+  just wrote (`type=plan`, `design-ref` = the design document this plan
+  implements).
+- This handoff always runs — there is no trivial-skip path for "the plan
+  looks fine."
+- Once that skill's loop terminates, proceed to Execution Handoff with the
+  resulting plan.
+
 ## Execution Handoff
 
 **VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks.** Proceed directly to offering execution choice:
