@@ -1,0 +1,221 @@
+#!/bin/sh
+# Deterministic test for the pi-review wrapper's argument construction.
+# A fake `pi` on PATH records its argv; this script asserts the wrapper
+# builds the correct command for each input combination, without invoking
+# the real pi.
+set -eu
+
+script_dir=$(cd "$(dirname "$0")" && pwd)
+wrapper="$script_dir/pi-review"
+
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+capture="$work/argv"
+bin="$work/bin"
+mkdir -p "$bin"
+
+cat > "$bin/pi" <<'EOF'
+#!/bin/sh
+# argv0 is not asserted: when a bare command name is exec'd after a PATH
+# search, some shells (e.g. bash, used here as /bin/sh) rewrite $0 to the
+# resolved path rather than passing the literal name through, so it isn't a
+# reliable signal. Capture only the arguments pi actually receives.
+printf '%s\n' "$@" > "$PI_REVIEW_TEST_CAPTURE"
+EOF
+chmod +x "$bin/pi"
+
+PATH="$bin:$PATH"
+export PATH
+PI_REVIEW_TEST_CAPTURE="$capture"
+export PI_REVIEW_TEST_CAPTURE
+
+doc="$work/doc.md"
+echo "doc" > "$doc"
+ref="$work/ref.md"
+echo "ref" > "$ref"
+
+fail=0
+
+assert_line() {
+  n=$1
+  expected=$2
+  actual=$(sed -n "${n}p" "$capture")
+  if [ "$actual" != "$expected" ]; then
+    echo "FAIL: line $n: expected [$expected] got [$actual]"
+    fail=1
+  fi
+}
+
+assert_line_count() {
+  expected=$1
+  actual=$(wc -l < "$capture" | tr -d ' ')
+  if [ "$actual" != "$expected" ]; then
+    echo "FAIL: expected $expected argv lines, got $actual"
+    fail=1
+  fi
+}
+
+assert_line_contains() {
+  n=$1
+  needle=$2
+  actual=$(sed -n "${n}p" "$capture")
+  case "$actual" in
+    *"$needle"*) ;;
+    *)
+      echo "FAIL: line $n: expected to contain [$needle], got [$actual]"
+      fail=1
+      ;;
+  esac
+}
+
+run_case() {
+  rm -f "$capture"
+  if ! ( cd "$work" && "$wrapper" "$@" >/dev/null ); then
+    echo "FAIL: wrapper exited non-zero for: $*"
+    fail=1
+    return 1
+  fi
+  return 0
+}
+
+spec_prompt="$script_dir/../brainstorming/spec-document-reviewer-prompt.md"
+plan_prompt="$script_dir/../writing-plans/plan-document-reviewer-prompt.md"
+
+# Case 1: design, no flags, no design-ref. Run from a different cwd (the
+# work dir, not the skill dir) to prove prompt resolution is relative to the
+# wrapper's own directory, not cwd.
+if run_case design "$doc"; then
+  assert_line 1 "-p"
+  assert_line 2 "--no-session"
+  assert_line 3 "--no-context-files"
+  assert_line 4 "--no-extensions"
+  assert_line 5 "--no-skills"
+  assert_line 6 "--approve"
+  assert_line 7 "-t"
+  assert_line 8 "read,grep,find,ls"
+  assert_line 9 "--thinking"
+  assert_line 10 "high"
+  assert_line 11 "@$spec_prompt"
+  assert_line 12 "@$doc"
+  assert_line_contains 13 "[DESIGN_FILE_PATH]"
+  assert_line_contains 13 "Ignore the subagent-dispatch framing"
+  assert_line_contains 13 "emit only the Status block"
+  assert_line_count 13
+fi
+
+# Case 2: plan with design-ref.
+if run_case plan "$doc" "$ref"; then
+  assert_line 11 "@$plan_prompt"
+  assert_line 12 "@$doc"
+  assert_line 13 "@$ref"
+  assert_line_contains 14 "[PLAN_FILE_PATH]"
+  assert_line_contains 14 "[DESIGN_FILE_PATH]"
+  assert_line_contains 14 "Ignore the subagent-dispatch framing"
+  assert_line_count 14
+fi
+
+# Case 3: --model and --effort recognised after the positionals.
+if run_case design "$doc" --effort low --model some-model; then
+  assert_line 9 "--model"
+  assert_line 10 "some-model"
+  assert_line 11 "--thinking"
+  assert_line 12 "low"
+fi
+
+# Case 4: --model and --effort recognised before the positionals.
+if run_case --model some-model --effort low design "$doc"; then
+  assert_line 9 "--model"
+  assert_line 10 "some-model"
+  assert_line 11 "--thinking"
+  assert_line 12 "low"
+fi
+
+# Case 5: env vars used when no flags are given.
+PI_REVIEW_MODEL=env-model
+PI_REVIEW_EFFORT=medium
+export PI_REVIEW_MODEL PI_REVIEW_EFFORT
+if run_case design "$doc"; then
+  assert_line 9 "--model"
+  assert_line 10 "env-model"
+  assert_line 11 "--thinking"
+  assert_line 12 "medium"
+fi
+unset PI_REVIEW_MODEL PI_REVIEW_EFFORT
+
+# Case 6: explicit flag overrides env var.
+PI_REVIEW_MODEL=env-model
+PI_REVIEW_EFFORT=medium
+export PI_REVIEW_MODEL PI_REVIEW_EFFORT
+if run_case design "$doc" --model flag-model --effort xhigh; then
+  assert_line 9 "--model"
+  assert_line 10 "flag-model"
+  assert_line 11 "--thinking"
+  assert_line 12 "xhigh"
+fi
+unset PI_REVIEW_MODEL PI_REVIEW_EFFORT
+
+# Case 7: bad type exits non-zero before invoking pi at all.
+rm -f "$capture"
+if ( cd "$work" && "$wrapper" bogus "$doc" >/dev/null 2>&1 ); then
+  echo "FAIL: bad type: expected non-zero exit"
+  fail=1
+fi
+if [ -f "$capture" ]; then
+  echo "FAIL: bad type: pi should not have been invoked"
+  fail=1
+fi
+
+# Case 8: --model with no following value exits with the wrapper's own clean
+# usage error, not a raw "unbound variable" shell error.
+rm -f "$capture"
+if ( cd "$work" && "$wrapper" design "$doc" --model >/dev/null 2>&1 ); then
+  echo "FAIL: missing --model value: expected non-zero exit"
+  fail=1
+fi
+if [ -f "$capture" ]; then
+  echo "FAIL: missing --model value: pi should not have been invoked"
+  fail=1
+fi
+
+# Case 9: --effort with no following value, same guard as Case 8.
+rm -f "$capture"
+if ( cd "$work" && "$wrapper" design "$doc" --effort >/dev/null 2>&1 ); then
+  echo "FAIL: missing --effort value: expected non-zero exit"
+  fail=1
+fi
+if [ -f "$capture" ]; then
+  echo "FAIL: missing --effort value: pi should not have been invoked"
+  fail=1
+fi
+
+# Case 10: plan without a design-ref is rejected -- a plan review must
+# always check the plan against its design.
+rm -f "$capture"
+if ( cd "$work" && "$wrapper" plan "$doc" >/dev/null 2>&1 ); then
+  echo "FAIL: plan without design-ref: expected non-zero exit"
+  fail=1
+fi
+if [ -f "$capture" ]; then
+  echo "FAIL: plan without design-ref: pi should not have been invoked"
+  fail=1
+fi
+
+# Case 11: design with a design-ref is rejected -- the spec prompt has no
+# placeholder for it, so silently accepting it would mask the omission.
+rm -f "$capture"
+if ( cd "$work" && "$wrapper" design "$doc" "$ref" >/dev/null 2>&1 ); then
+  echo "FAIL: design with design-ref: expected non-zero exit"
+  fail=1
+fi
+if [ -f "$capture" ]; then
+  echo "FAIL: design with design-ref: pi should not have been invoked"
+  fail=1
+fi
+
+if [ "$fail" -eq 0 ]; then
+  echo "PASS: all pi-review wrapper assertions"
+else
+  echo "FAIL: one or more pi-review wrapper assertions failed"
+fi
+exit "$fail"

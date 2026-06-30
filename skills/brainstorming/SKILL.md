@@ -74,6 +74,14 @@ Review the design yourself before sharing it.
 
 Fix any issues inline before sharing the design with the user.
 
+**Independent review (after self-review, before sharing with user):**
+- Load the `requesting-pi-review` skill and run it on the design document
+  you just wrote (`type=design`, no `design-ref`).
+- This handoff always runs — there is no trivial-skip path for "the design
+  looks fine."
+- Once that skill's loop terminates, present the resulting design to the
+  user.
+
 **Implementation (if continuing):**
 - Ask: "Ready to proceed to implementation planning?"
 - Use the `writing-plans` skill to create the detailed implementation plan
