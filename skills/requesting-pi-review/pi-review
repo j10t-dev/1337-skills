@@ -1,0 +1,101 @@
+#!/bin/sh
+# Invoke pi as an independent, read-only reviewer for a design or plan
+# document, using the shared reviewer-prompt templates from this repo.
+#
+# Usage: pi-review [--model M] [--effort LEVEL] design <doc-path>
+#        pi-review [--model M] [--effort LEVEL] plan <doc-path> <design-ref-path>
+#
+# A plan review always checks the plan against the design it must align
+# with, so design-ref-path is required for type "plan" and rejected for
+# type "design".
+#
+# Prompt files are resolved relative to this script's own directory, not
+# cwd, since the skill may be invoked from any working directory.
+set -eu
+
+script_dir=$(cd "$(dirname "$0")" && pwd)
+
+model=${PI_REVIEW_MODEL:-}
+effort=${PI_REVIEW_EFFORT:-high}
+pos1=
+pos2=
+pos3=
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --model)
+      [ $# -ge 2 ] || { echo "pi-review: --model requires a value" >&2; exit 2; }
+      model=$2
+      shift 2
+      ;;
+    --effort)
+      [ $# -ge 2 ] || { echo "pi-review: --effort requires a value" >&2; exit 2; }
+      effort=$2
+      shift 2
+      ;;
+    *)
+      if [ -z "$pos1" ]; then
+        pos1=$1
+      elif [ -z "$pos2" ]; then
+        pos2=$1
+      elif [ -z "$pos3" ]; then
+        pos3=$1
+      else
+        echo "pi-review: too many arguments: $1" >&2
+        exit 2
+      fi
+      shift
+      ;;
+  esac
+done
+
+type=$pos1
+doc=$pos2
+design_ref=$pos3
+
+if [ -z "$type" ] || [ -z "$doc" ]; then
+  echo "usage: pi-review [--model M] [--effort LEVEL] design <doc-path>" >&2
+  echo "       pi-review [--model M] [--effort LEVEL] plan <doc-path> <design-ref-path>" >&2
+  exit 2
+fi
+
+case "$type" in
+  design)
+    if [ -n "$design_ref" ]; then
+      echo "pi-review: design review does not take a design-ref-path" >&2
+      exit 2
+    fi
+    prompt="$script_dir/../brainstorming/spec-document-reviewer-prompt.md"
+    placeholder="[DESIGN_FILE_PATH]"
+    ;;
+  plan)
+    if [ -z "$design_ref" ]; then
+      echo "pi-review: plan review requires a design-ref-path (the design doc the plan must align with)" >&2
+      exit 2
+    fi
+    prompt="$script_dir/../writing-plans/plan-document-reviewer-prompt.md"
+    placeholder="[PLAN_FILE_PATH]"
+    ;;
+  *)
+    echo "pi-review: type must be 'design' or 'plan', got '$type'" >&2
+    exit 2
+    ;;
+esac
+
+directive="Resolve the prompt's $placeholder placeholder to $doc."
+if [ "$type" = "plan" ]; then
+  directive="$directive Resolve the prompt's [DESIGN_FILE_PATH] placeholder to $design_ref."
+fi
+directive="$directive Ignore the subagent-dispatch framing in the prompt file -- you are not dispatching a subagent, you are the reviewer. Review the document directly and emit only the Status block (Status, Issues, Recommendations) as your entire response."
+
+set -- pi -p --no-session --no-context-files --no-extensions --no-skills --approve -t read,grep,find,ls
+if [ -n "$model" ]; then
+  set -- "$@" --model "$model"
+fi
+set -- "$@" --thinking "$effort" "@$prompt" "@$doc"
+if [ -n "$design_ref" ]; then
+  set -- "$@" "@$design_ref"
+fi
+set -- "$@" "$directive"
+
+exec "$@"

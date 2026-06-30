@@ -40,6 +40,7 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 **Workflow & Collaboration**
 - `brainstorming`
 - `writing-plans`
+- `requesting-pi-review`
 - `executing-plans`
 - `subagent-driven-development`
 - `requesting-code-review`

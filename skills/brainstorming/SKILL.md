@@ -131,8 +131,16 @@ Review the design yourself before sharing it.
 
 Fix any issues inline before sharing the design with the user. No need to re-review — just fix and move on.
 
+**Independent review (after self-review, before sharing with user):**
+- Load the `requesting-pi-review` skill and run it on the design document
+  you just wrote (`type=design`, no `design-ref`).
+- This handoff always runs — there is no trivial-skip path for "the design
+  looks fine."
+- Once that skill's loop terminates, present the resulting design to the
+  user.
+
 **User Review Gate:**
-After the self-review passes, ask the user to review the written design before proceeding:
+After the self-review and independent review pass, ask the user to review the written design before proceeding:
 
 > "Design written to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
 
