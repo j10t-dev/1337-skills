@@ -1,0 +1,55 @@
+#!/bin/sh
+set -eu
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repo_root=$(CDPATH= cd -- "$script_dir/../.." && pwd)
+sdd="$script_dir/SKILL.md"
+implementer="$script_dir/implementer-prompt.md"
+reviewer="$script_dir/task-reviewer-prompt.md"
+generic="$repo_root/skills/working-with-subagents/SKILL.md"
+readme="$repo_root/README.md"
+fail=0
+
+require_text() {
+  file=$1
+  text=$2
+  if ! grep -Fq -- "$text" "$file"; then
+    echo "FAIL: $file: missing [$text]"
+    fail=1
+  fi
+}
+
+reject_text() {
+  file=$1
+  text=$2
+  if grep -Fq -- "$text" "$file"; then
+    echo "FAIL: $file: stale [$text]"
+    fail=1
+  fi
+}
+
+require_text "$generic" 'name: working-with-subagents'
+require_text "$generic" 'description: Use when delegating to a subagent'
+require_text "$generic" 'OpenAI (most to least capable): gpt-5.6-sol > gpt-5.6-terra > gpt-5.6-luna'
+require_text "$generic" 'Anthropic (most to least capable): fable > opus > sonnet'
+require_text "$sdd" '@../working-with-subagents/SKILL.md'
+reject_text "$sdd" '## Model'" Selection"
+require_text "$sdd" 'Every implementer, fixer, and task-reviewer dispatch explicitly supplies a model'
+require_text "$sdd" 'Every final-review dispatch does the same.'
+require_text "$sdd" 'The final whole-branch reviewer handles architecture and high-risk judgement, so use the most capable available model.'
+require_text "$implementer" 'model: [MODEL — REQUIRED: select via working-with-subagents]'
+require_text "$reviewer" 'model: [MODEL — REQUIRED: select via working-with-subagents]'
+reject_text "$implementer" 'SKILL.md Model'" Selection"
+reject_text "$reviewer" 'SKILL.md Model'" Selection"
+require_text "$readme" '- `working-with-subagents`'
+
+body_words=$(awk 'BEGIN { separators=0 } /^---$/ { separators++; next } separators >= 2 { print }' "$generic" | wc -w | tr -d ' ')
+if [ "$body_words" -lt 80 ] || [ "$body_words" -ge 200 ]; then
+  echo "FAIL: $generic: body word count $body_words is not approximately 100 and below 200"
+  fail=1
+fi
+
+if [ "$fail" -eq 0 ]; then
+  echo 'PASS: working-with-subagents is canonical and SDD references it'
+fi
+exit "$fail"

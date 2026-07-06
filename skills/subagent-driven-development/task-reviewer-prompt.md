@@ -10,8 +10,7 @@ more, nothing less) and is well-built (clean, tested, maintainable)
 ```
 Subagent/delegation tool (general-purpose):
   description: "Review Task N (spec + quality)"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
+  model: [MODEL — REQUIRED: select via working-with-subagents]
   prompt: |
     You are reviewing one task's implementation: first whether it matches its
     requirements, then whether it is well-built. This is a task-scoped gate,
@@ -28,6 +27,17 @@ Subagent/delegation tool (general-purpose):
     ## What the Implementer Claims They Built
 
     Read the implementer's report: [REPORT_FILE]
+
+    ## Context Boundary
+
+    The supplied task brief, global constraints, implementer report, and diff
+    package are your complete review boundary.
+
+    Do not locate or read the parent implementation plan, neighbouring tasks,
+    progress ledger, prior reviews, or session history. Read additional
+    repository code only for a concrete risk permitted under Diff Under Review.
+    If a requirement cannot be verified within this boundary, report it as
+    `⚠️ Cannot verify from diff`; do not broaden the review independently.
 
     ## Diff Under Review
 
@@ -167,7 +177,7 @@ Subagent/delegation tool (general-purpose):
 ```
 
 **Placeholders:**
-- `[MODEL]` — REQUIRED: reviewer model per SKILL.md Model Selection
+- `[MODEL]` — REQUIRED: reviewer model selected via `working-with-subagents`
 - `[BRIEF_FILE]` — REQUIRED: the task brief file (`scripts/task-brief PLAN N`
   prints the path; same file the implementer worked from)
 - `[GLOBAL_CONSTRAINTS]` — the binding requirements copied verbatim from

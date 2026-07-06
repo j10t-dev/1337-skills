@@ -169,10 +169,15 @@ fi
 # Case 8: --model with no following value exits with the wrapper's own clean
 # usage error, not a raw "unbound variable" shell error.
 rm -f "$capture"
-if ( cd "$work" && "$wrapper" design "$doc" --model >/dev/null 2>&1 ); then
-  echo "FAIL: missing --model value: expected non-zero exit"
-  fail=1
-fi
+stderr=$( (cd "$work" && "$wrapper" design "$doc" --model >/dev/null) 2>&1 ) \
+  && { echo "FAIL: missing --model value: expected non-zero exit"; fail=1; }
+case "$stderr" in
+  *"--model requires a value"*) ;;
+  *)
+    echo "FAIL: missing --model value: expected usage error on stderr, got [$stderr]"
+    fail=1
+    ;;
+esac
 if [ -f "$capture" ]; then
   echo "FAIL: missing --model value: pi should not have been invoked"
   fail=1
@@ -180,10 +185,15 @@ fi
 
 # Case 9: --effort with no following value, same guard as Case 8.
 rm -f "$capture"
-if ( cd "$work" && "$wrapper" design "$doc" --effort >/dev/null 2>&1 ); then
-  echo "FAIL: missing --effort value: expected non-zero exit"
-  fail=1
-fi
+stderr=$( (cd "$work" && "$wrapper" design "$doc" --effort >/dev/null) 2>&1 ) \
+  && { echo "FAIL: missing --effort value: expected non-zero exit"; fail=1; }
+case "$stderr" in
+  *"--effort requires a value"*) ;;
+  *)
+    echo "FAIL: missing --effort value: expected usage error on stderr, got [$stderr]"
+    fail=1
+    ;;
+esac
 if [ -f "$capture" ]; then
   echo "FAIL: missing --effort value: pi should not have been invoked"
   fail=1
@@ -210,6 +220,57 @@ if ( cd "$work" && "$wrapper" design "$doc" "$ref" >/dev/null 2>&1 ); then
 fi
 if [ -f "$capture" ]; then
   echo "FAIL: design with design-ref: pi should not have been invoked"
+  fail=1
+fi
+
+# Case 12: nonexistent document is rejected before pi is invoked -- the
+# real pi prints "File not found" for a bad @-path but exits 0, so without
+# this guard a typo'd path yields a "successful" run with no review in it.
+rm -f "$capture"
+stderr=$( (cd "$work" && "$wrapper" design "$work/no-such-doc.md" >/dev/null) 2>&1 ) \
+  && { echo "FAIL: missing doc: expected non-zero exit"; fail=1; }
+case "$stderr" in
+  *"cannot read"*) ;;
+  *)
+    echo "FAIL: missing doc: expected 'cannot read' on stderr, got [$stderr]"
+    fail=1
+    ;;
+esac
+if [ -f "$capture" ]; then
+  echo "FAIL: missing doc: pi should not have been invoked"
+  fail=1
+fi
+
+# Case 13: nonexistent design-ref is rejected the same way.
+rm -f "$capture"
+stderr=$( (cd "$work" && "$wrapper" plan "$doc" "$work/no-such-ref.md" >/dev/null) 2>&1 ) \
+  && { echo "FAIL: missing design-ref: expected non-zero exit"; fail=1; }
+case "$stderr" in
+  *"cannot read"*) ;;
+  *)
+    echo "FAIL: missing design-ref: expected 'cannot read' on stderr, got [$stderr]"
+    fail=1
+    ;;
+esac
+if [ -f "$capture" ]; then
+  echo "FAIL: missing design-ref: pi should not have been invoked"
+  fail=1
+fi
+
+# Case 14: an unrecognised option is rejected with a clear diagnostic rather
+# than being swallowed into a positional slot and misreported as a bad type.
+rm -f "$capture"
+stderr=$( (cd "$work" && "$wrapper" --modle some-model design "$doc" >/dev/null) 2>&1 ) \
+  && { echo "FAIL: unknown option: expected non-zero exit"; fail=1; }
+case "$stderr" in
+  *"unknown option: --modle"*) ;;
+  *)
+    echo "FAIL: unknown option: expected 'unknown option: --modle' on stderr, got [$stderr]"
+    fail=1
+    ;;
+esac
+if [ -f "$capture" ]; then
+  echo "FAIL: unknown option: pi should not have been invoked"
   fail=1
 fi
 

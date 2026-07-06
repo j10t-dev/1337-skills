@@ -42,6 +42,7 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 - `writing-plans`
 - `requesting-pi-review`
 - `executing-plans`
+- `working-with-subagents`
 - `subagent-driven-development`
 - `requesting-code-review`
 - `receiving-code-review`
@@ -64,6 +65,7 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
 - **Renames:** `finishing-a-development-branch` → `finishing-development`, `using-superpowers` → `using-skills`.
 - **No git worktrees.** `using-git-worktrees` is not onboarded; jj covers the isolation need.
 - **No brainstorming visual companion.** The browser-based mockup companion is intentionally excluded.
+- **Canonical subagent dispatch policy.** `working-with-subagents` centralises harness-neutral capability, tool, brief, and result-inspection guidance; SDD force-loads it while retaining orchestration-specific rules.
 - **No `dispatching-parallel-agents`.** Intentionally excluded; harnesses know how to parallelise their own subagents.
 - **Trimmed skill descriptions.** Upstream description tails that summarise workflow ("- requires X; evidence before assertions always") are stripped: descriptions carry triggering conditions only, per the writing-skills SDO guidance.
 

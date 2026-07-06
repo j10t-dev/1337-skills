@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+require_text() {
+  local file=$1 text=$2
+  if ! grep -Fq -- "$text" "$file"; then
+    printf 'FAIL: %s does not contain: %s\n' "$file" "$text" >&2
+    return 1
+  fi
+}
+
+require_text implementer-prompt.md 'complete requirements boundary'
+require_text implementer-prompt.md 'Do not locate or read the parent implementation plan'
+require_text implementer-prompt.md 'Return `NEEDS_CONTEXT`'
+require_text implementer-prompt.md 'Think rigorously within this boundary'
+
+require_text task-reviewer-prompt.md 'complete review boundary'
+require_text task-reviewer-prompt.md 'Do not locate or read the parent implementation plan'
+require_text task-reviewer-prompt.md 'do not broaden the review independently'
+
+require_text SKILL.md 'Every implementer, fixer, and task-reviewer dispatch'
+require_text SKILL.md 'final whole-branch reviewer'
+require_text SKILL.md 'Let a task-scoped subagent locate or read the parent plan'
+
+printf 'PASS: task-scoped subagent context boundaries are explicit\n'

@@ -5,8 +5,7 @@ Use this template when dispatching an implementer subagent.
 ```
 Subagent/delegation tool (general-purpose):
   description: "Implement Task N: [task name]"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
+  model: [MODEL — REQUIRED: select via working-with-subagents]
   prompt: |
     You are implementing Task N: [task name]
 
@@ -19,6 +18,19 @@ Subagent/delegation tool (general-purpose):
 
     [Scene-setting: where this fits, dependencies, architectural context,
     and any cross-task interfaces (exact signatures) the brief cannot know]
+
+    ## Context Boundary
+
+    Treat the task brief, this prompt's Context section, and any artefacts they
+    explicitly name as your complete requirements boundary.
+
+    - Do not locate or read the parent implementation plan, neighbouring task
+      briefs, progress ledger, prior-task reports, or session history.
+    - Inspect repository code only as needed to understand and implement this
+      task's concrete interfaces and established patterns.
+    - Do not broaden the task to obtain missing requirements independently.
+      Return `NEEDS_CONTEXT` and ask the controller instead.
+    - Think rigorously within this boundary; do not redefine or expand it.
 
     ## Before You Begin
 
@@ -131,7 +143,7 @@ Subagent/delegation tool (general-purpose):
 ```
 
 **Placeholders:**
-- `[MODEL]` — REQUIRED: implementer model per SKILL.md Model Selection
+- `[MODEL]` — REQUIRED: implementer model selected via `working-with-subagents`
 - `[BRIEF_FILE]` — REQUIRED: `scripts/task-brief PLAN N` prints the path
 - `[REPORT_FILE]` — REQUIRED: name it after the brief (`task-N-report.md`)
 - `[directory]` — working directory for the task

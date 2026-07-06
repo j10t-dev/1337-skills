@@ -16,8 +16,8 @@ findings — validate each claim against the actual document, never blind-apply.
 
 ## The Loop
 
-1. **Run the wrapper.** It is not on `PATH`. Invoke it by its absolute
-   skill-relative path: canonical location
+1. **Run the wrapper.** It is not on `PATH`. Invoke it by its canonical
+   absolute path:
    `~/.agents/1337-skills/skills/requesting-pi-review/pi-review` (the Claude
    and pi skill symlinks both resolve here).
 
@@ -38,6 +38,12 @@ findings — validate each claim against the actual document, never blind-apply.
    extensions, or skills loaded — only the prompt template and the
    document(s) passed in shape its judgement.
 
+   If the wrapper exits non-zero, or its output contains no Status block,
+   that is a failed invocation to diagnose and retry — it is not a review
+   round and consumes nothing from the 3-round review bound. Stop after 2
+   consecutive failed invocations; report the failure plainly instead of
+   retrying indefinitely.
+
 2. **Load `receiving-code-review` and triage.** Check every finding against
    the actual document. Fix legitimate ones. Reject misreads with a one-line
    reason. Treat the prompt's "Recommendations (advisory)" as non-blocking —
@@ -49,6 +55,8 @@ findings — validate each claim against the actual document, never blind-apply.
    - pi returns `Status: Approved`, or
    - 3 rounds have run (the initial review is round 1, so at most 2
      revise-and-recheck passes follow it), or
+   - 2 consecutive failed invocations occur (wrapper non-zero or no Status
+     block), or
    - the review has converged — every remaining finding is one already
      assessed and deliberately not actioned.
 

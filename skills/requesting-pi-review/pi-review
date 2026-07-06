@@ -33,6 +33,10 @@ while [ $# -gt 0 ]; do
       effort=$2
       shift 2
       ;;
+    -*)
+      echo "pi-review: unknown option: $1" >&2
+      exit 2
+      ;;
     *)
       if [ -z "$pos1" ]; then
         pos1=$1
@@ -81,6 +85,13 @@ case "$type" in
     exit 2
     ;;
 esac
+
+# pi exits 0 even when an @-file does not exist, so a typo'd path would
+# otherwise produce a "successful" run containing no review. Fail fast on
+# anything unreadable, including the prompt template owned by another skill.
+for f in "$prompt" "$doc" ${design_ref:+"$design_ref"}; do
+  [ -r "$f" ] || { echo "pi-review: cannot read $f" >&2; exit 2; }
+done
 
 directive="Resolve the prompt's $placeholder placeholder to $doc."
 if [ "$type" = "plan" ]; then
