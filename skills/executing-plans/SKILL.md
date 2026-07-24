@@ -5,79 +5,53 @@ description: Use when partner provides a complete implementation plan to execute
 
 # Executing Plans
 
-## Overview
-
-Load plan, review critically, execute all tasks, report completion.
-
-**Core principle:** Follow the plan systematically, stop when blocked.
+Execute a complete plan inline when subagents are unavailable or the partner requests inline execution.
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
-**Note:** If the current harness supports subagent dispatch, prefer the `subagent-driven-development` skill over this one — the quality of the work is significantly higher with fresh per-task subagents and review gates. Use this skill when the harness has no subagent support or the user asks for inline execution.
+## Start or Resume
 
-## The Process
+1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task. Stop on missing, duplicate, guessed, or ambiguous metadata.
+2. Use `.agents/sdd/progress.md` as the active-plan ledger. On a fresh run, resolve and record the full `Builds On` identities, require the feature bookmark to be absent, reject unexplained edits, position empty `@` on the run base, write the ledger, then create the feature bookmark there.
+3. On resume, require the same plan metadata and run-base identities. Verify completed commits form one exact-subject, exact-parent path and the feature bookmark identifies the accepted tip.
+4. Resume only the recorded task or final fix. If its exact accepted commit exists while the bookmark or ledger lags, advance the bookmark if needed, then record the full IDs. Stop on any other mismatch or divergence.
 
-### Step 1: Load and Review Plan
-1. Find the plan in the external docs repo: `$DOCS_ROOT/$projectName/plans/`
-2. Determine `$projectName` from the repo directory name unless the user specifies a different docs project name
-3. Use the agreed feature slug, jj bookmark/change description, or user-provided slug to identify the correct plan file: `$DOCS_ROOT/$projectName/plans/<slug>.md`
-4. Note which skills to use from "Skills to Use:" section
-5. Review the plan critically — identify any questions, concerns, blockers, or ambiguities
-6. If concerns or blockers: Raise them with your partner (specific questions via the current harness's user-question mechanism) before starting
-7. If clear: create a task list in the current harness's task tracker and proceed
+The ledger records the plan path, both bookmark names, full run-base identities, and one state per task or final fix: `in progress`, `pending (subject ...)`, or `change <full-id>, commit <full-id> (complete)`.
 
-### Step 2: Execute All Tasks
+## Task Loop
 
-For each task:
-1. Mark as in_progress
-2. Apply skills specified in "Skills to Use:" section using the current harness's skill-loading mechanism
-3. Follow each step exactly (plan has bite-sized steps)
-4. Keep task work in a task-sized jj change when the plan or workflow requires local change management
-5. Run verifications as specified
-6. Mark as completed
+For each task in order:
 
-### Step 3: Report Completion
+1. Confirm the ledger and feature bookmark identify the accepted tip. Write `Task N -> in progress` before new work; preserve that entry when resuming.
+2. Keep `@` undescribed with the feature bookmark at `@-`.
+3. Apply the plan's required skills and TDD steps. Run every specified verification.
+4. Only after verification passes, accept the task:
+   - confirm non-empty undescribed `@` has the feature bookmark as its sole parent;
+   - run `jj commit -m "<exact planned subject>"`;
+   - run `jj bookmark set "<Feature Bookmark>" -r @-`;
+   - record `@-`'s full change and commit IDs as complete.
+5. Mark the task complete in the tracker and continue in the new empty `@`.
 
-After all tasks complete:
-- Summarise what was implemented
-- Show final verification output
-- List files changed
+Inline execution has no task-review subagent and must not invent one. Verification is its acceptance gate. Never amend accepted work or move another bookmark.
 
-### Step 4: Complete Development
+## Final Review and Fixes
 
-After all tasks complete and verified:
-- Announce: "I'm using the finishing-development skill to complete this work."
-- Use the `finishing-development` skill
-- Follow that skill to verify tests, present options, execute choice
+Review from the recorded run base through the feature bookmark. For findings:
 
-## When to Stop and Ask for Help
+1. Record an exact pending `fix:` subject before changing work.
+2. Apply and verify the fix in undescribed `@`, then review from run base through `@`.
+3. After clean re-review, repeat the acceptance sequence using the pending subject.
+4. Repeat stable review through the feature bookmark.
 
-**STOP executing immediately when:**
-- Hit a blocker (missing dependency, test fails and you have attempted to fix them yourself, instruction unclear)
-- Plan has critical gaps preventing starting
-- You don't understand an instruction
-- Verification fails repeatedly
+After stable review passes with no pending fix, remove `.agents/sdd/` and use `finishing-development`.
 
-**Ask for clarification rather than guessing.**
+## Stop and Ask
 
-## When to Revisit Earlier Steps
+Stop on unclear instructions, missing dependencies, failed verification, unexplained work, malformed state, identity mismatch, divergence, or any state not covered above. Do not improvise rollback, rebase, split, squash, amend, integration, or unrelated bookmark movement.
 
-**Return to Review (Step 1) when:**
-- Partner updates the plan based on your feedback
-- Fundamental approach needs rethinking
+## Integration
 
-**Don't force through blockers** - stop and ask.
-
-## Remember
-- Load the correct plan document from `$DOCS_ROOT/$projectName/plans/` and note skills/files
-- Review the plan critically first — raise concerns before starting, not mid-task
-- Apply skills specified in "Skills to Use:"
-- Follow plan steps exactly
-- Don't skip verifications
-- Stop when blocked, don't guess
-- Never build implementation work directly on the trunk bookmark (main/master) without explicit user consent — start a new change/bookmark for the work
-
-## Integration with Other Skills
-
-**Uses:**
-- Skills specified in the plan document’s "Skills to Use:" section
+**Required workflow skills:**
+- `test-driven-development` for task implementation
+- `verification-before-completion` before reporting success
+- `finishing-development` after final review

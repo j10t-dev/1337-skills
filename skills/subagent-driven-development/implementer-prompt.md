@@ -58,6 +58,9 @@ Subagent/delegation tool (general-purpose):
     **Do not run any VCS commands (jj or git).** Version control belongs to
     the controller; your edits are picked up from the working tree.
 
+    A `**Commit:**` line belongs to the controller. It does not authorise you to run
+    VCS commands; ignore it while editing and verifying the task.
+
     **While you work:** If you encounter something unexpected or unclear, **ask
     questions**. It's always OK to pause and clarify. Don't guess.
 

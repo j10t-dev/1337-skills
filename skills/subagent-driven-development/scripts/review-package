@@ -1,20 +1,16 @@
 #!/usr/bin/env bash
-# Generate a review package: stat summary and full diff between two
-# working-copy snapshots, written to a file the reviewer reads in one call.
+# Generate a review package: stat summary and full diff between two exact
+# revisions, written to a file the reviewer reads in one call.
 #
 # Usage: review-package BASE HEAD [OUTFILE]
-# BASE and HEAD are jj commit IDs (or `@` for the current working copy).
-# Record BASE before dispatching an implementer with:
-#   jj log -r @ --no-graph -T commit_id
-# Commit IDs are immutable snapshots and stay resolvable after the working
-# copy amends (the old snapshot is hidden, not gone), so the diff captures
-# exactly the task's edits even though all tasks accumulate in one change.
-# Never pass a change ID as BASE: change IDs follow the amended change, so
-# the "base" would already contain the task's work and the diff would be
-# empty.
+# Task and fix rounds: review-package @- @
+# Stable final review: review-package RUN_BASE FEATURE_BOOKMARK
+# Pending final-fix review: review-package RUN_BASE @
+# BASE and HEAD may be any jj revisions that each resolve to one distinct
+# commit. The lifecycle documentation determines which boundary applies.
 # Default OUTFILE: <workspace>/review-<base>..<head>-<ts>-<pid>.diff
 # (the timestamp+PID keeps a re-review after fixes from overwriting the
-#  prior package).
+# prior package).
 set -euo pipefail
 
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then
@@ -43,12 +39,11 @@ resolve_one() {
 bs=$(resolve_one "$base" BASE)
 hs=$(resolve_one "$head" HEAD)
 
-# A change ID passed as BASE resolves to the *amended* change — i.e. the same
-# commit as HEAD — so the package would be empty and the review would pass
-# vacuously. Catch it here rather than shipping a hollow package.
+# Every package requires two distinct snapshots; equal revisions would make
+# any task, fix, or final review pass vacuously.
 if [ "$bs" = "$hs" ]; then
-  echo "BASE and HEAD resolve to the same commit ($bs) — was BASE a change ID?" >&2
-  echo "Record BASE as a commit ID before dispatch: jj log -r @ --no-graph -T commit_id" >&2
+  echo "BASE and HEAD resolve to the same commit ($bs) — nothing to review" >&2
+  echo "Use review-package @- @ for task/fix rounds, or distinct exact revisions for final review" >&2
   exit 3
 fi
 
