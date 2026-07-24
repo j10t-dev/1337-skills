@@ -23,6 +23,8 @@ Subagent/delegation tool (general-purpose):
     | Design Alignment | Plan covers design requirements, no major scope creep |
     | Task Decomposition | Tasks have clear boundaries, steps are actionable |
     | Buildability | Could an engineer follow this plan without getting stuck? |
+    | Linear Position | Exactly one `Builds On` resolving to one existing local bookmark target and exactly one distinct semantic `Feature Bookmark` absent at fresh-run start; a dependent design names its preceding feature bookmark |
+    | Commit Subjects | Every task has exactly one conventional subject describing delivered behaviour, with no task number, plan slug, or run metadata |
 
     ## Calibration
 
@@ -32,6 +34,7 @@ Subagent/delegation tool (general-purpose):
 
     Approve unless there are serious gaps — missing requirements from the design,
     contradictory steps, placeholder content, or tasks so vague they can't be acted on.
+    Return Issues Found for missing, duplicate, malformed, ambiguous, or unresolved `Builds On` values. Return Issues Found for missing, duplicate, malformed, or pre-existing `Feature Bookmark` values. Return Issues Found for guessed or unsuitable commit-subject values.
 
     ## Output Format
 

@@ -27,9 +27,10 @@ Dispatch code-reviewer subagent to catch issues before they cascade.
 
 Every review request must name the smallest accurate jj boundary:
 
-- **Current change:** Use `@` when reviewing the current task's change.
-- **Specific change:** Use a jj change ID when reviewing completed work that is not currently checked out.
-- **Bookmark/range:** Use a bookmark or explicit range when reviewing a larger integrated slice.
+- **Task in progress:** Use the supplied `@-..@` package.
+- **Completed task:** Review a supplied completed change ID when needed, not as an immutable base snapshot.
+- **Final feature:** Use the recorded run-base commit through the feature bookmark.
+- **Pending final fix:** Use run base through `@`.
 - **File list fallback:** Use an exact file list only when the change boundary is unavailable or misleading.
 
 Assume task workflows create reliable jj changes. Do not ask the reviewer to infer scope from full session history.

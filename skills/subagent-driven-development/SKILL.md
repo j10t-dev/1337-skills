@@ -53,62 +53,96 @@ digraph when_to_use {
 digraph process {
     rankdir=TB;
 
-    subgraph cluster_per_task {
-        label="Per Task";
-        "Record base commit ID, run task-brief, dispatch implementer subagent (./implementer-prompt.md)" [shape=box];
-        "Implementer subagent asks questions?" [shape=diamond];
-        "Answer questions, provide context" [shape=box];
-        "Implementer implements, tests, self-reviews" [shape=box];
-        "Write review package, dispatch task reviewer (./task-reviewer-prompt.md)" [shape=box];
-        "Task reviewer reports spec compliant and quality approved?" [shape=diamond];
-        "Dispatch fix subagent for Critical/Important findings" [shape=box];
-        "Mark task complete in task tracker and progress ledger" [shape=box];
-    }
+    "Pre-flight and initialise durable ledger" [shape=box];
+    "Write Task N -> in progress" [shape=box];
+    "Dispatch implementer; answer questions as needed" [shape=box];
+    "Implementer edits, tests, and self-reviews in undescribed @" [shape=box];
+    "Run scripts/review-package @- @ and dispatch task reviewer" [shape=box];
+    "Both task-review verdicts pass" [shape=diamond];
+    "Dispatch one fixer for Critical/Important findings" [shape=box];
+    "Controller accepts task with planned subject" [shape=box];
+    "Empty @ above advanced Feature Bookmark" [shape=box];
+    "Next task or final review" [shape=diamond];
+    "Run stable final review from run base through Feature Bookmark" [shape=box];
+    "Final review passes?" [shape=diamond];
+    "Record pending fix subject, dispatch one fixer, review run base through @" [shape=box];
+    "Controller accepts reviewed final fix" [shape=box];
+    "Clean scratch and use finishing-development" [shape=box style=filled fillcolor=lightgreen];
 
-    "Read plan, note context and global constraints, create task list" [shape=box];
-    "More tasks remain?" [shape=diamond];
-    "Dispatch final code reviewer subagent (../requesting-code-review/code-reviewer.md)" [shape=box];
-    "Use finishing-development" [shape=box style=filled fillcolor=lightgreen];
-
-    "Read plan, note context and global constraints, create task list" -> "Record base commit ID, run task-brief, dispatch implementer subagent (./implementer-prompt.md)";
-    "Record base commit ID, run task-brief, dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer subagent asks questions?";
-    "Implementer subagent asks questions?" -> "Answer questions, provide context" [label="yes"];
-    "Answer questions, provide context" -> "Record base commit ID, run task-brief, dispatch implementer subagent (./implementer-prompt.md)";
-    "Implementer subagent asks questions?" -> "Implementer implements, tests, self-reviews" [label="no"];
-    "Implementer implements, tests, self-reviews" -> "Write review package, dispatch task reviewer (./task-reviewer-prompt.md)";
-    "Write review package, dispatch task reviewer (./task-reviewer-prompt.md)" -> "Task reviewer reports spec compliant and quality approved?";
-    "Task reviewer reports spec compliant and quality approved?" -> "Dispatch fix subagent for Critical/Important findings" [label="no"];
-    "Dispatch fix subagent for Critical/Important findings" -> "Write review package, dispatch task reviewer (./task-reviewer-prompt.md)" [label="re-review"];
-    "Task reviewer reports spec compliant and quality approved?" -> "Mark task complete in task tracker and progress ledger" [label="yes"];
-    "Mark task complete in task tracker and progress ledger" -> "More tasks remain?";
-    "More tasks remain?" -> "Record base commit ID, run task-brief, dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
-    "More tasks remain?" -> "Dispatch final code reviewer subagent (../requesting-code-review/code-reviewer.md)" [label="no"];
-    "Dispatch final code reviewer subagent (../requesting-code-review/code-reviewer.md)" -> "Use finishing-development";
+    "Pre-flight and initialise durable ledger" -> "Write Task N -> in progress";
+    "Write Task N -> in progress" -> "Dispatch implementer; answer questions as needed";
+    "Dispatch implementer; answer questions as needed" -> "Implementer edits, tests, and self-reviews in undescribed @";
+    "Implementer edits, tests, and self-reviews in undescribed @" -> "Run scripts/review-package @- @ and dispatch task reviewer";
+    "Run scripts/review-package @- @ and dispatch task reviewer" -> "Both task-review verdicts pass";
+    "Both task-review verdicts pass" -> "Dispatch one fixer for Critical/Important findings" [label="no"];
+    "Dispatch one fixer for Critical/Important findings" -> "Run scripts/review-package @- @ and dispatch task reviewer" [label="same boundary"];
+    "Both task-review verdicts pass" -> "Controller accepts task with planned subject" [label="yes"];
+    "Controller accepts task with planned subject" -> "Empty @ above advanced Feature Bookmark";
+    "Empty @ above advanced Feature Bookmark" -> "Next task or final review";
+    "Next task or final review" -> "Write Task N -> in progress" [label="next task"];
+    "Next task or final review" -> "Run stable final review from run base through Feature Bookmark" [label="all tasks complete"];
+    "Run stable final review from run base through Feature Bookmark" -> "Final review passes?";
+    "Final review passes?" -> "Clean scratch and use finishing-development" [label="yes"];
+    "Final review passes?" -> "Record pending fix subject, dispatch one fixer, review run base through @" [label="no"];
+    "Record pending fix subject, dispatch one fixer, review run base through @" -> "Controller accepts reviewed final fix" [label="clean re-review"];
+    "Controller accepts reviewed final fix" -> "Run stable final review from run base through Feature Bookmark";
 }
 ```
 
 ## Version Control
 
-The controller owns all VCS state; subagents never run jj or git commands — implementers and fixers only edit files and run tests. All tasks accumulate in the current working-copy change: do not create, describe, or finalise changes. Splitting and describing the finished work is the human's job.
+Exactly one implementation plan is active. The controller owns every VCS mutation; implementers and fixers edit and verify, and reviewers remain read-only. Formal-plan permission covers only creating the declared local feature bookmark and committing an accepted task or separately reviewed final fix. It does not grant ad-hoc or integration permission. Every non-empty undescribed task/fix `@` must have exactly one parent, and that parent must be the declared feature bookmark target.
 
-- Before Task 1, record the run base: `jj log -r @ --no-graph -T commit_id`. The final whole-branch review diffs from this.
-- Before each implementer dispatch, record the task base the same way.
-- Record **commit IDs, never change IDs**. A commit ID is an immutable snapshot that stays resolvable after the working copy amends; a change ID follows the amended change, so by review time the "base" already contains the task's work and the diff comes out empty.
+| State | Required controller action |
+|---|---|
+| Run entry | Follow `Pre-Flight Plan Review`; matching existing state continues through `Durable Progress` |
+| Task starts | Write `Task N -> in progress`; dispatch only after the ledger write succeeds |
+| Task work | Keep non-empty `@` undescribed with the feature bookmark at `@-` |
+| Task review | Run `scripts/review-package @- @`; fix and re-run the same boundary |
+| Both task verdicts pass | Accept the task using its exact plan subject |
+| Final review | Compare the recorded run-base commit with `Feature Bookmark` |
+| Final fix starts | Record its exact pending `fix:` subject before dispatching the fixer |
+| Final fix passes re-review | Accept the fix using its pending ledger subject |
+
+### Accepting a Task or Final Fix
+
+After the applicable verification/review gate:
+
+1. Confirm `@` is non-empty, undescribed, has one parent, and that parent is the feature bookmark. Reconcile the completed ledger entries as one exact-subject, exact-parent path from the run base. Stop on any mismatch.
+2. Read the task subject from its `**Commit:**` field, or the final-fix subject from its pending ledger entry.
+3. Run `jj commit -m "<exact subject>"`. This leaves a new empty `@`; the accepted commit is `@-`.
+4. Run `jj bookmark set "<Feature Bookmark>" -r @-`.
+5. Read `@-` with `jj log -r @- --no-graph -T 'change_id ++ " " ++ commit_id'` and replace the pending ledger line with its full IDs and `(complete)`.
+
+Never amend an accepted commit or improvise rollback, rebase, split, squash, amend, or any bookmark movement beyond the declared feature bookmark. If interruption leaves the commit, bookmark, and ledger out of step, use the recovery table below.
 
 ## Pre-Flight Plan Review
 
-Before dispatching Task 1, scan the plan once for conflicts:
+Run this once before Task 1 or when resuming an interrupted run:
 
-- tasks that contradict each other or the plan's Global Constraints
-- anything the plan explicitly mandates that the review rubric treats as a defect (a test that asserts nothing, verbatim duplication of a logic block)
+1. Parse one `**Builds On:**`, one `**Feature Bookmark:**`, and one `**Commit:**` subject for every task; stop on missing or duplicate fields.
+2. Resolve `Builds On` to one local bookmark target and record its full change and commit IDs as the immutable run base.
+3. Read `.agents/sdd/progress.md`. A matching ledger resumes through `Durable Progress`; a ledger for another plan stops. Only an absent ledger is a fresh run.
+4. On a fresh run, stop on unexplained non-empty `@`. Reuse empty `@` when its sole parent is the run base; otherwise run `jj new <Builds On>`.
+5. On a fresh run, stop if `Feature Bookmark` already exists.
+6. On a fresh run, write the ledger, then run `jj bookmark create <Feature Bookmark> -r <run-base-commit>`.
 
-Present everything you find as one batched question — each finding beside the plan text that mandates it, asking which governs — before execution begins, not one interrupt per discovery mid-plan. If the scan is clean, proceed without comment. The review loop remains the net for conflicts that only emerge from implementation.
+A fresh ledger starts with exactly this shape:
+
+```text
+plan: /absolute/path/to/plan.md
+builds on: feature-a
+feature bookmark: feature-b
+run base: change aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, commit bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+```
+
+These fixed-width IDs are synthetic format illustrations. Real entries come from `jj log -T 'change_id ++ " " ++ commit_id'` and must be full length.
 
 ## Handling Implementer Status
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** Generate the review package (`scripts/review-package BASE @`, from this skill's directory — it prints the file path it wrote; BASE is the commit ID you recorded before dispatching the implementer, never a change ID or relative ref, which yields an empty or truncated diff), then dispatch the task reviewer with the printed path.
+**DONE:** Generate the review package with `scripts/review-package @- @` from this skill's directory; it prints the file path it wrote. Then dispatch the task reviewer with that path.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If they are about correctness or scope, address them before review. If they are observations (e.g. "this file is getting large"), note them and proceed to review.
 
@@ -124,7 +158,7 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 
 ## Handling Reviewer ⚠️ Items
 
-The task reviewer may report "⚠️ Cannot verify from diff" items — requirements that live in unchanged code or span tasks. These do not block the rest of the review, but you must resolve each one yourself before marking the task complete: you hold the plan and cross-task context the reviewer lacks. If you confirm an item is a real gap, treat it as a failed spec review — send it back to the implementer and re-review.
+The task reviewer may report "⚠️ Cannot verify from diff" items — requirements that live in unchanged code or span tasks. These do not block the rest of the review, but you must resolve each one yourself before accepting both task verdicts: you hold the plan and cross-task context the reviewer lacks. If you confirm an item is a real gap, treat it as a failed spec review — send it back to the implementer and re-review.
 
 ## Constructing Reviewer Prompts
 
@@ -134,13 +168,24 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
 - Do not ask a reviewer to re-run tests the implementer already ran on the same code — the implementer's report carries the test evidence.
 - Do not pre-judge findings for the reviewer — never instruct a reviewer to ignore or not flag a specific issue. If you believe a finding would be a false positive, let the reviewer raise it and adjudicate it in the review loop. If the prompt you are writing contains "do not flag," "don't treat X as a defect," "at most Minor," or "the plan chose" — stop: you are pre-judging, usually to spare yourself a review loop.
 - The global-constraints block you hand the reviewer is its attention lens. Copy the binding requirements verbatim from the plan's Global Constraints section or the spec: exact values, exact formats, and the stated relationships between components ("same layout as X", "matches Y"). The reviewer's template already carries the process rules (YAGNI, test hygiene, review method) — the constraints block is for what THIS project's spec demands.
-- Hand the reviewer its diff as a file: run this skill's `scripts/review-package BASE @` and pass the reviewer the file path it prints. The output never enters your own context, and the reviewer sees the stat summary and full diff in one read. Use the BASE commit ID you recorded before dispatching the implementer — never a change ID, which follows the amended change and empties the diff.
+- Hand the reviewer its diff as a file: run this skill's `scripts/review-package @- @` and pass the reviewer the file path it prints. The output never enters your own context, and the reviewer sees the accepted parent plus the current task's undescribed working-copy change.
 - A dispatch prompt describes one task, not the session's history. Do not paste accumulated prior-task summaries ("state after Tasks 1-3") into later dispatches. A fresh subagent needs its task, the interfaces it touches, and the global constraints. Nothing else.
-- Dispatch fix subagents for Critical and Important findings. Record Minor findings in the progress ledger as you go, and point the final whole-branch review at that list so it can triage which must be fixed before merge. A roll-up nobody reads is a silent discard.
+- Dispatch fix subagents for Critical and Important findings. Record Minor findings in the task report and point the final whole-branch review at that list so it can triage which must be fixed before merge. A roll-up nobody reads is a silent discard.
 - A finding labelled plan-mandated — or any finding that conflicts with what the plan's text requires — is the human's decision, like any plan contradiction: present the finding and the plan text, ask which governs. Do not dismiss the finding because the plan mandates it, and do not dispatch a fix that contradicts the plan without asking.
-- The final whole-branch review gets a package too: run `scripts/review-package RUN_BASE @`, where RUN_BASE is the commit ID you recorded before Task 1, and include the printed path in the final review dispatch.
+- Final review packages use exact revisions appropriate to their state:
+  - Stable final review: `scripts/review-package RUN_BASE FEATURE_BOOKMARK`
+  - Pending final-fix re-review: `scripts/review-package RUN_BASE @`
+  `RUN_BASE` is the full run-base commit ID recorded in the ledger.
 - Every fix dispatch carries the implementer contract: the fix subagent re-runs the tests covering its change and reports the results. Name the covering test files in the dispatch — a one-line fix does not need the whole suite. Before re-dispatching the reviewer, confirm the fix report contains the covering tests, the command run, and the output.
-- If the final whole-branch review returns findings, dispatch ONE fix subagent with the complete findings list — not one fixer per finding. Per-finding fixers each rebuild context and re-run suites; a real session's final-review fix wave cost more than all its tasks combined.
+- A final-review fixer follows the same VCS ban as an implementer. A `**Commit:**` line belongs to the controller, does not authorise VCS commands, and must be ignored while the fixer edits and verifies.
+- If the final whole-branch review returns findings, append this exact durable entry before dispatching ONE fix subagent with the complete findings list:
+
+  ```text
+  Final review fix 1 -> pending (subject `fix: address final review findings`)
+  ```
+
+  After its run-base-through-`@` package receives a clean re-review, use `Accepting a Task or Final Fix`. Never amend a task commit.
+- Scratch cleanup occurs only after final review passes and no pending fix exists. Remove `.agents/sdd/` then; another plan may start only after cleanup.
 
 ## File Handoffs
 
@@ -154,12 +199,47 @@ Everything you paste into a dispatch prompt — and everything a subagent prints
 
 ## Durable Progress
 
-Conversation memory does not survive compaction. Controllers that lost their place have re-dispatched entire completed task sequences — the single most expensive failure observed. Track progress in a ledger file, not only in the task tracker.
+Conversation memory does not survive compaction. `.agents/sdd/progress.md` is the durable state; never infer completion from conversation history. Its exact record forms are:
 
-- At skill start, check for a ledger: `cat "$(jj root)/.agents/sdd/progress.md"`. Tasks listed there as complete are DONE — do not re-dispatch them; resume at the first task not marked complete.
-- When a task's review comes back clean, append one line to the ledger in the same message as your other bookkeeping: `Task N: complete (base <commit-id>, head <commit-id>, review clean)` — the base and head commit IDs you recorded for the task.
-- The ledger is your recovery map: the snapshots it names remain resolvable in jj even after the working copy amends past them. After compaction, trust the ledger, `jj evolog`, and `jj op log` over your own recollection.
-- The ledger lives in git-ignored working-tree scratch; if it is discarded, recover the run's history from `jj op log`.
+```text
+plan: /absolute/path/to/plan.md
+builds on: feature-a
+feature bookmark: feature-b
+run base: change aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, commit bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+
+Task 1 -> in progress
+Task 1 -> change cccccccccccccccccccccccccccccccc, commit dddddddddddddddddddddddddddddddddddddddd (complete)
+Final review fix 1 -> pending (subject `fix: exact subject`)
+Final review fix 1 -> change eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee, commit ffffffffffffffffffffffffffffffffffffffff (complete)
+```
+
+The numbered state lines are mutually exclusive format examples. Synthetic IDs only illustrate width; completed entries contain the real full change and commit IDs from jj.
+
+Legacy, stale, or foreign ledger formats have no migration or compatibility path: stop rather than guessing or converting.
+
+Before any redispatch, prove:
+
+- every completed ledger change ID and commit ID still resolve to the same snapshot;
+- described commits after run base form one path in plan order;
+- each recovered task has the exact plan subject and expected parent;
+- completed task commits are never amended or redispatched.
+
+After those checks, perform only the action in the first matching recovery row:
+
+| Observed state | One recovery action |
+|---|---|
+| initialised ledger, absent feature bookmark, no task commits | Create the missing bookmark at run base. |
+| next exact task commit present while bookmark and ledger are behind | Advance the bookmark, then record its full identities. |
+| bookmark advanced while ledger still says in progress | Record the commit's full identities. |
+| completed final-fix commit with bookmark or ledger behind | Advance the bookmark, then record its full identities. |
+| pending final fix plus empty `@` and no matching child | Resume the recorded final-fix wave. |
+| pending final fix plus non-empty undescribed `@` | Resume run-base-through-`@` re-review. |
+| task in progress plus empty `@` | Dispatch or resume the recorded task. |
+| task in progress plus non-empty undescribed `@` | Dispatch or resume the recorded task. |
+| empty `@` above feature bookmark with no pending entry | Start the first uncompleted task or final review. |
+| unexplained non-empty `@`, described active `@`, divergence, or identity mismatch | Ambiguous: stop and ask. |
+
+Do not use `jj op log` as a substitute ledger and do not repair any state outside this table. If no row matches exactly, stop and ask.
 
 ## Prompt Templates
 
@@ -172,47 +252,40 @@ Conversation memory does not survive compaction. Controllers that lost their pla
 ```
 You: I'm using Subagent-Driven Development to execute this plan.
 
-[Read plan file once; note context and global constraints]
-[Create a tracked task list for all tasks]
-[Record RUN_BASE: jj log -r @ --no-graph -T commit_id]
+[Parse one Builds On, one Feature Bookmark, and every task Commit subject]
+[Resolve and record the immutable run base; reconcile or initialise the ledger]
+[Position empty @; create Feature Bookmark at run base only after the ledger write]
 
 Task 1: Hook installation script
 
-[Record task base commit ID; run scripts/task-brief PLAN 1; dispatch implementer
- (cheap model — mechanical, complete spec) with brief path + report path + context]
-
-Implementer: "Before I begin - should the hook be installed at user or system level?"
-You: "User level (~/.config/app/hooks/)"
+[Write "Task 1 -> in progress"; run task-brief; dispatch implementer]
 Implementer: [Status: DONE; 5/5 passing; report at .../task-1-report.md]
 
-[Run scripts/review-package BASE @; dispatch task reviewer (mid-tier) with brief +
- report + package paths + global constraints]
-Task reviewer: Spec ✅. Strengths: clean, well-tested. Issues: none. Task quality: Approved.
+[Run scripts/review-package @- @; dispatch task reviewer]
+Task reviewer: Spec ✅. Task quality: Approved.
 
-[Append "Task 1: complete (...)" to the ledger; mark Task 1 complete]
+[Accept Task 1: commit with its exact plan subject, advance Feature Bookmark, record full identities]
 
 Task 2: Recovery modes
 
-[Record task base; run task-brief for Task 2; dispatch implementer; report DONE]
-[Run review-package; dispatch task reviewer]
-Task reviewer:
-  Spec ❌: Missing progress reporting ("report every 100 items"); Extra --json flag.
-  Issues (Important): magic number 100.
+[Write "Task 2 -> in progress"; dispatch implementer; report DONE]
+[Run scripts/review-package @- @; dispatch task reviewer]
+Task reviewer: Spec ❌. Task quality: Needs fixes.
 
-[Dispatch ONE fix subagent with all findings]
-Fixer: removed --json, added progress reporting, extracted PROGRESS_INTERVAL.
-
-[Re-run review-package (same task base, new @); re-dispatch task reviewer]
+[Dispatch ONE fixer; keep @ undescribed]
+[Re-run scripts/review-package @- @; re-dispatch task reviewer]
 Task reviewer: Spec ✅. Task quality: Approved.
-
-[Mark Task 2 complete in ledger]
+[Accept Task 2 using `Accepting a Task or Final Fix`]
 
 ...
 
-[After all tasks: run review-package RUN_BASE @; dispatch final reviewer (most capable)]
-Final reviewer: All requirements met, ready for user review.
-
-Done!
+[Run scripts/review-package RUN_BASE FEATURE_BOOKMARK; dispatch final reviewer]
+Final reviewer: Important findings.
+[Append "Final review fix 1 -> pending (subject `fix: address final review findings`)" before fixer dispatch]
+[Dispatch ONE final-review fixer; run scripts/review-package RUN_BASE @]
+Final reviewer: Clean re-review.
+[Accept the reviewed final fix with its pending subject]
+[Repeat stable final review; after it passes with no pending fix, remove .agents/sdd/]
 ```
 
 ## Advantages
@@ -262,10 +335,10 @@ Done!
 - Skip review loops (reviewer found issues = implementer fixes = review again)
 - Let implementer self-review replace actual review (both are needed)
 - Tell a reviewer what not to flag, or pre-rate a finding's severity in the dispatch prompt ("treat it as Minor at most")
-- Dispatch a task reviewer without a diff file — generate it first (`scripts/review-package BASE @`) and name the printed path in the prompt
+- Dispatch a task reviewer without a diff file — generate it first (`scripts/review-package @- @`) and name the printed path in the prompt
 - Move to the next task while the review has open Critical/Important issues
-- Re-dispatch a task the progress ledger already marks complete — check the ledger (and `jj op log`) after any compaction or resume
-- Let a subagent run jj or git commands — VCS belongs to the controller, and change curation to the human
+- Re-dispatch a task the progress ledger already marks complete — reconcile the ledger and committed path after any compaction or resume
+- Let a subagent run jj or git commands — every VCS mutation belongs to the controller
 
 **If subagent asks questions:**
 - Answer clearly and completely
@@ -293,4 +366,4 @@ Done!
 - **test-driven-development** - Subagents follow TDD for each task
 
 **Alternative workflow:**
-- **executing-plans** - Use for parallel session instead of same-session execution
+- **executing-plans** - Use for inline execution without task subagents

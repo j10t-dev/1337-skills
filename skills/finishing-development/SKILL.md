@@ -73,6 +73,8 @@ Subagent/delegation tool (code-reviewer):
 **If user skips review:**
 - Continue to Step 3
 
+A formally executed feature already consists of accepted task commits plus any separately reviewed final-fix commits, and its feature bookmark identifies the accepted tip. Leave that curated local stack unchanged unless the user explicitly requests history reshaping or integration.
+
 ### Step 3: Present Completion Options
 
 Inform user:
@@ -85,7 +87,7 @@ Implementation complete and tests pass. Choose next step:
 4. Continue with another task
 ```
 
-**Do not perform integration operations** (rebase shared work, move bookmarks, submit externally, create/update PRs, or advance the target bookmark) unless the user explicitly asks. Local jj change management is allowed when the plan or workflow requires it: describe changes, split work, squash within the current task, or create task-sized changes. The user controls final jj/git-colocated integration.
+**Do not perform integration operations** (rebase shared work, move bookmarks, submit externally, create/update PRs, or advance the target bookmark) unless the user explicitly asks. The user controls final jj/git-colocated integration.
 
 ## Common Mistakes
 

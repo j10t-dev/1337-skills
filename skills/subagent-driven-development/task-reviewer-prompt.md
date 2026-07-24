@@ -41,19 +41,26 @@ Subagent/delegation tool (general-purpose):
 
     ## Diff Under Review
 
-    **Base:** [BASE]
-    **Head:** [HEAD]
+    **Base:** `@-`, `@`'s sole parent
+    **Head:** `@`, the undescribed working-copy change containing this task
     **Diff file:** [DIFF_FILE]
 
     Read the diff file once — it contains a stat summary and the full diff
     with surrounding context, and it is your view of the change. The
     diff's context lines ARE the changed files: do not read a
     changed file separately unless a hunk you must judge is cut off
-    mid-function — and say so in your report. Do not re-run VCS commands.
-    If the diff file is missing, fetch the diff yourself:
-    `jj diff --stat --from [BASE] --to [HEAD]` and
-    `jj diff --git --from [BASE] --to [HEAD]`.
-    Do not crawl the broader codebase. Inspect code outside the diff only
+    mid-function — and say so in your report. On the normal path, read the
+    supplied package and run no VCS command. If and only if the package is
+    unavailable and the controller prompt explicitly permits fallback, use
+    this narrowly bounded, read-only jj inspection:
+
+    ```bash
+    jj diff --stat --from @- --to @
+    jj diff --git --from @- --to @
+    ```
+
+    Otherwise report the unavailable package to the controller. Do not crawl
+    the broader codebase. Inspect code outside the diff only
     to evaluate a concrete risk you can name — one focused check per named
     risk, and name both the risk and what you checked in your report.
     Cross-cutting changes are legitimate named risks: if the diff changes
@@ -186,13 +193,8 @@ Subagent/delegation tool (general-purpose):
   are already in this template)
 - `[REPORT_FILE]` — REQUIRED: the file the implementer wrote its detailed
   report to
-- `[BASE]` — the commit ID recorded before this task's implementer was
-  dispatched (a commit ID, never a change ID — the working-copy change
-  amends as tasks accumulate, so a change ID would already contain the
-  task's work)
-- `[HEAD]` — the current working-copy commit (`@`, or its commit ID)
 - `[DIFF_FILE]` — REQUIRED: the path the controller wrote the review
-  package to (`scripts/review-package BASE @` prints the unique path it
+  package to (`scripts/review-package @- @` prints the unique path it
   wrote; the package never enters the controller's context)
 
 **Reviewer returns:** Spec Compliance verdict (✅/❌/⚠️), Strengths, Issues

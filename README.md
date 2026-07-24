@@ -59,6 +59,7 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
 
 - **UK English** throughout skill content.
 - **jj, not git.** All VCS instructions, scripts, and examples use jj. Raw git commands are never used.
+- **Controller-owned task commits.** Formal plan execution commits each accepted task with the plan's exact conventional subject and advances one declared feature bookmark. Ad-hoc commits, integration, and `$DOCS_ROOT` VCS remain user-controlled.
 - **Harness neutrality.** Canonical skill content avoids harness-specific tool names ("task tracker", "current harness's skill mechanism"); harness specifics live in adapter files.
 - **External docs repo.** Designs and plans live in `$DOCS_ROOT/$projectName/{designs,plans}/` (default `~/dev/j10t-docs`), not in-repo under `docs/superpowers/`.
 - **pi-review handoff (addition, not replacement).** After the inline self-review checklist, brainstorming and writing-plans hand the document to `requesting-pi-review` (on the `feat/requesting-pi-review` branch) for independent cross-harness confirmation. Self-review still runs first. Upstream's subagent document-reviewer prompts are no longer routed to.

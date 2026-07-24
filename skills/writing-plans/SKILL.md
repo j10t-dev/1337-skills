@@ -117,6 +117,11 @@ Consider multiple factors when defining Task boundaries:
 
 **Architecture:** [2-3 sentences about approach - summarise from DESIGN.md]
 
+**Builds On:** `feature-a`
+**Feature Bookmark:** `feature-b`
+
+`Builds On` must resolve to exactly one existing local bookmark target. `Feature Bookmark` must be absent at fresh-run start. `Feature Bookmark` is the new local output bookmark. The first feature may build on `main`; every dependent feature names the preceding feature bookmark. No value is guessed from an older plan, current working copy, plan slug, or stale ledger. A plan missing either field is incomplete and must not execute until the user supplies it.
+
 **Tech Stack:** [Key technologies/libraries]
 
 **Skills to Use:**
@@ -143,6 +148,10 @@ include this section.]
 
 ```markdown
 ## Task N: [Component Name]
+
+**Commit:** `feat: add recovery modes`
+
+This is the exact conventional-commit subject the controller uses after acceptance. It describes delivered behaviour and contains no task number, plan slug, run ID, or metadata. A plan missing this field for any task is incomplete and must not execute until the user supplies it.
 
 **Files:**
 - Create: `exact/path/to/file.py`
@@ -219,6 +228,10 @@ Review the plan yourself before sharing it.
 - **No placeholders:** Scan for the patterns in the No Placeholders section above and fix them.
 - **Type consistency:** Types, method signatures, and property names used in later tasks match what earlier tasks defined. A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 - **Context sufficiency:** A competent executor with no session history can complete the task from the plan plus listed required files.
+- **Linear position:** `Builds On` resolves to exactly one existing local bookmark target and `Feature Bookmark` is a distinct semantic output bookmark absent at fresh-run start; dependent plans form one explicit stack.
+- **Commit subjects:** Every task has exactly one suitable conventional-commit subject describing its delivered behaviour, with no task number or plan/run metadata.
+
+A plan missing any of the three required field classes is incomplete and must not execute until the user supplies it.
 
 Fix any issues inline before sharing the plan.
 
