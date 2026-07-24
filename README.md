@@ -63,6 +63,7 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
 - **Harness neutrality.** Canonical skill content avoids harness-specific tool names ("task tracker", "current harness's skill mechanism"); harness specifics live in adapter files.
 - **External docs repo.** Designs and plans live in `$DOCS_ROOT/$projectName/{designs,plans}/` (default `~/dev/j10t-docs`), not in-repo under `docs/superpowers/`.
 - **pi-review handoff (addition, not replacement).** After the inline self-review checklist, brainstorming and writing-plans hand the document to `requesting-pi-review` (on the `feat/requesting-pi-review` branch) for independent cross-harness confirmation. Self-review still runs first. Upstream's subagent document-reviewer prompts are no longer routed to.
+- **Mandatory programme design and vertical increments.** Brainstorming designs include a file-tree diff, boundary map, key interfaces, and representative scenario call trees (or a credible non-executable exemption); writing-plans preserves those decisions in observable vertical behaviour increments rather than horizontal layer batches.
 - **Renames:** `finishing-a-development-branch` → `finishing-development`, `using-superpowers` → `using-skills`.
 - **No git worktrees.** `using-git-worktrees` is not onboarded; jj covers the isolation need.
 - **No brainstorming visual companion.** The browser-based mockup companion is intentionally excluded.

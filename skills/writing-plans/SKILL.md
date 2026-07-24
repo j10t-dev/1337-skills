@@ -36,9 +36,32 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 If the design covers multiple independent subsystems, it should have been broken into sub-project designs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
 
+## Design Conformance
+
+Read the approved design's `Program Design` section before choosing files or
+tasks. Treat its file layout, unit boundaries and responsibilities, public
+interfaces and consequential internal seams, and representative scenario call
+paths as constraints.
+
+Validate those artefacts against the repository before planning. If the plan
+would move a responsibility, restructure approved files, introduce a public
+dependency, change a public signature or error contract, or replace an approved
+orchestration path, return `DesignRevisionRequired`, stop planning, and route the
+change through design revision and review. Do not hide a material redesign in a
+task brief.
+
+Private helpers, local algorithms, and equivalent implementation mechanics may
+be resolved in the plan when they preserve approved behaviour, boundaries, and
+contracts. Binding an already-approved dependency behind an unchanged public
+signature is equivalent local mechanics when the design does not approve that
+binding as a consequential seam.
+
 ## File Structure
 
-Before defining tasks, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in.
+Before defining tasks, map every approved programme-design file to its created,
+modified, or removed plan path and responsibility. Preserve the approved
+boundaries; planning fills in private details but does not redesign public
+structure.
 
 - Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
 - You reason best about code you can hold in context at once, and your edits are more reliable when files are focused. Prefer smaller, focused files over large ones that do too much.
@@ -50,59 +73,69 @@ This structure informs the task decomposition. Each task should produce self-con
 ## Plan Structure: Tasks and Subtasks
 
 **PLAN.md = Feature/Overall Change**
-- The big picture: "User CSV Export", "Code Review Workflow Simplification"
+- The complete approved change and its implementation sequence.
 
-**Task = Unit of work for one subagent**
-- One subagent dispatched per Task
-- Sized based on coupling, dependencies, file conflicts, and logical coherence (see Task Boundaries below)
+**Task = One reviewable vertical behaviour increment**
+- One subagent and one fresh review gate per task.
+- Normally suitable for one commit.
+- Traverses every affected layer needed to demonstrate one behaviour; it need
+  not span UI to persistence when the affected system has fewer layers.
 
 **Subtask = Logical phase within a task**
-- Contains specific steps for the subagent to execute
+- Failing test, minimal implementation, focused verification, refactor, and
+  integrated outcome verification.
 
-**Step = Individual action (2-5 minutes)**
-- Granular instruction with exact commands and expected output
+**Step = Individual action (2–5 minutes)**
+- Exact content, command, and expected result.
 
-## Task Boundaries - What Makes a Good Task?
+A normal task is one reviewable vertical behaviour increment. Write every task,
+including a decomposition-only or outline response, with each bold field below
+in this order:
 
-A task is the smallest unit that carries its own test cycle and is worth a
-fresh reviewer's gate. Fold setup, configuration, scaffolding, and
-documentation steps into the task whose deliverable needs them; split only
-where a reviewer could meaningfully reject one task while approving its
-neighbour. Each task ends with an independently testable deliverable.
+```markdown
+**Behaviour:** What becomes possible after this task
+**Scenario:** The approved scenario or branch this task implements
+**Files:** Every cross-layer file created, modified, or removed
+**Interfaces:** Exact contracts consumed and produced
+**Observable outcome:** The integrated check that demonstrates the behaviour
+**Dependencies:** Earlier tasks required before this task
+```
 
-Consider multiple factors when defining Task boundaries:
+## Vertical Task Boundaries
 
-**Coupling & Dependencies:**
-- Tightly coupled changes → same Task
-- If B depends on A's output → consider combining into one Task
-- Can run independently? → separate Tasks
+Choose the smallest increment that has its own test cycle, observable integrated
+outcome, and meaningful review gate. The first task is normally a tracer bullet
+through the primary approved scenario, proving the boundaries and main call
+path. Then prefer core behaviour, the smallest viable slice, highest novelty or
+integration risk, remaining scenario branches, and finally hardening or polish
+that cannot fit naturally into an earlier slice.
 
-**File Conflicts:**
-- Multiple Tasks editing same files → will conflict in parallel execution
-- Related edits to same file group → same Task
+Split an oversized task by smaller observable behaviour or scenario branch, not
+by technical layer. Independently observable scenario branches are separate
+tasks; do not bundle them merely to reduce task count. Migrations, shared
+infrastructure, scaffolding, and preparatory refactors belong to the first
+behaviour slice that needs them unless
+they form an independently safe, testable, and reviewable prerequisite.
 
-**Logical Coherence:**
-- Does this make sense as a reviewable unit?
-- Natural boundary: service layer, API endpoint, UI component, documentation set
+A separate foundation task must state:
 
-**Reviewable Stack Shape:**
-- Each Task should produce one coherent reviewable unit unless the plan explicitly says otherwise
-- Order tasks so foundations come first and dependent behaviour builds later
-- Keep unrelated changes separate so feedback on an earlier unit can be addressed without untangling later work
-- Avoid mixing mechanical refactors, behaviour changes, and polish in the same Task unless they must happen together
+- why no observable vertical increment is practical;
+- the independently verifiable state it produces;
+- the later behaviour that consumes it.
 
-**Subagent Efficiency:**
-- Justify context transfer overhead (10min-1hr of work per Task)
-- Avoid micro-Tasks that are pure overhead
+Every task ends with integrated verification of its observable outcome. Unit
+checks alone are insufficient when the approved scenario crosses boundaries.
 
-**Independence for Parallel Execution:**
-- Can Tasks 1, 2, 3 be dispatched simultaneously?
-- If they must be sequential, consider if they should be one Task
+Mark tasks parallel only when they do not conflict in files, interfaces,
+migrations, or state transitions. Reduced parallelism is preferable to
+deferring integration. Sequence shared entrypoints and stateful changes rather
+than claiming unsafe independence.
 
-**Rule of thumb:**
-- 1-5 Tasks per PLAN typically
-- Each Task = 10min-2hr of work
-- Simple Task might have 1 Subtask, complex Task might have 5-10 Subtasks
+Retain practical sizing discipline: normally 1–5 tasks per plan and 10 minutes
+to 2 hours of work per task. A task must justify fresh subagent context transfer,
+remain small enough for one review gate, and group files that change together.
+Do not create micro-tasks for setup overhead or split tightly coupled files only
+to increase apparent parallelism.
 
 ## Plan Document Header
 
@@ -147,11 +180,16 @@ include this section.]
 ## Task Structure
 
 ```markdown
-## Task N: [Component Name]
+## Task N: [Observable behaviour]
 
 **Commit:** `feat: add recovery modes`
 
-This is the exact conventional-commit subject the controller uses after acceptance. It describes delivered behaviour and contains no task number, plan slug, run ID, or metadata. A plan missing this field for any task is incomplete and must not execute until the user supplies it.
+This is the exact conventional-commit subject supplied to the controller helper. It describes delivered behaviour and contains no task number, plan slug, run ID, or metadata. A plan missing this field for any task is incomplete and must not execute until the user supplies it.
+
+**Behaviour:** [What becomes possible]
+**Scenario:** [Exact approved call tree or branch]
+**Observable outcome:** [Human or automated integrated observation]
+**Dependencies:** [Task references or `None`]
 
 **Files:**
 - Create: `exact/path/to/file.py`
@@ -159,39 +197,42 @@ This is the exact conventional-commit subject the controller uses after acceptan
 - Test: `tests/exact/path/to/test.py`
 
 **Interfaces:**
-- Consumes: [what this task uses from earlier tasks — exact signatures]
-- Produces: [what later tasks rely on — exact function names, parameter and
-  return types. A task's implementer sees only their own task; this block is
-  how they learn the names and types neighbouring tasks use.]
+- Consumes: [exact names, parameters, and return types from approved design or earlier tasks]
+- Produces: [exact names, parameters, and return types later tasks use]
 
-### Subtask N.1: Write and verify failing test
+### Subtask N.1: Write and verify the failing behaviour test
 
 **Step 1:** Write the failing test
 
 ```python
-def test_specific_behavior():
+def test_specific_behaviour():
     result = function(input)
     assert result == expected
 ```
 
-**Step 2:** Run test to verify it fails
+**Step 2:** Run the test to verify RED
 
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: FAIL with "function not defined"
+Run: `pytest tests/path/test.py::test_specific_behaviour -v`
+Expected: FAIL for the missing behaviour, not a fixture or syntax error.
 
-### Subtask N.2: Implement and verify solution
+### Subtask N.2: Implement and verify the behaviour
 
-**Step 1:** Write minimal implementation
+**Step 1:** Write the minimal approved implementation
 
 ```python
 def function(input):
     return expected
 ```
 
-**Step 2:** Run test to verify it passes
+**Step 2:** Run focused verification
 
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: PASS
+Run: `pytest tests/path/test.py::test_specific_behaviour -v`
+Expected: PASS.
+
+**Step 3:** Verify the observable integrated outcome
+
+Run: `[exact entrypoint or integration-test command]`
+Expected: `[exact externally observable output, state transition, or effect]`.
 ```
 
 ## No Placeholders
@@ -230,6 +271,12 @@ Review the plan yourself before sharing it.
 - **Context sufficiency:** A competent executor with no session history can complete the task from the plan plus listed required files.
 - **Linear position:** `Builds On` resolves to exactly one existing local bookmark target and `Feature Bookmark` is a distinct semantic output bookmark absent at fresh-run start; dependent plans form one explicit stack.
 - **Commit subjects:** Every task has exactly one suitable conventional-commit subject describing its delivered behaviour, with no task number or plan/run metadata.
+- **Programme-design conformance:** Planned files, responsibilities, public interfaces, consequential seams, and scenario paths match the approved `Program Design`; material conflicts returned to design revision.
+- **Verticality:** Each normal task is one observable behaviour increment rather than a layer, component batch, or test-only follow-up.
+- **Integrated outcome:** Every task states and verifies an observable integrated result after focused GREEN checks.
+- **Foundation exceptions:** Every foundation-only task explains why no vertical increment is practical, proves independent state, and names its later consumer.
+- **Task/commit coherence:** Each task is one coherent reviewable unit normally suitable for one commit.
+- **Parallel safety:** Tasks marked parallel share no files, interfaces, migrations, or state transitions.
 
 A plan missing any of the three required field classes is incomplete and must not execute until the user supplies it.
 
