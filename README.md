@@ -9,6 +9,7 @@ This repository is the canonical home for the `1337-skills` collection. Parent d
 ## Layout
 
 - `skills/` - canonical skill files.
+- `adapters/` - harness-specific skills and scripts, deliberately outside the shared `skills/` tree.
 - `hooks/` - hook scripts/configuration for harnesses that support them.
 - `.claude-plugin/`, `.claude/` - Claude Code adapter metadata.
 
@@ -26,6 +27,14 @@ Claude Code plugin compatibility:
 ~/.claude/plugins/local/1337-skills -> ~/.agents/1337-skills
 ```
 
+Claude-only adapter skills:
+
+```text
+~/.claude/skills/requesting-pi-review -> ~/.agents/1337-skills/adapters/claude/skills/requesting-pi-review
+```
+
+Adapter skills live outside `skills/`, so harnesses consuming `~/.agents/skills/` never enumerate them.
+
 Pi and other harnesses should consume the shared skill tree through `~/.agents/skills/`.
 
 ## Skills
@@ -40,7 +49,7 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 **Workflow & Collaboration**
 - `brainstorming`
 - `writing-plans`
-- `requesting-pi-review`
+- `requesting-document-review`
 - `executing-plans`
 - `working-with-subagents`
 - `subagent-driven-development`
@@ -53,6 +62,9 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 - `using-skills`
 - `writing-skills`
 
+**Claude-only adapters** (`adapters/claude/skills/`)
+- `requesting-pi-review`
+
 ## Intentional Divergences from Upstream
 
 Deliberate deltas from obra/superpowers. Anything not listed here that differs from upstream is fair game for a sync.
@@ -62,7 +74,7 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
 - **Controller-owned task commits.** Formal plan execution commits each accepted task with the plan's exact conventional subject and advances one declared feature bookmark. Ad-hoc commits, integration, and `$DOCS_ROOT` VCS remain user-controlled.
 - **Harness neutrality.** Canonical skill content avoids harness-specific tool names ("task tracker", "current harness's skill mechanism"); harness specifics live in adapter files.
 - **External docs repo.** Designs and plans live in `$DOCS_ROOT/$projectName/{designs,plans}/` (default `~/dev/j10t-docs`), not in-repo under `docs/superpowers/`.
-- **pi-review handoff (addition, not replacement).** After the inline self-review checklist, brainstorming and writing-plans hand the document to `requesting-pi-review` (on the `feat/requesting-pi-review` branch) for independent cross-harness confirmation. Self-review still runs first. Upstream's subagent document-reviewer prompts are no longer routed to.
+- **Independent document review (addition, not replacement).** After the inline self-review checklist, brainstorming and writing-plans hand the document to `requesting-document-review`, which dispatches a native reviewer subagent of the running harness using upstream's document-reviewer prompt templates. Self-review still runs first. `requesting-pi-review` is a Claude-only adapter that substitutes pi as the reviewer on explicit user request.
 - **Mandatory programme design and vertical increments.** Brainstorming designs include a file-tree diff, boundary map, key interfaces, and representative scenario call trees (or a credible non-executable exemption); writing-plans preserves those decisions in observable vertical behaviour increments rather than horizontal layer batches.
 - **Renames:** `finishing-a-development-branch` → `finishing-development`, `using-superpowers` → `using-skills`.
 - **No git worktrees.** `using-git-worktrees` is not onboarded; jj covers the isolation need.
