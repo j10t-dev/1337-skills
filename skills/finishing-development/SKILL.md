@@ -59,11 +59,13 @@ Subagent/delegation tool (code-reviewer):
 
     Review scope:
     - JJ_BOUNDARY: [use `@`, a specific jj change ID, bookmark, or explicit range]
-    - PLAN_REFERENCE: relevant plan document in `$DOCS_ROOT/$projectName/plans/`, if available
+    - PLAN_REFERENCE: [absolute path to the relevant plan document, if available]
     - DESCRIPTION: completion review for the implemented work
 
     Do not infer scope from session history or auto-detect from ambient repository state.
 ```
+
+Every path in the dispatch prompt is absolute and already expanded. The reviewer does not activate skills and does not read your shell environment, so an unexpanded `$DOCS_ROOT`, `$projectName`, or leading `~` reaches it as literal text it cannot resolve. Plans live in `$DOCS_ROOT/$projectName/plans/<slug>.md`; resolve that to an absolute path before dispatching — see the docs-root rules in `writing-plans`.
 
 **After review:**
 - Fix Critical issues immediately

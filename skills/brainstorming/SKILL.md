@@ -107,7 +107,7 @@ digraph brainstorming {
 
 **Documentation:**
 - Design and plan documents always live in an external docs repo, separate from the code repo
-- `$DOCS_ROOT` is the docs repo root. Use the `DOCS_ROOT` environment variable if set; otherwise default to `~/dev/j10t-docs`
+- `$DOCS_ROOT` is the docs repo root. Resolve it from the `DOCS_ROOT` environment variable, or from the default defined in your instructions file. Expand it to an absolute path before using it in a file-tool path or a subagent prompt. If neither defines it, ask the user — never guess a path, and never fall back to writing docs in-repo
 - Designs: `$DOCS_ROOT/$projectName/designs/`
 - Plans: `$DOCS_ROOT/$projectName/plans/`
 - Determine `$projectName` from the repo directory name unless the user specifies a different docs project name

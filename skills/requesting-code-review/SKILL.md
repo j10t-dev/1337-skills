@@ -39,6 +39,8 @@ Assume task workflows create reliable jj changes. Do not ask the reviewer to inf
 
 Use the current harness's subagent/delegation tool with the code-reviewer type if available, filling the template at `code-reviewer.md`
 
+Every path in the dispatch prompt is absolute and already expanded. The reviewer does not activate skills and does not read your shell environment, so an unexpanded `$DOCS_ROOT`, `$projectName`, or leading `~` reaches it as literal text it cannot resolve. Resolve them before dispatching — see the docs-root rules in `writing-plans`.
+
 **3. Act on feedback:**
 - Fix Critical/Important issues
 - **Re-review Critical/Important fixes** using the smallest scope that proves the issue was resolved: specific files, affected tests, or a narrower jj boundary if appropriate
@@ -55,7 +57,7 @@ You: Let me request code review before proceeding.
 
 [Dispatch code-reviewer subagent]
   DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
-  PLAN_REFERENCE: Task 2 from `$DOCS_ROOT/$projectName/plans/<slug>.md`
+  PLAN_REFERENCE: Task 2 from `/abs/path/to/docs/<projectName>/plans/<slug>.md`
   JJ_BOUNDARY: @
 
 [Subagent returns]:
@@ -69,7 +71,7 @@ You: [Fix progress indicators]
 
 [Dispatch code-reviewer again to verify fix]
   DESCRIPTION: Verification of progress indicator fix
-  PLAN_REFERENCE: Task 2 from `$DOCS_ROOT/$projectName/plans/<slug>.md`
+  PLAN_REFERENCE: Task 2 from `/abs/path/to/docs/<projectName>/plans/<slug>.md`
   FIX_REVIEW_SCOPE:
     - Verify the progress indicator issue is fixed
     - Review only:
