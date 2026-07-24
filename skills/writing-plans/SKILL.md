@@ -286,8 +286,8 @@ Fix any issues inline before sharing the plan.
 
 ## Independent Review
 
-- Load the `requesting-pi-review` skill and run it on the plan document you
-  just wrote (`type=plan`, `design-ref` = the design document this plan
+- Load the `requesting-document-review` skill and run it on the plan document
+  you just wrote (`type=plan`, `design-ref` = the design document this plan
   implements).
 - This handoff always runs — there is no trivial-skip path for "the plan
   looks fine."
