@@ -28,13 +28,11 @@ You MUST track each of these items in the current harness's task tracker and com
 1. **Explore project context** — check files, docs, recent changes, and representative existing execution paths
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 3. **Propose 2-3 approaches** — with trade-offs and your recommendation
-4. **Present system design** — architecture, components, data flow, errors, and testing; get user approval in sections
-5. **Present programme design** — file-tree diff, boundary map, key interfaces, and scenario call trees; get user approval
-6. **Write design doc** — save to `$DOCS_ROOT/$projectName/designs/<slug>.md`
-7. **Design self-review** — inline check for placeholders, contradictions, ambiguity, scope, and programme-design consistency
-8. **Independent review** — run the existing `requesting-pi-review` design loop
-9. **User reviews written design** — ask the user to review the design file before proceeding
-10. **Transition to implementation** — invoke the writing-plans skill to create the implementation plan
+4. **Present design** — follow `design-document-template.md`, present it in sections, and get user approval
+5. **Write design doc** — save to `$DOCS_ROOT/$projectName/designs/<slug>.md`
+6. **Design self-review** — check the document against the template and inline review criteria
+7. **User reviews written design** — ask the user to review the design file before proceeding
+8. **Transition to implementation** — invoke the writing-plans skill to create the implementation plan
 
 ## Process Flow
 
@@ -43,28 +41,21 @@ digraph brainstorming {
     "Explore project context and execution paths" [shape=box];
     "Ask clarifying questions" [shape=box];
     "Propose 2-3 approaches" [shape=box];
-    "Present system design sections" [shape=box];
-    "User approves system design?" [shape=diamond];
-    "Present programme design sections" [shape=box];
-    "User approves programme design?" [shape=diamond];
+    "Present design sections" [shape=box];
+    "User approves design?" [shape=diamond];
     "Write design doc" [shape=box];
-    "Design self-review\n(including programme design)" [shape=box];
-    "Independent pi review" [shape=box];
+    "Design self-review" [shape=box];
     "User reviews written design?" [shape=diamond];
     "Invoke writing-plans skill" [shape=doublecircle];
 
     "Explore project context and execution paths" -> "Ask clarifying questions";
     "Ask clarifying questions" -> "Propose 2-3 approaches";
-    "Propose 2-3 approaches" -> "Present system design sections";
-    "Present system design sections" -> "User approves system design?";
-    "User approves system design?" -> "Present system design sections" [label="no, revise"];
-    "User approves system design?" -> "Present programme design sections" [label="yes"];
-    "Present programme design sections" -> "User approves programme design?";
-    "User approves programme design?" -> "Present programme design sections" [label="no, revise"];
-    "User approves programme design?" -> "Write design doc" [label="yes"];
-    "Write design doc" -> "Design self-review\n(including programme design)";
-    "Design self-review\n(including programme design)" -> "Independent pi review";
-    "Independent pi review" -> "User reviews written design?";
+    "Propose 2-3 approaches" -> "Present design sections";
+    "Present design sections" -> "User approves design?";
+    "User approves design?" -> "Present design sections" [label="no, revise"];
+    "User approves design?" -> "Write design doc" [label="yes"];
+    "Write design doc" -> "Design self-review";
+    "Design self-review" -> "User reviews written design?";
     "User reviews written design?" -> "Write design doc" [label="changes requested"];
     "User reviews written design?" -> "Invoke writing-plans skill" [label="approved"];
 }
@@ -94,10 +85,10 @@ digraph brainstorming {
 - Lead with your recommended option and explain why
 
 **Presenting the design:**
+- Read `design-document-template.md` from this skill directory and use it as the output contract
 - Once you believe you understand what you're building, present the design
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
 - Ask after each section whether it looks right so far
-- Cover: architecture, components, data flow, error handling, testing
 - Be ready to go back and clarify if something doesn't make sense
 
 **Design for isolation and clarity:**
@@ -105,92 +96,6 @@ digraph brainstorming {
 - For each unit, you should be able to answer: what does it do, how do you use it, and what does it depend on?
 - Can someone understand what a unit does without reading its internals? Can you change the internals without breaking consumers? If not, the boundaries need work.
 - Smaller, well-bounded units are also easier for you to work with - you reason better about code you can hold in context at once, and your edits are more reliable when files are focused. When a file grows large, that's often a signal that it's doing too much.
-
-## Program Design (mandatory)
-
-Programme design follows system architecture and precedes final design approval.
-Use the exact `## Program Design` heading so reviewers and planners can locate
-this contract. It describes proposed code shape compactly enough for a reviewer
-to assess boundaries, interfaces, and representative execution before planning.
-
-Executable changes include all four artefacts below. Keep them scenario-scoped:
-exclude exhaustive static call graphs, incidental framework callbacks, and
-unchanged plumbing.
-
-### File-tree diff
-
-Use `+`, `~`, and `-` for created, modified, and removed files, and state one
-responsibility for every affected file:
-
-```diff
- src/resource/
-+├── resource-client.ts      # Wraps resource API calls
-~└── resource-route.ts       # Wires create behaviour into the route
-```
-
-Follow the repository's existing layout; this artefact does not authorise
-unrelated restructuring.
-
-### Boundary map
-
-For each affected unit, record its responsibility, the design decision or
-complexity it hides, public dependencies, owned data or state, side effects,
-and failure behaviour. Justify boundaries through cohesion, information hiding,
-and change locality. Boundaries hide coherent design decisions rather than
-execution phases; the scenario tree only shows how independently justified
-units collaborate.
-
-### Key interfaces in pseudocode
-
-Give exact names, parameter and return types, important errors, and behavioural
-constraints for public interfaces and consequential internal seams:
-
-```ts
-interface ResourceClient {
-  create(input: CreateResourceInput): Promise<Result<Resource, CreateError>>
-}
-```
-
-Omit ordinary private helpers whose shape does not affect consumers or
-neighbouring tasks.
-
-### Scenario call trees
-
-Show the shortest representative path from an entrypoint to an observable
-effect. Include the primary production path, the corresponding test path when
-dependencies differ, and materially distinct error, event, or asynchronous
-paths. Mark external I/O, durable side effects, and asynchronous boundaries;
-use diff notation when changing an existing control flow. In call-tree notation,
-`→` is a synchronous call and `⇢ await` is an asynchronous boundary. When tests
-substitute a production dependency, name both implementations and verify that
-they satisfy the same interface and behavioural contract.
-
-```text
-Production:
-HTTP PUT /resources/:slug
-  → resourceRoute.create
-    → ResourceService.create
-      ⇢ await ResourceStore.insert
-    ← Resource
-  ← HTTP 201
-
-Tests:
-resourceRoute.create
-  → ResourceService.create
-    ⇢ await InMemoryResourceStore.insert
-  ← HTTP 201 response
-```
-
-A change without executable flow still includes the `Program Design` section.
-It replaces each inapplicable artefact with a specific explanation of why no
-runtime behaviour, callable interface, dependency substitution, or execution
-path changes. Do not invent runtime behaviour to satisfy the template.
-
-Material programme-design changes return to design revision and review. These
-include moving responsibilities, changing approved file layout or public
-signatures, adding a public dependency, or replacing an approved scenario call
-path. Private helper structure and equivalent local mechanics remain planning
-or implementation decisions when they preserve the approved boundaries.
 
 **Working in existing codebases:**
 - Explore the current structure before proposing changes. Follow existing patterns.
@@ -224,10 +129,7 @@ Review the design yourself before sharing it.
 - **Ambiguity:** Open questions are explicit; assumptions are labelled.
 - **No placeholders:** Remove `TBD`, `TODO`, vague component names, and undefined references.
 - **Implementation readiness:** A plan writer can turn the design into concrete tasks without session history.
-- **Programme-design completeness:** Every executable design has a responsibility-labelled file-tree diff, boundary map, key interfaces, and representative scenario call trees; every exemption is specific to a change without executable flow.
-- **Boundary quality:** Boundaries hide coherent design decisions rather than execution phases, and every proposed file has one stated responsibility.
-- **Programme-design consistency:** Interface names and types agree with the scenario call trees; production, test, and materially distinct failure or asynchronous paths are represented; test substitutions satisfy the same interface and behavioural contract as production dependencies.
-- **Planning gate:** Material changes to approved layout, boundaries, interfaces, or call paths require design revision and another review.
+- **Template conformance:** The document satisfies `design-document-template.md`, including its programme-design and change-control checks.
 
 Fix any issues inline before sharing the design with the user. No need to re-review — just fix and move on.
 

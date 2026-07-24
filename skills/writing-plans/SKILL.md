@@ -47,14 +47,15 @@ Validate those artefacts against the repository before planning. If the plan
 would move a responsibility, restructure approved files, introduce a public
 dependency, change a public signature or error contract, or replace an approved
 orchestration path, return `DesignRevisionRequired`, stop planning, and route the
-change through design revision and review. Do not hide a material redesign in a
-task brief.
+change through design revision and review. Name the approved artefact, proposed
+replacement, and exact conflict before stopping. Do not hide a material redesign
+in a task brief.
 
 Private helpers, local algorithms, and equivalent implementation mechanics may
 be resolved in the plan when they preserve approved behaviour, boundaries, and
-contracts. Binding an already-approved dependency behind an unchanged public
-signature is equivalent local mechanics when the design does not approve that
-binding as a consequential seam.
+contracts. Binding an approved dependency as private state of the unit that owns
+an unchanged method is equivalent local mechanics when the design leaves binding
+unspecified; it does not permit ambient or global state or a new public contract.
 
 ## File Structure
 
@@ -95,10 +96,10 @@ in this order:
 ```markdown
 **Behaviour:** What becomes possible after this task
 **Scenario:** The approved scenario or branch this task implements
-**Files:** Every cross-layer file created, modified, or removed
-**Interfaces:** Exact contracts consumed and produced
 **Observable outcome:** The integrated check that demonstrates the behaviour
 **Dependencies:** Earlier tasks required before this task
+**Files:** Every cross-layer file created, modified, or removed
+**Interfaces:** Exact contracts consumed and produced
 ```
 
 ## Vertical Task Boundaries
@@ -111,8 +112,9 @@ integration risk, remaining scenario branches, and finally hardening or polish
 that cannot fit naturally into an earlier slice.
 
 Split an oversized task by smaller observable behaviour or scenario branch, not
-by technical layer. Independently observable scenario branches are separate
-tasks; do not bundle them merely to reduce task count. Migrations, shared
+by technical layer. Treat each independently observable branch as a separate task
+by default. Combine branches only when they form one coherent outcome and
+coupling or task size would make separation impractical. Migrations, shared
 infrastructure, scaffolding, and preparatory refactors belong to the first
 behaviour slice that needs them unless
 they form an independently safe, testable, and reviewable prerequisite.
