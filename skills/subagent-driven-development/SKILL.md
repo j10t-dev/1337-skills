@@ -47,7 +47,7 @@ digraph when_to_use {
 
 > "Dispatch X subagent" below means delegate to a fresh agent via the current harness's subagent/delegation mechanism.
 
-**SDD model requirement:** Every implementer, fixer, and task-reviewer dispatch explicitly supplies a model selected under `working-with-subagents`; these SDD calls use general-purpose delegation rather than matching preconfigured roles. Every final-review dispatch does the same. The final whole-branch reviewer handles architecture and high-risk judgement, so use the most capable available model.
+**SDD model requirement:** Every implementer, fixer, and task-reviewer dispatch explicitly supplies a model selected under `working-with-subagents`; these SDD calls use general-purpose delegation rather than matching preconfigured roles. Every final-review dispatch does the same. Resumed implementers retain their original model. The final whole-branch reviewer handles architecture and high-risk judgement, so use the most capable available model.
 
 ```dot
 digraph process {
@@ -59,7 +59,7 @@ digraph process {
     "Implementer edits, tests, and self-reviews in undescribed @" [shape=box];
     "Run scripts/review-package @- @ and dispatch task reviewer" [shape=box];
     "Both task-review verdicts pass" [shape=diamond];
-    "Dispatch one fixer for Critical/Important findings" [shape=box];
+    "Resume implementer; after 3 failed rounds use a fresh, more capable implementer" [shape=box];
     "Controller accepts task with planned subject" [shape=box];
     "Empty @ above advanced Feature Bookmark" [shape=box];
     "Next task or final review" [shape=diamond];
@@ -74,8 +74,8 @@ digraph process {
     "Dispatch implementer; answer questions as needed" -> "Implementer edits, tests, and self-reviews in undescribed @";
     "Implementer edits, tests, and self-reviews in undescribed @" -> "Run scripts/review-package @- @ and dispatch task reviewer";
     "Run scripts/review-package @- @ and dispatch task reviewer" -> "Both task-review verdicts pass";
-    "Both task-review verdicts pass" -> "Dispatch one fixer for Critical/Important findings" [label="no"];
-    "Dispatch one fixer for Critical/Important findings" -> "Run scripts/review-package @- @ and dispatch task reviewer" [label="same boundary"];
+    "Both task-review verdicts pass" -> "Resume implementer; after 3 failed rounds use a fresh, more capable implementer" [label="no"];
+    "Resume implementer; after 3 failed rounds use a fresh, more capable implementer" -> "Run scripts/review-package @- @ and dispatch task reviewer" [label="same boundary"];
     "Both task-review verdicts pass" -> "Controller accepts task with planned subject" [label="yes"];
     "Controller accepts task with planned subject" -> "Empty @ above advanced Feature Bookmark";
     "Empty @ above advanced Feature Bookmark" -> "Next task or final review";
@@ -160,6 +160,10 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 
 The task reviewer may report "⚠️ Cannot verify from diff" items — requirements that live in unchanged code or span tasks. These do not block the rest of the review, but you must resolve each one yourself before accepting both task verdicts: you hold the plan and cross-task context the reviewer lacks. If you confirm an item is a real gap, treat it as a failed spec review — send it back to the implementer and re-review.
 
+## Fix Rounds
+
+Resume the same implementer for Critical and Important review fixes. After three failed rounds, dispatch a fresh, more capable implementer. Re-review after every round.
+
 ## Constructing Reviewer Prompts
 
 Per-task reviews are task-scoped gates. The broad review happens once, at the final whole-branch review. When you fill a reviewer template:
@@ -170,13 +174,13 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
 - The global-constraints block you hand the reviewer is its attention lens. Copy the binding requirements verbatim from the plan's Global Constraints section or the spec: exact values, exact formats, and the stated relationships between components ("same layout as X", "matches Y"). The reviewer's template already carries the process rules (YAGNI, test hygiene, review method) — the constraints block is for what THIS project's spec demands.
 - Hand the reviewer its diff as a file: run this skill's `scripts/review-package @- @` and pass the reviewer the file path it prints. The output never enters your own context, and the reviewer sees the accepted parent plus the current task's undescribed working-copy change.
 - A dispatch prompt describes one task, not the session's history. Do not paste accumulated prior-task summaries ("state after Tasks 1-3") into later dispatches. A fresh subagent needs its task, the interfaces it touches, and the global constraints. Nothing else.
-- Dispatch fix subagents for Critical and Important findings. Record Minor findings in the task report and point the final whole-branch review at that list so it can triage which must be fixed before merge. A roll-up nobody reads is a silent discard.
+- Record Minor findings in the task report and point the final whole-branch review at that list so it can triage which must be fixed before merge. A roll-up nobody reads is a silent discard.
 - A finding labelled plan-mandated — or any finding that conflicts with what the plan's text requires — is the human's decision, like any plan contradiction: present the finding and the plan text, ask which governs. Do not dismiss the finding because the plan mandates it, and do not dispatch a fix that contradicts the plan without asking.
 - Final review packages use exact revisions appropriate to their state:
   - Stable final review: `scripts/review-package RUN_BASE FEATURE_BOOKMARK`
   - Pending final-fix re-review: `scripts/review-package RUN_BASE @`
   `RUN_BASE` is the full run-base commit ID recorded in the ledger.
-- Every fix dispatch carries the implementer contract: the fix subagent re-runs the tests covering its change and reports the results. Name the covering test files in the dispatch — a one-line fix does not need the whole suite. Before re-dispatching the reviewer, confirm the fix report contains the covering tests, the command run, and the output.
+- Every fix round carries the implementer contract: the implementer re-runs the tests covering its change and reports the results. Name the covering test files in the assignment — a one-line fix does not need the whole suite. Before re-dispatching the reviewer, confirm the fix report contains the covering tests, the command run, and the output.
 - A final-review fixer follows the same VCS ban as an implementer. A `**Commit:**` line belongs to the controller, does not authorise VCS commands, and must be ignored while the fixer edits and verifies.
 - If the final whole-branch review returns findings, append this exact durable entry before dispatching ONE fix subagent with the complete findings list:
 
@@ -195,7 +199,7 @@ Everything you paste into a dispatch prompt — and everything a subagent prints
 - **Task brief:** before dispatching an implementer, run this skill's `scripts/task-brief PLAN_FILE N` — it extracts the task's full text to a file and prints the path. Compose the dispatch so the brief stays the single source of requirements. Your dispatch should contain: (1) one line on where this task fits; (2) the brief path, introduced as "read this first — it is your requirements, with the exact values to use verbatim"; (3) interfaces and decisions from earlier tasks that the brief cannot know; (4) your resolution of any ambiguity you noticed in the brief; (5) the report-file path and report contract. Exact values (numbers, magic strings, signatures, test cases) appear only in the brief.
 - **Report file:** name the implementer's report file after the brief (`…/task-N-brief.md` → `…/task-N-report.md`) and put it in the dispatch prompt. The implementer writes the full report there and returns only status, a one-line test summary, and concerns.
 - **Reviewer inputs:** the task reviewer gets three paths — the same brief file, the report file, and the review package — plus the global constraints that bind the task.
-- Fix dispatches append their fix report (with test results) to the same report file and return a short summary; re-reviews read the updated file.
+- Fix rounds append their report (with test results) to the same report file and return a short summary; re-reviews read the updated file.
 
 ## Durable Progress
 
@@ -272,7 +276,7 @@ Task 2: Recovery modes
 [Run scripts/review-package @- @; dispatch task reviewer]
 Task reviewer: Spec ❌. Task quality: Needs fixes.
 
-[Dispatch ONE fixer; keep @ undescribed]
+[Resume the implementer; keep @ undescribed]
 [Re-run scripts/review-package @- @; re-dispatch task reviewer]
 Task reviewer: Spec ✅. Task quality: Approved.
 [Accept Task 2 using `Accepting a Task or Final Fix`]
@@ -344,12 +348,6 @@ Final reviewer: Clean re-review.
 - Answer clearly and completely
 - Provide additional context if needed
 - Don't rush them into implementation
-
-**If reviewer finds issues:**
-- Dispatch a fix subagent for them
-- Reviewer reviews again
-- Repeat until approved
-- Don't skip the re-review
 
 **If subagent fails task:**
 - Dispatch a fix subagent with specific instructions

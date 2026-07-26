@@ -25,7 +25,7 @@ Subagent/delegation tool (general-purpose):
     | YAGNI | Unrequested features, over-engineering |
     | Program Design | Every design has a `Program Design` section. Executable changes have a responsibility-labelled file-tree diff, justified boundary map, exact key interfaces, and representative production/test/material failure or asynchronous scenario call trees. A non-executable change gives a specific credible exemption for each inapplicable artefact. |
 
-    Missing, contradictory, or implementation-blocking programme-design artefacts are issues. Check that every proposed file has one responsibility, boundaries hide coherent decisions rather than execution phases, interface names and types agree with call trees, external I/O and async boundaries are visible, and test substitutions satisfy the same interface and behavioural contract as production dependencies. A vague exemption is an issue when runtime or callable behaviour actually changes.
+    Missing, contradictory, or implementation-blocking programme-design artefacts are issues. Check that every proposed file has one responsibility, boundaries hide coherent decisions rather than execution phases, interface names and types agree with call trees, external I/O and async boundaries are visible, and test substitutions satisfy the same interface and behavioural contract as production dependencies. Changed call paths use a contextual call-tree diff rather than only describing the final path. A vague exemption is an issue when runtime or callable behaviour actually changes.
 
     ## Calibration
 

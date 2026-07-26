@@ -92,32 +92,38 @@ neighbouring tasks.
 ### Scenario call trees
 
 Show the shortest representative path from an entrypoint to an observable
-effect. Include:
+effect. For changed execution paths, show a contextual call-tree diff: retain
+enough unchanged calls to locate the change, mark removed calls with `-` and
+added calls with `+`, and show where control returns or produces an effect.
+Include:
 
 - the primary production path;
 - the corresponding test path when dependencies differ; and
 - materially distinct error, event, or asynchronous paths.
 
-Mark external I/O, durable side effects, and asynchronous boundaries. Use diff
-notation when changing an existing control flow. In call-tree notation, `→` is
-a synchronous call and `⇢ await` is an asynchronous boundary. When tests
-substitute a production dependency, name both implementations and verify that
-they satisfy the same interface and behavioural contract.
+Mark external I/O, durable side effects, and asynchronous boundaries. In
+call-tree notation, `→` is a synchronous call and `⇢ await` is an asynchronous
+boundary. When tests substitute a production dependency, name both
+implementations and verify that they satisfy the same interface and behavioural
+contract.
 
-```text
+```diff
 Production:
-HTTP PUT /resources/:slug
-  → resourceRoute.create
-    → ResourceService.create
-      ⇢ await ResourceStore.insert
-    ← Resource
-  ← HTTP 201
+ HTTP PUT /resources/:slug
+ └─ resourceRoute.create
+-   ├─ ResourceService.create
+-   │  ⇢ await ResourceStore.insert
++   ├─ ResourceApplication.create
++   │  └─ ResourceService.create
++   │     ⇢ await ResourceStore.insert
+    └─ HTTP 201
 
 Tests:
-resourceRoute.create
-  → ResourceService.create
-    ⇢ await InMemoryResourceStore.insert
-  ← HTTP 201 response
+ resourceRoute.create
+   → ResourceApplication.create
+     → ResourceService.create
+       ⇢ await InMemoryResourceStore.insert
+   ← HTTP 201 response
 ```
 
 ## Applicability and change control

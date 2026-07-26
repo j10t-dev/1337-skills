@@ -60,7 +60,7 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 
 **Meta**
 - `using-skills`
-- `writing-skills`
+- `writing-for-agents`
 
 **Claude-only adapters** (`adapters/claude/skills/`)
 - `requesting-pi-review`
@@ -81,7 +81,7 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
 - **No brainstorming visual companion.** The browser-based mockup companion is intentionally excluded.
 - **Canonical subagent dispatch policy.** `working-with-subagents` centralises harness-neutral capability, tool, brief, and result-inspection guidance; SDD force-loads it while retaining orchestration-specific rules.
 - **No `dispatching-parallel-agents`.** Intentionally excluded; harnesses know how to parallelise their own subagents.
-- **Trimmed skill descriptions.** Upstream description tails that summarise workflow ("- requires X; evidence before assertions always") are stripped: descriptions carry triggering conditions only, per the writing-skills SDO guidance.
+- **Trimmed skill descriptions.** Upstream description tails that summarise workflow ("- requires X; evidence before assertions always") are stripped: descriptions remain compact invocation pointers, per `writing-for-agents`.
 
 ## Upstream
 
