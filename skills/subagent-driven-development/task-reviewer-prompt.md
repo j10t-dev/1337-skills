@@ -72,10 +72,10 @@ Subagent/delegation tool (general-purpose):
 
     ## The Verdict Is Yours
 
-    This process seats one reviewer per diff, and you are it. Reach your verdict
-    from your own reading; a reviewer you commission covers the same diff at full
-    cost and carries no standing here. Where the diff is too large for one pass,
-    take it in passes yourself and say so in your report.
+    You are the only reviewer this diff gets. Reach your verdict from your own
+    reading. A reviewer you commission repeats your work at full cost and its
+    verdict counts for nothing here. If the diff is too large for one pass, read
+    it in several passes yourself and say so in your report.
 
     ## Do Not Trust the Report
 
@@ -100,11 +100,11 @@ Subagent/delegation tool (general-purpose):
     Warnings or other noise in the implementer's reported test output are
     findings — test output should be pristine.
 
-    Evidence you cannot see is not evidence that does not exist. If the report or
-    its test output looks truncated, or you cannot find the results it claims,
-    re-read the report file at its stated path. Report a genuinely missing or
-    garbled result as a gap for the controller. Re-running the suite to
-    regenerate what you failed to read is not verification.
+    Failing to read the evidence does not mean the evidence is missing. If the
+    report or its test output looks truncated, or you cannot find the results it
+    claims, re-read the report file at its stated path. Report a result that is
+    genuinely absent or garbled as a gap for the controller. Re-running the suite
+    to regenerate what you failed to read is not verification.
 
     ## Part 1: Spec Compliance
 

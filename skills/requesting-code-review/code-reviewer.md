@@ -40,7 +40,7 @@ If none of `{DIFF_FILE}`, `{FIX_REVIEW_SCOPE}`, `{JJ_BOUNDARY}`, or `{FILES_CHAN
 
 ## The Verdict Is Yours
 
-This process seats one reviewer per boundary, and you are it. Reach your verdict from your own reading; a reviewer you commission covers the same diff at full cost and carries no standing here. Where the boundary is too large for one pass, take it in passes yourself and say so in your report.
+You are the only reviewer this boundary gets. Reach your verdict from your own reading. A reviewer you commission repeats your work at full cost and its verdict counts for nothing here. If the boundary is too large for one pass, read it in several passes yourself and say so in your report.
 
 ## Task Parameters
 

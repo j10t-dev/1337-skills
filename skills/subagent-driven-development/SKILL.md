@@ -17,13 +17,13 @@ Execute a plan by dispatching a fresh implementer subagent per task, a task revi
 
 **Continuous execution:** Do not pause to check in between tasks. Execute all tasks from the plan without stopping. "Should I continue?" prompts and progress summaries waste the partner's time — they asked you to execute the plan, so execute it.
 
-**Rulings, not stalls.** A running plan does not wait on a human. Conflicts, ambiguities, plan defects, a review finding that collides with the plan's text — decide them. The approved design is the binding authority, the plan is its argument from that design, and your judgement settles what neither answers. Record every decision in the ledger as a ruling and keep going. A wrong ruling costs rework the user can see and undo; a run parked on a question costs their whole session and buys nothing.
+**Rulings, not stalls.** A running plan does not wait on a human. Decide the conflicts, the ambiguities, the plan defects, the review finding that contradicts the plan's text. The approved design is the binding authority, the plan is its argument from that design, and your judgement settles what neither answers. Record every decision in the ledger as a ruling and keep going. A wrong ruling costs rework the user can see and undo. A run parked on a question costs their whole session and buys nothing.
 
 Five things stop the run, and only these:
 
 - an irreversible or destructive operation
 - a security-sensitive action
-- an integration or side effect the user reserves — rebase, split, squash, amending an accepted commit, push, submit, PR work, or any bookmark movement beyond the declared feature bookmark
+- an integration or side effect the user reserves, meaning rebase, split, squash, amending an accepted commit, push, submit, PR work, or any bookmark movement beyond the declared feature bookmark
 - ledger and repository state that no `Durable Progress` recovery row matches exactly
 - a plan so broken that every path forward is a guess
 
@@ -71,7 +71,9 @@ digraph process {
     "Implementer edits, tests, and self-reviews in undescribed @" [shape=box];
     "Run scripts/review-package @- @ and dispatch task reviewer" [shape=box];
     "Both task-review verdicts pass" [shape=diamond];
-    "Resume implementer; after 3 failed rounds use a fresh, more capable implementer" [shape=box];
+    "Fix round R of 3: R<3 resume implementer; R=3 fresh implementer, more capable model" [shape=box];
+    "R = 3 with findings open?" [shape=diamond];
+    "Adjudicate open findings, park with rulings" [shape=box];
     "Controller accepts task with planned subject" [shape=box];
     "Empty @ above advanced Feature Bookmark" [shape=box];
     "Next task or final review" [shape=diamond];
@@ -86,8 +88,11 @@ digraph process {
     "Dispatch implementer; answer questions as needed" -> "Implementer edits, tests, and self-reviews in undescribed @";
     "Implementer edits, tests, and self-reviews in undescribed @" -> "Run scripts/review-package @- @ and dispatch task reviewer";
     "Run scripts/review-package @- @ and dispatch task reviewer" -> "Both task-review verdicts pass";
-    "Both task-review verdicts pass" -> "Resume implementer; after 3 failed rounds use a fresh, more capable implementer" [label="no"];
-    "Resume implementer; after 3 failed rounds use a fresh, more capable implementer" -> "Run scripts/review-package @- @ and dispatch task reviewer" [label="same boundary"];
+    "Both task-review verdicts pass" -> "R = 3 with findings open?" [label="no"];
+    "R = 3 with findings open?" -> "Fix round R of 3: R<3 resume implementer; R=3 fresh implementer, more capable model" [label="no - next round"];
+    "R = 3 with findings open?" -> "Adjudicate open findings, park with rulings" [label="yes - cap reached"];
+    "Fix round R of 3: R<3 resume implementer; R=3 fresh implementer, more capable model" -> "Run scripts/review-package @- @ and dispatch task reviewer" [label="same boundary"];
+    "Adjudicate open findings, park with rulings" -> "Controller accepts task with planned subject";
     "Both task-review verdicts pass" -> "Controller accepts task with planned subject" [label="yes"];
     "Controller accepts task with planned subject" -> "Empty @ above advanced Feature Bookmark";
     "Empty @ above advanced Feature Bookmark" -> "Next task or final review";
@@ -153,15 +158,15 @@ These fixed-width IDs are synthetic format illustrations. Real entries come from
 
 ### Plan Conflict Scan
 
-Scan the plan once for conflicts before Task 1 dispatches, and write the result to the ledger as a table. The scan's output is rows, not a verdict:
+Scan the plan once for conflicts before Task 1 dispatches, and write the result to the ledger as a table. The scan produces rows, not a verdict.
 
-- one row per pair of tasks sharing a file or an interface — the two tasks, what one produces against what the other consumes, and what you found
-- one row per task — whether its own text agrees with itself: the tests it specifies against the code it specifies, the files it creates against the files it later touches
-- one row per plan instruction the reviewer rubric treats as a defect — a test that asserts nothing, verbatim duplication of a logic block
+- one row per pair of tasks sharing a file or an interface, naming the two tasks, what one produces against what the other consumes, and what you found
+- one row per task, recording whether its own text agrees with itself: the tests it specifies against the code it specifies, the files it creates against the files it later touches
+- one row per plan instruction the reviewer rubric treats as a defect, such as a test that asserts nothing or verbatim duplication of a logic block
 
 "The scan is clean" without those rows is not a scan you ran.
 
-Rule on every conflict the table surfaces before Task 1 dispatches — the design is the binding authority, the plan is its argument — and record each ruling beside its row. Carry a ruling into the dispatch of every task it binds. The review loop remains the net for conflicts that only emerge from implementation.
+Rule on every conflict the table surfaces before Task 1 dispatches. The design is the binding authority and the plan is its argument. Record each ruling beside its row, and carry a ruling into the dispatch of every task it binds. The review loop still catches conflicts that only emerge from implementation.
 
 ## Handling Implementer Status
 
@@ -187,7 +192,17 @@ The task reviewer may report "⚠️ Cannot verify from diff" items — requirem
 
 ## Fix Rounds
 
-Resume the same implementer for Critical and Important review fixes. After three failed rounds, dispatch a fresh, more capable implementer. Re-review after every round.
+Resume the same implementer for Critical and Important review fixes, and re-review after every round. Rounds one and two go back to the same implementer. Round three goes to a fresh implementer on a more capable model. Three rounds is the cap.
+
+At the cap, stop dispatching fixes and adjudicate every finding still open. You hold the plan and the cross-task context the reviewer lacks:
+
+- if the reviewer is wrong or the point is arguable, park it with a ruling saying why the code stands
+- if it is real but nothing later builds on it, park it with a ruling saying it is real and deferred
+- if it is real and later work depends on it, or it exposes a plan defect, rule on the smallest change that unblocks the dependent work, record the ruling, and carry it into the next task's dispatch
+
+Adjudication closes the task. Accept it through `Accepting a Task or Final Fix`, and point the final whole-branch review at the parked findings alongside the Minor ones.
+
+Adjudicate only at the cap. Adjudicating at round two to end the loop early is pre-judging under another name.
 
 ## Constructing Reviewer Prompts
 
@@ -280,7 +295,9 @@ Do not use `jj op log` as a substitute ledger and do not repair any state outsid
 
 ## Finish
 
-Before removing `.agents/sdd/`, collect every `Ruling:` line in the ledger — the conflict scan's, the ⚠️ resolutions, the plan-mandated findings, all of them — into your final message under "Rulings I made", in the order you made them, each with what it costs if wrong. The list is exhaustive: if the ledger holds a ruling, the list holds it. That list is the only place decisions you took on the user's behalf reach them, and it is what they read to find what needs reworking. A ruling deleted with the scratch directory was a decision made in secret.
+Before removing `.agents/sdd/`, collect every `Ruling:` line in the ledger into your final message under "Rulings I made", in the order you made them, each with what it costs if wrong. That means the conflict scan's rulings, the parked findings, the ⚠️ resolutions, and the plan-mandated findings. The list is exhaustive. If the ledger holds a ruling, the list holds it.
+
+This list is the only place the decisions you took on the user's behalf reach them, and it is what they read to find what needs reworking. Delete the scratch directory first and those decisions are gone unreported.
 
 Then hand off with finishing-development.
 
@@ -368,7 +385,7 @@ Final reviewer: Clean re-review.
 **Never:**
 - Build implementation work directly on the trunk bookmark (main/master) without explicit user consent — start a new change for the run
 - Skip task review, or accept a report missing either verdict (spec compliance AND task quality are both required)
-- Proceed with unfixed Critical/Important issues
+- Proceed with unfixed Critical/Important issues before the fix-round cap, or past it without a recorded ruling
 - Dispatch multiple implementation subagents in parallel (conflicts)
 - Make a subagent read the whole plan file (hand it its task brief — `scripts/task-brief` — instead)
 - Let a task-scoped subagent locate or read the parent plan, neighbouring tasks, progress ledger, prior-task materials, or session history
@@ -379,10 +396,10 @@ Final reviewer: Clean re-review.
 - Let implementer self-review replace actual review (both are needed)
 - Tell a reviewer what not to flag, or pre-rate a finding's severity in the dispatch prompt ("treat it as Minor at most")
 - Dispatch a task reviewer without a diff file — generate it first (`scripts/review-package @- @`) and name the printed path in the prompt
-- Move to the next task while the review has open Critical/Important issues
+- Move to the next task while Critical/Important findings are open and unruled
 - Re-dispatch a task the progress ledger already marks complete — reconcile the ledger and committed path after any compaction or resume
 - Let a subagent run jj or git commands — every VCS mutation belongs to the controller
-- Park the run on a question the design, the plan, or your own judgement can answer — rule, record it, carry on
+- Park the run on a question the design, the plan, or your own judgement can answer. Rule, record it, carry on
 - Remove `.agents/sdd/` before every ruling in it has been reported to the user
 
 **If subagent asks questions:**

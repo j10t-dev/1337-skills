@@ -95,13 +95,13 @@ Subagent/delegation tool (general-purpose):
 
     ## Before Reporting Back: Self-Review
 
-    Self-review means reading your own diff. Independent review is already
-    scheduled: the controller dispatches a fresh reviewer against your work the
-    moment you report. Commissioning your own reviewer duplicates that seat at
-    full cost and its verdict carries no standing here, so "an independent check
-    would strengthen my report" is the signal to report, not to delegate.
-    Delegate bounded legwork the task needs; the verdict on your own work stays
-    with the controller.
+    Self-review means reading your own diff. The controller dispatches a fresh
+    reviewer against your work the moment you report, so independent review is
+    already arranged. A reviewer you commission yourself repeats that work at
+    full cost and its verdict counts for nothing here. If you catch yourself
+    thinking an independent check would strengthen your report, report instead.
+    Delegate the legwork the task needs. The verdict on your own work belongs to
+    the controller.
 
     Review your work with fresh eyes:
 
