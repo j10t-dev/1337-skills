@@ -67,7 +67,7 @@ Subagent/delegation tool (general-purpose):
     While iterating, run the focused test for what you're changing; run the
     full suite once before reporting back, not after every edit.
 
-    ## Code Organization
+    ## Code Organisation
 
     You reason best about code you can hold in context at once, and your edits
     are more reliable when files are focused. Keep this in mind:

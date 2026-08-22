@@ -60,7 +60,7 @@ Skip any step = lying, not verifying
 - Tired and wanting work over
 - **ANY wording implying success without having run verification**
 
-## Rationalization Prevention
+## Rationalisation Prevention
 
 | Excuse | Reality |
 |--------|---------|

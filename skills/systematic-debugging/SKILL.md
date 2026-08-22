@@ -28,7 +28,7 @@ If you haven't completed Phase 1, you cannot propose fixes.
 Use for ANY technical issue:
 - Test failures
 - Bugs in production
-- Unexpected behavior
+- Unexpected behaviour
 - Performance problems
 - Build failures
 - Integration issues
@@ -84,7 +84,7 @@ You MUST complete each phase before proceeding to the next.
      - Check state at each layer
 
    Run once to gather evidence showing WHERE it breaks
-   THEN analyze evidence to identify failing component
+   THEN analyse evidence to identify failing component
    THEN investigate that specific component
    ```
 
@@ -194,7 +194,7 @@ You MUST complete each phase before proceeding to the next.
 4. **If Fix Doesn't Work**
    - STOP
    - Count: How many fixes have you tried?
-   - If < 3: Return to Phase 1, re-analyze with new information
+   - If < 3: Return to Phase 1, re-analyse with new information
    - **If ≥ 3: STOP and question the architecture (step 5 below)**
    - DON'T attempt Fix #4 without architectural discussion
 
@@ -244,7 +244,7 @@ If you catch yourself thinking:
 
 **When you see these:** STOP. Return to Phase 1.
 
-## Common Rationalizations
+## Common Rationalisations
 
 | Excuse | Reality |
 |--------|---------|
@@ -282,7 +282,7 @@ If systematic investigation reveals issue is truly environmental, timing-depende
 These techniques are part of systematic debugging and available in this directory:
 
 - **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
-- **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
+- **`defence-in-depth.md`** - Add validation at multiple layers after finding root cause
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
 - **`find-polluter.sh`** - Bisection script to find which test creates pollution
 - **`condition-based-waiting-example.ts`** - Complete implementation from real debugging session

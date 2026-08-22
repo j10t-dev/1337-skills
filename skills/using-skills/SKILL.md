@@ -34,7 +34,7 @@ When multiple skills apply, process skills come first — they set the approach,
 
 ## Red Flags
 
-These thoughts mean STOP—you're rationalizing:
+These thoughts mean STOP—you're rationalising:
 
 | Thought | Reality |
 |---------|---------|

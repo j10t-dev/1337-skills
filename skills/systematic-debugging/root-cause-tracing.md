@@ -14,12 +14,12 @@ digraph when_to_use {
     "Can trace backwards?" [shape=diamond];
     "Fix at symptom point" [shape=box];
     "Trace to original trigger" [shape=box];
-    "BETTER: Also add defense-in-depth" [shape=box];
+    "BETTER: Also add defence-in-depth" [shape=box];
 
     "Bug appears deep in stack?" -> "Can trace backwards?" [label="yes"];
     "Can trace backwards?" -> "Trace to original trigger" [label="yes"];
     "Can trace backwards?" -> "Fix at symptom point" [label="no - dead end"];
-    "Trace to original trigger" -> "BETTER: Also add defense-in-depth";
+    "Trace to original trigger" -> "BETTER: Also add defence-in-depth";
 }
 ```
 
@@ -121,7 +121,7 @@ Runs tests one-by-one, stops at first polluter. See script for usage.
 
 **Fix:** Made tempDir a getter that throws if accessed before beforeEach
 
-**Also added defense-in-depth:**
+**Also added defence-in-depth:**
 - Layer 1: Project.create() validates directory
 - Layer 2: WorkspaceManager validates not empty
 - Layer 3: NODE_ENV guard refuses git init outside tmpdir
@@ -165,7 +165,7 @@ digraph principle {
 - Trace back through full call chain
 - Find the original trigger
 - Fix at the source, not the symptom
-- Add defense-in-depth validation at each layer after fixing
+- Add defence-in-depth validation at each layer after fixing
 
 ## Stack Trace Tips
 

@@ -7,13 +7,13 @@ Reference example of extracting, structuring, and bulletproofing a critical skil
 Extracted debugging framework from `/Users/jesse/.claude/CLAUDE.md`:
 - 4-phase systematic process (Investigation → Pattern Analysis → Hypothesis → Implementation)
 - Core mandate: ALWAYS find root cause, NEVER fix symptoms
-- Rules designed to resist time pressure and rationalization
+- Rules designed to resist time pressure and rationalisation
 
 ## Extraction Decisions
 
 **What to include:**
 - Complete 4-phase framework with all rules
-- Anti-shortcuts ("NEVER fix symptom", "STOP and re-analyze")
+- Anti-shortcuts ("NEVER fix symptom", "STOP and re-analyse")
 - Pressure-resistant language ("even if faster", "even if I seem in a hurry")
 - Concrete steps for each phase
 
@@ -27,21 +27,21 @@ Extracted debugging framework from `/Users/jesse/.claude/CLAUDE.md`:
 1. **Rich when_to_use** - Included symptoms and anti-patterns
 2. **Type: technique** - Concrete process with steps
 3. **Keywords** - "root cause", "symptom", "workaround", "debugging", "investigation"
-4. **Flowchart** - Decision point for "fix failed" → re-analyze vs add more fixes
+4. **Flowchart** - Decision point for "fix failed" → re-analyse vs add more fixes
 5. **Phase-by-phase breakdown** - Scannable checklist format
 6. **Anti-patterns section** - What NOT to do (critical for this skill)
 
 ## Bulletproofing Elements
 
-Framework designed to resist rationalization under pressure:
+Framework designed to resist rationalisation under pressure:
 
 ### Language Choices
 - "ALWAYS" / "NEVER" (not "should" / "try to")
 - "even if faster" / "even if I seem in a hurry"
-- "STOP and re-analyze" (explicit pause)
-- "Don't skip past" (catches the actual behavior)
+- "STOP and re-analyse" (explicit pause)
+- "Don't skip past" (catches the actual behaviour)
 
-### Structural Defenses
+### Structural Defences
 - **Phase 1 required** - Can't skip to implementation
 - **Single hypothesis rule** - Forces thinking, prevents shotgun fixes
 - **Explicit failure mode** - "IF your first fix doesn't work" with mandatory action
@@ -70,9 +70,9 @@ Created 4 validation tests following skills/meta/testing-skills-with-subagents:
 
 ### Test 4: Failed First Fix
 - Hypothesis doesn't work, temptation to add more fixes
-- **Result:** Stopped, re-analyzed, formed new hypothesis (no shotgun)
+- **Result:** Stopped, re-analysed, formed new hypothesis (no shotgun)
 
-**All tests passed.** No rationalizations found.
+**All tests passed.** No rationalisations found.
 
 ## Iterations
 
@@ -90,7 +90,7 @@ Created 4 validation tests following skills/meta/testing-skills-with-subagents:
 
 Bulletproof skill that:
 - ✅ Clearly mandates root cause investigation
-- ✅ Resists time pressure rationalization
+- ✅ Resists time pressure rationalisation
 - ✅ Provides concrete steps for each phase
 - ✅ Shows anti-patterns explicitly
 - ✅ Tested under multiple pressure scenarios

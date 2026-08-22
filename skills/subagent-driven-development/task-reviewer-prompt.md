@@ -153,7 +153,7 @@ Subagent/delegation tool (general-purpose):
 
     ## Calibration
 
-    Categorize issues by actual severity. Not everything is Critical.
+    Categorise issues by actual severity. Not everything is Critical.
     Important means this task cannot be trusted until it is fixed: incorrect
     or fragile behaviour, a missed requirement, or maintainability damage you
     would block a merge over — verbatim duplication of a logic block,
@@ -161,7 +161,7 @@ Subagent/delegation tool (general-purpose):
     and polish suggestions are Minor.
     If the plan or brief explicitly mandates something this rubric calls a
     defect (a test that asserts nothing, verbatim duplication of a logic
-    block), that IS a finding — report it as Important, labeled
+    block), that IS a finding — report it as Important, labelled
     plan-mandated. The plan's authorship does not grade its own work; the
     human decides.
     Acknowledge what was done well before listing issues — accurate praise

@@ -121,7 +121,7 @@ say so.
 [Architecture problems, missing features, poor error handling, test gaps]
 
 #### Minor (Nice to Have)
-[Code style, optimization opportunities, documentation improvements]
+[Code style, optimisation opportunities, documentation improvements]
 
 **For each issue:**
 - File:line reference
@@ -141,7 +141,7 @@ say so.
 ## Critical Rules
 
 **DO:**
-- Categorize by actual severity (not everything is Critical)
+- Categorise by actual severity (not everything is Critical)
 - Be specific (file:line, not vague)
 - Explain WHY issues matter
 - Acknowledge strengths

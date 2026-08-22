@@ -19,14 +19,14 @@ Write the test first. Watch it fail. Write minimal code to pass.
 - New features
 - Bug fixes
 - Refactoring
-- Behavior changes
+- Behaviour changes
 
 **Exceptions require explicit user permission before implementation:**
 - Throwaway prototypes
 - Generated code
 - Configuration-only changes where no meaningful executable test exists
 
-Thinking "skip TDD just this once"? Stop. That's rationalization.
+Thinking "skip TDD just this once"? Stop. That's rationalisation.
 
 ## The Iron Law
 
@@ -88,7 +88,7 @@ test('retries failed operations 3 times', async () => {
   expect(attempts).toBe(3);
 });
 ```
-Clear name, tests real behavior, one thing
+Clear name, tests real behaviour, one thing
 </Good>
 
 <Bad>
@@ -106,7 +106,7 @@ Vague name, tests mock setup not code
 </Bad>
 
 **Requirements:**
-- One behavior
+- One behaviour
 - Clear name
 - Real code (only mock dependencies)
 
@@ -123,7 +123,7 @@ Confirm:
 - Failure message is expected
 - Fails because feature missing (not typos)
 
-**Test passes?** You're testing existing behavior. Fix test.
+**Test passes?** You're testing existing behaviour. Fix test.
 
 **Test errors?** Fix error, re-run until it fails correctly.
 
@@ -189,7 +189,7 @@ After green only:
 - Improve names
 - Extract helpers
 
-Keep tests green. Don't add behavior.
+Keep tests green. Don't add behaviour.
 
 ### Repeat
 
@@ -200,7 +200,7 @@ Next failing test for next feature.
 | Quality | Good | Bad |
 |---------|------|-----|
 | **Minimal** | One thing. "and" in name? Split it. | `test('validates email and domain and whitespace')` |
-| **Clear** | Name describes behavior | `test('test1')` |
+| **Clear** | Name describes behaviour | `test('test1')` |
 | **Shows intent** | Demonstrates desired API | Obscures what code should do |
 
 When writing or changing any test, read [writing-good-tests.md](writing-good-tests.md):
@@ -209,7 +209,7 @@ When writing or changing any test, read [writing-good-tests.md](writing-good-tes
 - Assert real behaviour, never mock behaviour
 - Run scripts and assert effects; never grep their source text
 
-## Common Rationalizations
+## Common Rationalisations
 
 | Excuse | Reality |
 |--------|---------|
@@ -232,7 +232,7 @@ When writing or changing any test, read [writing-good-tests.md](writing-good-tes
 - Test passes immediately
 - Can't explain why test failed
 - Tests added "later"
-- Rationalizing "just this once"
+- Rationalising "just this once"
 - "I already manually tested it"
 - "Tests after achieve the same purpose"
 - "It's about spirit not ritual"

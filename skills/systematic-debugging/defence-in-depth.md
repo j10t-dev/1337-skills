@@ -1,4 +1,4 @@
-# Defense-in-Depth Validation
+# Defence-in-Depth Validation
 
 ## Overview
 
