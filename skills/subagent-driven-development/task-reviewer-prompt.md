@@ -70,6 +70,13 @@ Subagent/delegation tool (general-purpose):
     Your review is read-only on this checkout. Do not mutate the working
     copy or change state in any way.
 
+    ## The Verdict Is Yours
+
+    This process seats one reviewer per diff, and you are it. Reach your verdict
+    from your own reading; a reviewer you commission covers the same diff at full
+    cost and carries no standing here. Where the diff is too large for one pass,
+    take it in passes yourself and say so in your report.
+
     ## Do Not Trust the Report
 
     Treat the implementer's report as unverified claims about the code. It
@@ -92,6 +99,12 @@ Subagent/delegation tool (general-purpose):
 
     Warnings or other noise in the implementer's reported test output are
     findings — test output should be pristine.
+
+    Evidence you cannot see is not evidence that does not exist. If the report or
+    its test output looks truncated, or you cannot find the results it claims,
+    re-read the report file at its stated path. Report a genuinely missing or
+    garbled result as a gap for the controller. Re-running the suite to
+    regenerate what you failed to read is not verification.
 
     ## Part 1: Spec Compliance
 
