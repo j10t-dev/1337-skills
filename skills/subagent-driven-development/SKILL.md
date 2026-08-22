@@ -192,13 +192,17 @@ The task reviewer may report "⚠️ Cannot verify from diff" items — requirem
 
 ## Fix Rounds
 
-Resume the same implementer for Critical and Important review fixes, and re-review after every round. Rounds one and two go back to the same implementer. Round three goes to a fresh implementer on a more capable model. Three rounds is the cap.
+Resume the same implementer for Critical and Important review fixes, and re-review after every round. Rounds one and two go back to the same implementer. Round three goes to a fresh implementer on the most capable model available to you; where the run already uses that model, round three is still a fresh implementer on it, because the fresh context is the point. Three rounds is the cap.
+
+Record the round on the task's in-progress ledger line before you dispatch it. The round is durable state, not a ruling. After a compaction you cannot otherwise tell whether to resume, escalate, or adjudicate.
 
 At the cap, stop dispatching fixes and adjudicate every finding still open. You hold the plan and the cross-task context the reviewer lacks:
 
 - if the reviewer is wrong or the point is arguable, park it with a ruling saying why the code stands
 - if it is real but nothing later builds on it, park it with a ruling saying it is real and deferred
-- if it is real and later work depends on it, or it exposes a plan defect, rule on the smallest change that unblocks the dependent work, record the ruling, and carry it into the next task's dispatch
+- if it is real and later work depends on it, or it exposes a plan defect, rule on the smallest change that unblocks the dependent work and dispatch it as its own fix against its own boundary
+
+Never fold that unblocking change into the next task's dispatch. The next implementer is scoped to its own brief and its reviewer receives only that brief and the binding constraints, so inherited work arrives with no requirement behind it. The reviewer either rejects it as unrelated or passes it unexamined. Give it a pending fix entry of its own, dispatch it with the ruling as its stated requirements, review it against that boundary, and accept it through `Accepting a Task or Final Fix` before the next task dispatches.
 
 Adjudication closes the task. Accept it through `Accepting a Task or Final Fix`, and point the final whole-branch review at the parked findings alongside the Minor ones.
 
@@ -252,12 +256,19 @@ feature bookmark: feature-b
 run base: change aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, commit bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 
 Task 1 -> in progress
+Task 1 -> in progress (fix round 2 of 3, same implementer)
+Task 1 -> in progress (fix round 3 of 3, fresh implementer, most capable model)
 Task 1 -> change cccccccccccccccccccccccccccccccc, commit dddddddddddddddddddddddddddddddddddddddd (complete)
+Task 1 unblocking fix -> pending (subject `fix: exact subject`)
 Final review fix 1 -> pending (subject `fix: exact subject`)
 Final review fix 1 -> change eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee, commit ffffffffffffffffffffffffffffffffffffffff (complete)
 ```
 
 The numbered state lines are mutually exclusive format examples. Synthetic IDs only illustrate width; completed entries contain the real full change and commit IDs from jj.
+
+The fix-round suffix is part of the in-progress line, rewritten in place as each round dispatches. No suffix means no fix round has run. A resumed task resumes at its recorded round, so a task carrying `fix round 3 of 3` has reached the cap and adjudicates rather than dispatching again.
+
+An unblocking fix entry has the same pending and complete shapes as a final review fix, and the recovery rows below that name a final fix apply to it identically.
 
 Rulings are records, not state. Append each one where you make it, in exactly this form:
 
