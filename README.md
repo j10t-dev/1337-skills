@@ -65,6 +65,13 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 **Writing**
 - `unslop`
 
+**Language practice**
+- `typescript-best-practices`
+
+**Principles** (agent-only; `user-invocable: false`, so no slash command)
+- `principle-type-system-discipline`
+- `principle-boundary-discipline`
+
 **Meta**
 - `using-skills`
 - `writing-for-agents`
@@ -91,6 +98,8 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
 - **No `dispatching-parallel-agents`.** Intentionally excluded; harnesses know how to parallelise their own subagents.
 - **`unslop` (third-party addition).** Not from upstream. Replicated from [cursor/plugins](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md) `pstack/skills/unslop`, body verbatim; only the description was rewritten as an invocation pointer. It governs human-facing prose, not agent-facing documents, which follow `writing-for-agents`.
 - **Matt Pocock grilling skills (third-party addition).** `grill-me`, `grill-with-docs`, `grilling`, and `domain-modeling` come from [mattpocock/skills](https://github.com/mattpocock/skills). Router wording is harness-neutral. `domain-modeling` maintains `CONTEXT.md` terminology only; ADR creation is deliberately excluded because this pack's design workflow owns decision documentation.
+- **TypeScript practice skills (third-party addition).** `typescript-best-practices` (with `references/patterns.md`), `principle-type-system-discipline`, and `principle-boundary-discipline` come from [cursor/plugins](https://github.com/cursor/plugins/tree/main/pstack/skills) `pstack/skills`. Bodies are otherwise verbatim, with three deliberate deltas. First, UK English, per the convention above. Second, the principles carry `user-invocable: false` in place of upstream's `disable-model-invocation: true`: they are agent reference, not commands anyone would type, and the upstream flag would additionally block the citing skill from reaching them, since Claude Code refuses the call and tells the user to run the skill themselves. Third, upstream's `**principle-name** principle skill` prose is rewritten as explicit invocation instructions, and the pointer to `encode-lessons-in-structure` is dropped rather than dragging a fourth principle in. Upstream resolves these references through `poteto-mode`, which inlines all twenty-one principles in an index; this fork has no equivalent, so the principles stand alone and are invoked directly.
+
 - **Trimmed skill descriptions.** Upstream description tails that summarise workflow ("- requires X; evidence before assertions always") are stripped: descriptions remain compact invocation pointers, per `writing-for-agents`.
 
 ## Upstream
