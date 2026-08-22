@@ -15,7 +15,19 @@ Execute a plan by dispatching a fresh implementer subagent per task, a task revi
 
 **Narration:** between tool calls, narrate at most one short line — the ledger and the tool results carry the record.
 
-**Continuous execution:** Do not pause to check in between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste the partner's time — they asked you to execute the plan, so execute it.
+**Continuous execution:** Do not pause to check in between tasks. Execute all tasks from the plan without stopping. "Should I continue?" prompts and progress summaries waste the partner's time — they asked you to execute the plan, so execute it.
+
+**Rulings, not stalls.** A running plan does not wait on a human. Conflicts, ambiguities, plan defects, a review finding that collides with the plan's text — decide them. The approved design is the binding authority, the plan is its argument from that design, and your judgement settles what neither answers. Record every decision in the ledger as a ruling and keep going. A wrong ruling costs rework the user can see and undo; a run parked on a question costs their whole session and buys nothing.
+
+Five things stop the run, and only these:
+
+- an irreversible or destructive operation
+- a security-sensitive action
+- an integration or side effect the user reserves — rebase, split, squash, amending an accepted commit, push, submit, PR work, or any bookmark movement beyond the declared feature bookmark
+- ledger and repository state that no `Durable Progress` recovery row matches exactly
+- a plan so broken that every path forward is a guess
+
+Everything else is a ruling.
 
 ## When to Use
 
@@ -126,6 +138,7 @@ Run this once before Task 1 or when resuming an interrupted run:
 4. On a fresh run, stop on unexplained non-empty `@`. Reuse empty `@` when its sole parent is the run base; otherwise run `jj new <Builds On>`.
 5. On a fresh run, stop if `Feature Bookmark` already exists.
 6. On a fresh run, write the ledger, then run `jj bookmark create <Feature Bookmark> -r <run-base-commit>`.
+7. Resolve the plan's `**Design:**` path and read it. The design is the authority every ruling resolves against. If the plan names no design, or the path does not resolve, record `Ruling: proceeding with no reachable design -- <what you looked for> -- rulings in this run are provisional` and continue.
 
 A fresh ledger starts with exactly this shape:
 
@@ -137,6 +150,18 @@ run base: change aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, commit bbbbbbbbbbbbbbbbbbbbbb
 ```
 
 These fixed-width IDs are synthetic format illustrations. Real entries come from `jj log -T 'change_id ++ " " ++ commit_id'` and must be full length.
+
+### Plan Conflict Scan
+
+Scan the plan once for conflicts before Task 1 dispatches, and write the result to the ledger as a table. The scan's output is rows, not a verdict:
+
+- one row per pair of tasks sharing a file or an interface — the two tasks, what one produces against what the other consumes, and what you found
+- one row per task — whether its own text agrees with itself: the tests it specifies against the code it specifies, the files it creates against the files it later touches
+- one row per plan instruction the reviewer rubric treats as a defect — a test that asserts nothing, verbatim duplication of a logic block
+
+"The scan is clean" without those rows is not a scan you ran.
+
+Rule on every conflict the table surfaces before Task 1 dispatches — the design is the binding authority, the plan is its argument — and record each ruling beside its row. Carry a ruling into the dispatch of every task it binds. The review loop remains the net for conflicts that only emerge from implementation.
 
 ## Handling Implementer Status
 
@@ -152,13 +177,13 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 1. If it's a context problem, provide more context and re-dispatch with the same model
 2. If the task requires more reasoning, re-dispatch with a more capable model
 3. If the task is too large, break it into smaller pieces
-4. If the plan itself is wrong, escalate to the human
+4. If the plan itself is wrong, rule on the correction, record the ruling, and re-dispatch with that ruling carried in the brief
 
 **Never** ignore an escalation or force the same model to retry without changes. If the implementer said it's stuck, something needs to change.
 
 ## Handling Reviewer ⚠️ Items
 
-The task reviewer may report "⚠️ Cannot verify from diff" items — requirements that live in unchanged code or span tasks. These do not block the rest of the review, but you must resolve each one yourself before accepting both task verdicts: you hold the plan and cross-task context the reviewer lacks. If you confirm an item is a real gap, treat it as a failed spec review — send it back to the implementer and re-review.
+The task reviewer may report "⚠️ Cannot verify from diff" items — requirements that live in unchanged code or span tasks. These do not block the rest of the review, but you must resolve each one yourself before accepting both task verdicts: you hold the plan and cross-task context the reviewer lacks. If you confirm an item is a real gap, treat it as a failed spec review — send it back to the implementer and re-review. Record how you resolved each item as a ruling.
 
 ## Fix Rounds
 
@@ -175,7 +200,7 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
 - Hand the reviewer its diff as a file: run this skill's `scripts/review-package @- @` and pass the reviewer the file path it prints. The output never enters your own context, and the reviewer sees the accepted parent plus the current task's undescribed working-copy change.
 - A dispatch prompt describes one task, not the session's history. Do not paste accumulated prior-task summaries ("state after Tasks 1-3") into later dispatches. A fresh subagent needs its task, the interfaces it touches, and the global constraints. Nothing else.
 - Record Minor findings in the task report and point the final whole-branch review at that list so it can triage which must be fixed before merge. A roll-up nobody reads is a silent discard.
-- A finding labelled plan-mandated — or any finding that conflicts with what the plan's text requires — is the human's decision, like any plan contradiction: present the finding and the plan text, ask which governs. Do not dismiss the finding because the plan mandates it, and do not dispatch a fix that contradicts the plan without asking.
+- A finding labelled plan-mandated — or any finding that conflicts with what the plan's text requires — is yours to rule on: weigh the finding against the plan text, decide with the design as the binding authority, and record the ruling before you act on it. Do not dismiss the finding because the plan mandates it, and do not dispatch a fix that contradicts the plan without a recorded ruling.
 - Final review packages use exact revisions appropriate to their state:
   - Stable final review: `scripts/review-package RUN_BASE FEATURE_BOOKMARK`
   - Pending final-fix re-review: `scripts/review-package RUN_BASE @`
@@ -219,6 +244,14 @@ Final review fix 1 -> change eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee, commit ffffffffff
 
 The numbered state lines are mutually exclusive format examples. Synthetic IDs only illustrate width; completed entries contain the real full change and commit IDs from jj.
 
+Rulings are records, not state. Append each one where you make it, in exactly this form:
+
+```text
+Ruling: <what you decided> -- <why> -- <what it costs if wrong>
+```
+
+Reconciliation and recovery read only the `->` state lines; a ruling line never resolves to a change, a commit, or a task.
+
 Legacy, stale, or foreign ledger formats have no migration or compatibility path: stop rather than guessing or converting.
 
 Before any redispatch, prove:
@@ -244,6 +277,12 @@ After those checks, perform only the action in the first matching recovery row:
 | unexplained non-empty `@`, described active `@`, divergence, or identity mismatch | Ambiguous: stop and ask. |
 
 Do not use `jj op log` as a substitute ledger and do not repair any state outside this table. If no row matches exactly, stop and ask.
+
+## Finish
+
+Before removing `.agents/sdd/`, collect every `Ruling:` line in the ledger — the conflict scan's, the ⚠️ resolutions, the plan-mandated findings, all of them — into your final message under "Rulings I made", in the order you made them, each with what it costs if wrong. The list is exhaustive: if the ledger holds a ruling, the list holds it. That list is the only place decisions you took on the user's behalf reach them, and it is what they read to find what needs reworking. A ruling deleted with the scratch directory was a decision made in secret.
+
+Then hand off with finishing-development.
 
 ## Prompt Templates
 
@@ -289,7 +328,7 @@ Final reviewer: Important findings.
 [Dispatch ONE final-review fixer; run scripts/review-package RUN_BASE @]
 Final reviewer: Clean re-review.
 [Accept the reviewed final fix with its pending subject]
-[Repeat stable final review; after it passes with no pending fix, remove .agents/sdd/]
+[Repeat stable final review; after it passes with no pending fix, report every ledger Ruling: line under "Rulings I made", then remove .agents/sdd/]
 ```
 
 ## Advantages
@@ -343,6 +382,8 @@ Final reviewer: Clean re-review.
 - Move to the next task while the review has open Critical/Important issues
 - Re-dispatch a task the progress ledger already marks complete — reconcile the ledger and committed path after any compaction or resume
 - Let a subagent run jj or git commands — every VCS mutation belongs to the controller
+- Park the run on a question the design, the plan, or your own judgement can answer — rule, record it, carry on
+- Remove `.agents/sdd/` before every ruling in it has been reported to the user
 
 **If subagent asks questions:**
 - Answer clearly and completely

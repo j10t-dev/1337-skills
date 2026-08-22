@@ -150,12 +150,16 @@ to increase apparent parallelism.
 
 **Goal:** [One sentence describing what this builds]
 
-**Architecture:** [2-3 sentences about approach - summarise from DESIGN.md]
+**Architecture:** [2-3 sentences about approach - summarise from the design]
+
+**Design:** [absolute path to the approved design this plan implements]
 
 **Builds On:** `feature-a`
 **Feature Bookmark:** `feature-b`
 
 `Builds On` must resolve to exactly one existing local bookmark target. `Feature Bookmark` must be absent at fresh-run start. `Feature Bookmark` is the new local output bookmark. The first feature may build on `main`; every dependent feature names the preceding feature bookmark. No value is guessed from an older plan, current working copy, plan slug, or stale ledger. A plan missing either field is incomplete and must not execute until the user supplies it.
+
+`Design` is the absolute path to the approved design in `$DOCS_ROOT/$projectName/designs/`, expanded — never a `$DOCS_ROOT`, `$projectName`, or `~` a reader cannot resolve. The plan argues from the design, so the design travels with it: the executor reads both, and the design is the binding authority wherever the two disagree.
 
 **Tech Stack:** [Key technologies/libraries]
 
