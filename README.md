@@ -58,6 +58,9 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 - `handling-github-pr-reviews`
 - `finishing-development`
 
+**Writing**
+- `unslop`
+
 **Meta**
 - `using-skills`
 - `writing-for-agents`
@@ -81,6 +84,7 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
 - **No brainstorming visual companion.** The browser-based mockup companion is intentionally excluded.
 - **Canonical subagent dispatch policy.** `working-with-subagents` centralises harness-neutral capability, tool, brief, and result-inspection guidance; SDD force-loads it while retaining orchestration-specific rules.
 - **No `dispatching-parallel-agents`.** Intentionally excluded; harnesses know how to parallelise their own subagents.
+- **`unslop` (third-party addition).** Not from upstream. Replicated from [cursor/plugins](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md) `pstack/skills/unslop`, body verbatim; only the description was rewritten as an invocation pointer. It governs human-facing prose, not agent-facing documents, which follow `writing-for-agents`.
 - **Trimmed skill descriptions.** Upstream description tails that summarise workflow ("- requires X; evidence before assertions always") are stripped: descriptions remain compact invocation pointers, per `writing-for-agents`.
 
 ## Upstream
