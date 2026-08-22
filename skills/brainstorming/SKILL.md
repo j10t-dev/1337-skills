@@ -1,162 +1,249 @@
 ---
 name: brainstorming
-description: Use when asked to create, add, or change any feature, component, or behaviour and no approved design exists yet - comes before writing-plans, test-driven-development, or any implementation skill
+description: Use when asked to create, add, or change any feature, component, or behaviour before its implementation path has been approved
 ---
 
-# Brainstorming Ideas Into Designs
+# Brainstorming implementation paths
 
 ## Overview
 
-Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
+Explore and clarify a requested change, then route it by capacity. Work that is
+one reviewable task, fits the current session, and has no unresolved
+consequential design choice takes the direct path. Everything else keeps the
+full design and planning path.
 
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it.
+Take no implementation action until the user has explicitly approved either a
+direct-path brief or a full-path design.
 </HARD-GATE>
 
-**Announce at start:** "I'm using the brainstorming skill to refine your idea into a design."
+**Announce after classification:**
+- Direct: "I'm using the brainstorming skill to prepare a direct implementation brief."
+- Full: "I'm using the brainstorming skill to refine this change into a design."
 
-Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design in manageable sections, checking after each section whether it looks right so far.
+## Anti-pattern: skipping the gate
 
-## Anti-Pattern: "This Is Too Simple To Need A Design"
-
-Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
+Small work may skip a design document. It never skips classification, a
+four-field brief, or explicit approval. If the brief cannot name the files and
+verification, continue exploration or clarification until one of the full-path
+triggers can be named.
 
 ## Checklist
 
-You MUST track each of these items in the current harness's task tracker and complete them in order:
+Track these items in the current harness's task tracker and complete the
+applicable branch in order:
 
-1. **Explore project context** — check files, docs, recent changes, and representative existing execution paths
-2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-3. **Propose 2-3 approaches** — with trade-offs and your recommendation
-4. **Present design** — follow `design-document-template.md`, present it in sections, and get user approval
-5. **Write design doc** — save to `$DOCS_ROOT/$projectName/designs/<slug>.md`
-6. **Design self-review** — check the document against the template and inline review criteria
-7. **User reviews written design** — ask the user to review the design file before proceeding
-8. **Transition to implementation** — invoke the writing-plans skill to create the implementation plan
+1. **Explore project context** - check files, docs, recent changes, and representative existing execution paths
+2. **Clarify only what is needed** - establish purpose, constraints, success criteria, task boundaries, and consequential design choices
+3. **Classify** - evaluate both full-path triggers, the file diagnostic, and any user override
+4. **Direct path** - present classification and brief in one message, then wait for explicit approval
+5. **Direct execution** - invoke `test-driven-development`, then mandatory `requesting-code-review`, then `finishing-development` at Step 3
+6. **Full path** - compare approaches, present and approve the design, write and review it, then invoke `writing-plans`
+7. **Upgrade when needed** - stop direct work that fires a trigger and re-enter at clarification
 
-## Process Flow
+## Process flow
 
 ```dot
 digraph brainstorming {
     "Explore project context and execution paths" [shape=box];
-    "Ask clarifying questions" [shape=box];
+    "Clarify only what is needed" [shape=box];
+    "Classify" [shape=diamond];
+    "Present classification and brief" [shape=box];
+    "User approves brief?" [shape=diamond];
+    "Escalate or revise?" [shape=diamond];
+    "Invoke test-driven-development" [shape=box];
+    "Invoke requesting-code-review" [shape=box];
+    "Finishing-development Step 3" [shape=doublecircle];
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
-    "Write design doc" [shape=box];
-    "Design self-review" [shape=box];
+    "Write and review design" [shape=box];
     "User reviews written design?" [shape=diamond];
-    "Invoke writing-plans skill" [shape=doublecircle];
+    "Invoke writing-plans" [shape=doublecircle];
 
-    "Explore project context and execution paths" -> "Ask clarifying questions";
-    "Ask clarifying questions" -> "Propose 2-3 approaches";
+    "Explore project context and execution paths" -> "Clarify only what is needed";
+    "Clarify only what is needed" -> "Classify";
+    "Classify" -> "Present classification and brief" [label="direct"];
+    "Classify" -> "Propose 2-3 approaches" [label="full"];
+    "Present classification and brief" -> "User approves brief?";
+    "User approves brief?" -> "Invoke test-driven-development" [label="yes"];
+    "User approves brief?" -> "Escalate or revise?" [label="no"];
+    "Escalate or revise?" -> "Propose 2-3 approaches" [label="escalate"];
+    "Escalate or revise?" -> "Present classification and brief" [label="revise"];
+    "Invoke test-driven-development" -> "Invoke requesting-code-review";
+    "Invoke requesting-code-review" -> "Finishing-development Step 3";
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "Write design doc" [label="yes"];
-    "Write design doc" -> "Design self-review";
-    "Design self-review" -> "User reviews written design?";
-    "User reviews written design?" -> "Write design doc" [label="changes requested"];
-    "User reviews written design?" -> "Invoke writing-plans skill" [label="approved"];
+    "User approves design?" -> "Write and review design" [label="yes"];
+    "Write and review design" -> "User reviews written design?";
+    "User reviews written design?" -> "Write and review design" [label="changes requested"];
+    "User reviews written design?" -> "Invoke writing-plans" [label="approved"];
 }
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.
+## Shared exploration and clarification
 
-## The Process
+Check the current project state first: files, docs, recent changes, and
+representative execution paths. Existing execution paths must come from
+repository evidence. Continue exploring or label an assumption for user
+approval; never invent a current call path.
 
-**Understanding the idea:**
-- Check out the current project state first (files, docs, recent changes)
-- Before asking detailed questions, assess scope: if the request describes
-  multiple independent subsystems, flag this immediately rather than refining
-  details of a project that needs decomposition first.
-- If the project is too large for a single spec, help the user decompose into
-  sub-projects — the independent pieces, how they relate, what order to build —
-  then brainstorm the first sub-project through the normal design flow. Each
-  sub-project gets its own spec → plan → implementation cycle.
-- Ask questions one at a time to refine the idea
-- Prefer open-ended questions that include 2-4 concrete suggestions or examples to help the user respond
-- Only one question per message - if a topic needs more exploration, break it into multiple questions
-- Focus on understanding: purpose, constraints, success criteria, common gotchas and footguns
+Assess scope before detailed questions. If the request contains independent
+subsystems, identify the pieces, their relationship, and their delivery order
+before continuing. Ask one question at a time. Prefer open questions with two to
+four concrete examples when examples help. Clarify only enough to establish the
+purpose, constraints, success criteria, task boundaries, and consequential
+design choices.
 
-**Exploring approaches:**
-- Propose 2-3 different approaches with trade-offs
-- Present options conversationally with your recommendation and reasoning
-- Lead with your recommended option and explain why
+## Classification
 
-**Presenting the design:**
-- Read `design-document-template.md` from this skill directory and use it as the output contract
-- Once you believe you understand what you're building, present the design
-- Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
-- Ask after each section whether it looks right so far
-- Be ready to go back and clarify if something doesn't make sense
+The direct path is the default. Use the full path when any of these conditions
+holds:
 
-**Design for isolation and clarity:**
-- Break the system into smaller units that each have one clear purpose, communicate through well-defined interfaces, and can be understood and tested independently
-- For each unit, you should be able to answer: what does it do, how do you use it, and what does it depend on?
-- Can someone understand what a unit does without reading its internals? Can you change the internals without breaking consumers? If not, the boundaries need work.
-- Smaller, well-bounded units are also easier for you to work with - you reason better about code you can hold in context at once, and your edits are more reliable when files are focused. When a file grows large, that's often a signal that it's doing too much.
+1. The work decomposes into more than one task that must land as separate
+   commits.
+2. More than one defensible approach remains, and the choice has consequences
+   beyond this change.
+3. The user explicitly requested a design or implementation plan.
 
-**Working in existing codebases:**
-- Explore the current structure before proposing changes. Follow existing patterns.
-- Existing execution paths must be established from repository evidence. Continue exploration or label an assumption for user approval; never fabricate a current call path.
-- Where existing code has problems that affect the work (e.g. a file that's grown too large, unclear boundaries, tangled responsibilities), include targeted improvements as part of the design - the way a good developer improves code they're working in.
-- Don't propose unrelated refactoring. Stay focused on what serves the current goal.
+Before choosing the direct path, name every affected file. Inability to do so is
+evidence that one of the first two conditions has gone unnoticed. Continue
+exploration or clarification until the trigger is named; the diagnostic does
+not become a separate routing rule.
 
-## After the Design
+Report the decision in this form:
 
-**Documentation:**
-- Design and plan documents always live in an external docs repo, separate from the code repo
-- `$DOCS_ROOT` is the docs repo root. Resolve it from the `DOCS_ROOT` environment variable, or from the default defined in your instructions file. Expand it to an absolute path before using it in a file-tool path or a subagent prompt. If neither defines it, ask the user — never guess a path, and never fall back to writing docs in-repo
-- Designs: `$DOCS_ROOT/$projectName/designs/`
-- Plans: `$DOCS_ROOT/$projectName/plans/`
-- Determine `$projectName` from the repo directory name unless the user specifies a different docs project name
-- Determine the document slug:
-  - If the current jj bookmark or change description is a good semantic identifier, you may reuse its slug
-  - Otherwise ask the user for a feature/design slug
-- Design file: `$DOCS_ROOT/$projectName/designs/<slug>.md`
-- Create the target directory if it doesn't exist
-- Write the validated design to that filename
-- VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks
+```text
+Path: Direct | Full
+Decomposes into separately committed tasks: yes | no
+Open consequential design question: yes | no
+File diagnostic: FilesNamed | CannotNameFiles
+User design override: present | absent
+Reason: <the fired trigger, or why none fired>
+```
 
-**Design review (before sharing with user):**
-Review the design yourself before sharing it.
+## Direct-path gate
 
-**Inline self-review checklist:**
-- **Completeness:** Purpose, constraints, success criteria, architecture, components, data flow, error handling, and testing are covered.
-- **Internal consistency:** The design does not contradict itself across sections.
-- **Scope control:** The design is focused enough for one implementation plan; unrelated subsystems are split out or marked as future work.
-- **Ambiguity:** Open questions are explicit; assumptions are labelled.
-- **No placeholders:** Remove `TBD`, `TODO`, vague component names, and undefined references.
-- **Implementation readiness:** A plan writer can turn the design into concrete tasks without session history.
-- **Template conformance:** The document satisfies `design-document-template.md`, including its programme-design and change-control checks.
+Present the classification and brief in one message. The brief contains:
 
-Fix any issues inline before sharing the design with the user. No need to re-review — just fix and move on.
+- **Changes:** the observable behaviour to add or alter.
+- **Files:** every file to create, modify, or remove.
+- **Verification:** the failing test, focused pass, and integrated check.
+- **Exclusions:** adjacent work deliberately left unchanged.
 
-**Independent review (after self-review, before sharing with user):**
-- Load the `requesting-document-review` skill and run it on the design
-  document you just wrote (`type=design`, no `design-ref`).
-- This handoff always runs — there is no trivial-skip path for "the design
-  looks fine."
-- Once that skill's loop terminates, present the resulting design to the
-  user.
+Then wait for explicit approval. Approval of the request itself is not approval
+of the brief.
 
-**User Review Gate:**
-After the self-review and independent review pass, ask the user to review the written design before proceeding:
+If the user refuses the gate, ask one bounded question: "Escalate to the full
+design path, or revise the brief?" Escalation resumes at approach comparison.
+Revision produces a corrected classification-and-brief message and waits again.
 
-> "Design written to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
+## Direct-path execution
 
-Wait for the user's response. If they request changes, make them and re-run the self-review. Only proceed once the user approves.
+After explicit brief approval, use this execution contract:
 
-**Implementation:**
-- Invoke the writing-plans skill to create the detailed implementation plan
-- Do NOT invoke any other skill. writing-plans is the next step.
+```text
+1. test-driven-development
+   EXECUTION_CONTEXT: main session
+2. requesting-code-review
+   JJ_BOUNDARY: @
+   DESCRIPTION: direct-path implementation
+   REQUIREMENTS: <inline the approved brief verbatim>
+   REVIEW_EXIT: fix and re-review Critical or Important findings until none remain
+3. finishing-development
+   Entry: Step 3
+```
 
-## Key Principles
+The approved brief is the complete requirement boundary. Code review is
+unconditional. `REQUIREMENTS` replaces `PLAN_REFERENCE`; a direct path has no
+plan. Enter `finishing-development` at Step 3 because TDD plus the mandatory
+review already supplied verification and review.
 
-- **One question at a time** - Don't overwhelm with multiple questions in one message
-- **Open-ended with concrete suggestions** - Give 2-4 examples or likely options to make answering easier
-- **Incremental validation** - Present design in sections, validate each before continuing
-- **YAGNI ruthlessly** - Remove unnecessary features from all designs
-- **Explore alternatives** - Always propose 2-3 approaches before settling
-- **Be flexible** - Go back and clarify when something doesn't make sense
+Report direct-path completion with all four facts:
+
+```text
+Durable artefacts: code and tests
+External docs repository: no design, plan, or brief file
+VCS treatment: ad hoc under vcs.md
+Commit authority: explicit user instruction required
+```
+
+## Upgrade from direct to full
+
+If implementation reveals another separately committed task or an unresolved
+consequential design choice, stop immediately. Name the fired trigger and
+present all work completed so far. Ask whether to keep that work as a starting
+point or revert it. Apply the user's decision, then re-enter this skill at
+clarification. Carry the original exploration forward unchanged and add the new
+evidence. Never carry implementation work into the design or discard it without
+that decision.
+
+## Full path
+
+### Compare approaches
+
+Propose two or three approaches with their trade-offs. Lead with the recommended
+option and explain why it best fits the clarified constraints. If the project is
+too large for one design, decompose it and take the first sub-project through
+this full path; each sub-project gets its own design, plan, and implementation
+cycle.
+
+### Present the design
+
+Read `design-document-template.md` from this skill directory and use it as the
+output contract. Present the design in manageable sections, checking after each
+section whether it is correct so far. Scale each section to its complexity.
+Return to clarification when an assumption or boundary remains unsettled.
+
+Design units around one clear responsibility, explicit dependencies, and
+interfaces consumers can understand without reading internals. Follow the
+repository's existing patterns. Include targeted improvements only when an
+existing problem blocks or materially complicates this work; avoid unrelated
+refactoring.
+
+### Write and review the design
+
+Design and plan documents live in the external docs repository, separate from
+the code repository. Resolve `$DOCS_ROOT` from the environment or the default in
+the active instructions, then expand it to an absolute path. If neither source
+defines it, ask the user. Never guess or write these documents in the code
+repository.
+
+Use these paths:
+
+- Design: `$DOCS_ROOT/$projectName/designs/<slug>.md`
+- Plan: `$DOCS_ROOT/$projectName/plans/<slug>.md`
+
+Derive `$projectName` from the repository directory unless the user specifies a
+different docs project. Use a user-provided slug, a suitable current jj bookmark
+or change description, or ask for one. Create the design directory if needed.
+VCS operations in `$DOCS_ROOT` remain the user's responsibility.
+
+Before sharing the written design, self-review it for:
+
+- completeness across purpose, constraints, success criteria, architecture,
+  components, data flow, errors, testing, and programme design;
+- internal consistency and focused scope;
+- explicit assumptions and open questions;
+- absence of placeholders and undefined references;
+- conformance to `design-document-template.md`, including its programme-design
+  and change-control checks;
+- enough detail for a plan writer with no session history.
+
+Fix any issue found by self-review. Then load `requesting-document-review` and
+run it with `type=design` and no design reference. This review is mandatory.
+When its loop terminates, ask the user to review the written design file. Apply
+requested changes and repeat self-review before proceeding.
+
+After the user approves the written design, invoke `writing-plans`. This is the
+full path's terminal state.
+
+## Key principles
+
+- **Capacity decides the path.** Perceived difficulty does not.
+- **One question at a time.** Clarify only what affects routing or design.
+- **Evidence before assumptions.** Establish current execution paths from the repository.
+- **YAGNI.** Exclude work that does not serve the accepted outcome.
+- **Full-path alternatives.** Compare two or three approaches when the full path fires.
+- **Full-path validation.** Present the design in sections and validate each one.
