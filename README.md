@@ -48,6 +48,10 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 
 **Workflow & Collaboration**
 - `brainstorming`
+- `grill-me`
+- `grill-with-docs`
+- `grilling`
+- `domain-modeling`
 - `writing-plans`
 - `requesting-document-review`
 - `executing-plans`
@@ -85,6 +89,7 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
 - **Canonical subagent dispatch policy.** `working-with-subagents` centralises harness-neutral capability, tool, brief, and result-inspection guidance; SDD force-loads it while retaining orchestration-specific rules.
 - **No `dispatching-parallel-agents`.** Intentionally excluded; harnesses know how to parallelise their own subagents.
 - **`unslop` (third-party addition).** Not from upstream. Replicated from [cursor/plugins](https://github.com/cursor/plugins/blob/main/pstack/skills/unslop/SKILL.md) `pstack/skills/unslop`, body verbatim; only the description was rewritten as an invocation pointer. It governs human-facing prose, not agent-facing documents, which follow `writing-for-agents`.
+- **Matt Pocock grilling skills (third-party addition).** `grill-me`, `grill-with-docs`, `grilling`, and `domain-modeling` come from [mattpocock/skills](https://github.com/mattpocock/skills). Router wording is harness-neutral. `domain-modeling` maintains `CONTEXT.md` terminology only; ADR creation is deliberately excluded because this pack's design workflow owns decision documentation.
 - **Trimmed skill descriptions.** Upstream description tails that summarise workflow ("- requires X; evidence before assertions always") are stripped: descriptions remain compact invocation pointers, per `writing-for-agents`.
 
 ## Upstream
