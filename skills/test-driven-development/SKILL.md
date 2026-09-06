@@ -3,325 +3,41 @@ name: test-driven-development
 description: Use when implementing any feature or bugfix, before writing implementation code
 ---
 
-# Test-Driven Development (TDD)
+# Test-driven development
 
-## Overview
+New features, behaviour changes and bug fixes require a failing test before implementation. If you wrote implementation first, delete it and start over, without keeping it as reference or adapting it while writing tests. Throw away exploratory code before starting TDD. Throwaway prototypes and other exceptions to test-first require user permission.
 
-Write the test first. Watch it fail. Write minimal code to pass.
+For refactoring, reuse existing coverage; test uncovered behaviour first. Where no useful executable test exists, inspect prose, validate configuration or check generated output through its generator. Do not add tests that merely mirror implementation. Required project checks still apply.
 
-**Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
+## Red, green, refactor
 
-## When to Use
+1. **Red.** Write one minimal test of one behaviour, with a clear name and intended API. Exercise real code; mock only unavoidable dependencies. Run the focused test and observe an expected assertion failure caused by missing behaviour, not a typo or test error. If it passes immediately, correct the test; if it errors, fix the error and rerun until it fails correctly.
+2. **Green.** Write the simplest implementation that passes. Keep the cycle within one reviewable unit, without extra features or unrelated refactoring. Run the test and applicable existing coverage. Fix code, not the test, when implementation fails. Confirm output is pristine, with no errors or warnings.
+3. **Refactor.** Only after green, remove duplication, improve names or extract helpers. Keep tests green and add no behaviour. Repeat with the next failing test.
 
-**Always:**
-- New features
-- Bug fixes
-- Behaviour changes
+For other test failures, investigate within scope. For apparently unrelated failures, report the command, actual output and evidence to the controller; do not silently expand the task. Continue only independent authorised work. The controller records repair requirements and arranges verification and review. Resolve recorded failures before final delivery unless the user explicitly changes that requirement.
 
-For refactoring, reuse existing coverage; test uncovered behaviour first.
-
-Where no useful executable test exists, inspect prose, validate configuration or
-check generated output through its generator. Do not add tests that merely mirror
-implementation. Required project checks still apply.
-
-Throwaway prototypes and other exceptions to test-first require user permission.
-
-## The Iron Law
-
-```
-NO NEW BEHAVIOUR OR BUG FIX WITHOUT A FAILING TEST FIRST
-```
-
-Write code before the test? Delete it. Start over.
-
-**No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
-
-## Red-Green-Refactor
-
-```dot
-digraph tdd_cycle {
-    rankdir=LR;
-    red [label="RED\nWrite failing test", shape=box, style=filled, fillcolor="#ffcccc"];
-    verify_red [label="Verify fails\ncorrectly", shape=diamond];
-    green [label="GREEN\nMinimal code", shape=box, style=filled, fillcolor="#ccffcc"];
-    verify_green [label="Verify passes\nAll green", shape=diamond];
-    refactor [label="REFACTOR\nClean up", shape=box, style=filled, fillcolor="#ccccff"];
-    next [label="Next", shape=ellipse];
-
-    red -> verify_red;
-    verify_red -> green [label="yes"];
-    verify_red -> red [label="wrong\nfailure"];
-    green -> verify_green;
-    verify_green -> refactor [label="yes"];
-    verify_green -> green [label="no"];
-    refactor -> verify_green [label="stay\ngreen"];
-    verify_green -> next;
-    next -> red;
-}
-```
-
-### RED - Write Failing Test
-
-Write one minimal test showing what should happen.
-
-<Good>
-```typescript
-test('retries failed operations 3 times', async () => {
-  let attempts = 0;
-  const operation = async () => {
-    attempts++;
-    if (attempts < 3) throw new Error('fail');
-    return 'success';
-  };
-
-  const result = await retryOperation(operation);
-
-  expect(result).toBe('success');
-  expect(attempts).toBe(3);
-});
-```
-Clear name, tests real behaviour, one thing
-</Good>
-
-<Bad>
-```typescript
-test('retry works', async () => {
-  const mockRetry = jest.fn()
-    .mockRejectedValueOnce(new Error())
-    .mockRejectedValueOnce(new Error())
-    .mockResolvedValueOnce('success');
-  await mockRetry();
-  expect(mockRetry).toHaveBeenCalledTimes(3);
-});
-```
-Vague name, tests mock setup not code
-</Bad>
-
-**Requirements:**
-- One behaviour
-- Clear name
-- Real code (only mock dependencies)
-
-### Verify RED - Watch It Fail
-
-**MANDATORY. Never skip.**
-
-```bash
-npm test path/to/test.test.ts
-```
-
-Confirm:
-- Test fails (not errors)
-- Failure message is expected
-- Fails because feature missing (not typos)
-
-**Test passes?** You're testing existing behaviour. Fix test.
-
-**Test errors?** Fix error, re-run until it fails correctly.
-
-### GREEN - Minimal Code
-
-Write simplest code to pass the test.
-
-<Good>
-```typescript
-async function retryOperation<T>(fn: () => Promise<T>): Promise<T> {
-  for (let i = 0; i < 3; i++) {
-    try {
-      return await fn();
-    } catch (e) {
-      if (i === 2) throw e;
-    }
-  }
-  throw new Error('unreachable');
-}
-```
-Just enough to pass
-</Good>
-
-<Bad>
-```typescript
-async function retryOperation<T>(
-  fn: () => Promise<T>,
-  options?: {
-    maxRetries?: number;
-    backoff?: 'linear' | 'exponential';
-    onRetry?: (attempt: number) => void;
-  }
-): Promise<T> {
-  // YAGNI
-}
-```
-Over-engineered
-</Bad>
-
-Don't add features, refactor unrelated code, or "improve" beyond the test. Keep each TDD cycle scoped to one reviewable unit.
-
-### Verify GREEN - Watch It Pass
-
-**MANDATORY.**
-
-```bash
-npm test path/to/test.test.ts
-```
-
-Confirm:
-- Test passes
-- Other tests still pass
-- Output pristine (no errors, warnings)
-
-**Test fails?** Fix code, not test.
-
-**Other tests fail?** Investigate within scope. For apparently unrelated
-failures, report the command, actual output and evidence to the controller;
-do not silently expand the task. Continue only independent authorised work.
-The controller records repair requirements and arranges verification and review.
-Resolve recorded failures before final delivery unless the user explicitly
-changes that requirement.
-
-### REFACTOR - Clean Up
-
-After green only:
-- Remove duplication
-- Improve names
-- Extract helpers
-
-Keep tests green. Don't add behaviour.
-
-### Repeat
-
-Next failing test for next feature.
-
-## Good Tests
-
-| Quality | Good | Bad |
-|---------|------|-----|
-| **Minimal** | One thing. "and" in name? Split it. | `test('validates email and domain and whitespace')` |
-| **Clear** | Name describes behaviour | `test('test1')` |
-| **Shows intent** | Demonstrates desired API | Obscures what code should do |
+## Test quality
 
 When writing or changing any test, read [writing-good-tests.md](writing-good-tests.md):
-- Name the production change that would make the test fail
-- Derive expectations independently of the code under test
-- Assert real behaviour, never mock behaviour
-- Run scripts and assert effects; never grep their source text
+- Name the production change that would make the test fail.
+- Derive expectations independently of the code under test.
+- Assert real behaviour, never mock behaviour.
+- Run scripts and assert effects; never grep their source text.
 
-## Common Rationalisations
+Cover edge cases and errors. Keep distinct behaviours separate. Manual exploration or a test that only passed does not establish test-first evidence.
 
-| Excuse | Reality |
-|--------|---------|
-| "Too simple to test" | Test behaviour, not implementation details. |
-| "I'll test after" | Tests passing immediately prove nothing. |
-| "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
-| "Already manually tested" | Ad-hoc ≠ systematic. No record, can't re-run. |
-| "Deleting X hours is wasteful" | Sunk cost fallacy. Keeping unverified code is technical debt. |
-| "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete. |
-| "Need to explore first" | Fine. Throw away exploration, start with TDD. |
-| "Test hard = design unclear" | Listen to test. Hard to test = hard to use. |
-| "TDD will slow me down" | TDD faster than debugging. Pragmatic = test-first. |
-| "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
-| "Existing code has no tests" | You're improving it. Add tests for existing code. |
+## When stuck
 
-## Red Flags - STOP and Start Over
+Write the wished-for API and assertion first; ask your human partner if needed. A complicated test suggests simplifying the interface. If everything needs mocking, reduce coupling with dependency injection. Extract large setup into helpers, then simplify the design if setup remains complex.
 
-- Code before test
-- Test after implementation
-- Test passes immediately
-- Can't explain why test failed
-- Tests added "later"
-- Rationalising "just this once"
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "Keep as reference" or "adapt existing code"
-- "Already spent X hours, deleting is wasteful"
-- "TDD is dogmatic, I'm being pragmatic"
-- "This is different because..."
+## Completion checklist
 
-**All of these mean: Delete code. Start over with TDD.**
+Track applicable items using the current harness's task tracker, following `using-skills`:
 
-## Example: Bug Fix
+- [ ] New behaviour and bug fixes have meaningful coverage, including edge cases and errors.
+- [ ] Each required test failed for the expected reason before implementation.
+- [ ] Implementation was minimal and tests exercise real code.
+- [ ] Applicable tests and required project checks pass with pristine output.
 
-**Bug:** Empty email accepted
-
-**RED**
-```typescript
-test('rejects empty email', async () => {
-  const result = await submitForm({ email: '' });
-  expect(result.error).toBe('Email required');
-});
-```
-
-**Verify RED**
-```bash
-$ npm test
-FAIL: expected 'Email required', got undefined
-```
-
-**GREEN**
-```typescript
-function submitForm(data: FormData) {
-  if (!data.email?.trim()) {
-    return { error: 'Email required' };
-  }
-  // ...
-}
-```
-
-**Verify GREEN**
-```bash
-$ npm test
-PASS
-```
-
-**REFACTOR**
-Extract validation for multiple fields if needed.
-
-## Verification Checklist
-
-**IMPORTANT:** Per using-skills mandate, track each checklist item below using the current harness's task tracker.
-
-Before marking work complete:
-
-- [ ] New behaviour and bug fixes have meaningful coverage
-- [ ] Watched each test fail before implementing
-- [ ] Each test failed for expected reason (feature missing, not typo)
-- [ ] Wrote minimal code to pass each test
-- [ ] Applicable tests and required project checks pass
-- [ ] Output pristine (no errors, warnings)
-- [ ] Tests use real code (mocks only if unavoidable)
-- [ ] Edge cases and errors covered
-
-Apply the checklist where test-first is required.
-
-## When Stuck
-
-| Problem | Solution |
-|---------|----------|
-| Don't know how to test | Write wished-for API. Write assertion first. Ask your human partner. |
-| Test too complicated | Design too complicated. Simplify interface. |
-| Must mock everything | Code too coupled. Use dependency injection. |
-| Test setup huge | Extract helpers. Still complex? Simplify design. |
-
-## Debugging Integration
-
-Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
-
-Never fix bugs without a test.
-
-## Final Rule
-
-```
-New behaviour or bug fix → test exists and failed first
-Otherwise → do not claim test-first
-```
-
-## Integration with Other Skills
-
-**Complementary skills:**
-- **verification-before-completion** - Verify tests pass before claiming complete
-- **systematic-debugging** - Bug fixes require TDD cycle
+Apply test-first items only where test-first is required. Do not claim test-first without observed failure. Bug fixes use `systematic-debugging` for investigation and this cycle for the reproducer and fix. Use `verification-before-completion` before claiming completion.

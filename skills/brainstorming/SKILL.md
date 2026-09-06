@@ -13,14 +13,9 @@ consequential design choice takes the direct path. Everything else keeps the
 full design and planning path.
 
 <HARD-GATE>
-Full-path implementation needs design approval. Direct work needs an authorised
-brief; the user's request can supply that authority.
+Full-path implementation needs design approval. The user's request authorises
+direct work within its scope; ask before adding scope or at a requested checkpoint.
 </HARD-GATE>
-
-## Anti-pattern: skipping the gate
-
-Small work still needs classification and a four-field brief. Name the files
-and verification before proceeding; investigate further if either is unclear.
 
 ## Checklist
 
@@ -29,8 +24,8 @@ applicable branch in order:
 
 1. **Explore project context** - check files, docs, recent changes, and representative existing execution paths
 2. **Clarify only what is needed** - establish purpose, constraints, success criteria, task boundaries, and consequential design choices
-3. **Classify** - evaluate both full-path triggers, the file diagnostic, and any user override
-4. **Direct path** - present classification and brief; proceed if authorised
+3. **Assess scope internally** - evaluate full-path triggers and investigate unknown files
+4. **Direct path** - proceed within the request and agreed clarifications; no compulsory classification or brief output
 5. **Direct execution** - invoke `test-driven-development`, then mandatory `requesting-code-review`, then `finishing-development` at Step 3
 6. **Full path** - compare approaches, present and approve the design, write and review it, then invoke `writing-plans`
 7. **Upgrade when needed** - stop direct work that fires a trigger and re-enter at clarification
@@ -41,11 +36,7 @@ applicable branch in order:
 digraph brainstorming {
     "Explore project context and execution paths" [shape=box];
     "Clarify only what is needed" [shape=box];
-    "Classify" [shape=diamond];
-    "Present classification and brief" [shape=box];
-    "Brief authorised?" [shape=diamond];
-    "User approves brief?" [shape=diamond];
-    "Escalate or revise?" [shape=diamond];
+    "Assess scope internally" [shape=diamond];
     "Invoke test-driven-development" [shape=box];
     "Invoke requesting-code-review" [shape=box];
     "Finishing-development Step 3" [shape=doublecircle];
@@ -57,16 +48,9 @@ digraph brainstorming {
     "Invoke writing-plans" [shape=doublecircle];
 
     "Explore project context and execution paths" -> "Clarify only what is needed";
-    "Clarify only what is needed" -> "Classify";
-    "Classify" -> "Present classification and brief" [label="direct"];
-    "Classify" -> "Propose 2-3 approaches" [label="full"];
-    "Present classification and brief" -> "Brief authorised?";
-    "Brief authorised?" -> "Invoke test-driven-development" [label="yes"];
-    "Brief authorised?" -> "User approves brief?" [label="no"];
-    "User approves brief?" -> "Invoke test-driven-development" [label="yes"];
-    "User approves brief?" -> "Escalate or revise?" [label="no"];
-    "Escalate or revise?" -> "Propose 2-3 approaches" [label="escalate"];
-    "Escalate or revise?" -> "Present classification and brief" [label="revise"];
+    "Clarify only what is needed" -> "Assess scope internally";
+    "Assess scope internally" -> "Invoke test-driven-development" [label="direct, within authorised scope"];
+    "Assess scope internally" -> "Propose 2-3 approaches" [label="full"];
     "Invoke test-driven-development" -> "Invoke requesting-code-review";
     "Invoke requesting-code-review" -> "Finishing-development Step 3";
     "Propose 2-3 approaches" -> "Present design sections";
@@ -93,7 +77,7 @@ four concrete examples when examples help. Clarify only enough to establish the
 purpose, constraints, success criteria, task boundaries, and consequential
 design choices. Look up facts yourself; questions block only dependent work.
 
-## Classification
+## Internal scope assessment
 
 The direct path is the default. Use the full path when any of these conditions
 holds:
@@ -104,37 +88,14 @@ holds:
    beyond this change.
 3. The user explicitly requested a design or implementation plan.
 
-Before choosing the direct path, name every affected file. Inability to do so is
-evidence that one of the first two conditions has gone unnoticed. Continue
-exploration or clarification until the trigger is named; the diagnostic does
-not become a separate routing rule.
-
-Report the decision in this form:
-
-```text
-Path: Direct | Full
-Decomposes into separately committed tasks: yes | no
-Open consequential design question: yes | no
-File diagnostic: FilesNamed | CannotNameFiles
-User design override: present | absent
-Reason: <the fired trigger, or why none fired>
-```
-
-## Direct-path gate
-
-Present the classification and brief in one message. The brief contains:
-
-- **Changes:** the observable behaviour to add or alter.
-- **Files:** every file to create, modify, or remove.
-- **Verification:** the failing test, focused pass, and integrated check.
-- **Exclusions:** adjacent work deliberately left unchanged.
-
-The request authorises a brief within its scope. Ask for approval only for added
-scope or a checkpoint the user requested. Revise the brief when corrected.
+Investigate unknown affected files and verification needs. Uncertainty calls for
+exploration, not a classification report or automatic full-path routing. Assess
+scope internally; a concise internal requirements record may preserve the user
+request and agreed clarifications without a compulsory user-facing format.
 
 ## Direct-path execution
 
-Once the brief is authorised:
+Within the user request and agreed clarifications:
 
 ```text
 1. test-driven-development
@@ -142,14 +103,14 @@ Once the brief is authorised:
 2. requesting-code-review
    JJ_BOUNDARY: @
    DESCRIPTION: direct-path implementation
-   REQUIREMENTS: <inline the authorised brief verbatim>
+   REQUIREMENTS: <inline the user request and agreed clarifications as the complete requirements>
    REVIEW_EXIT: fix and re-review Critical or Important findings until none remain
 3. finishing-development
    Entry: Step 3
 ```
 
-The authorised brief is the complete requirement boundary. Code review is
-unconditional. `REQUIREMENTS` replaces `PLAN_REFERENCE`; a direct path has no
+The user request and agreed clarifications are the complete requirement boundary;
+no separate brief is required. Independent code review is unconditional. `REQUIREMENTS` replaces `PLAN_REFERENCE`; a direct path has no
 plan. Enter `finishing-development` at Step 3 because TDD plus the mandatory
 review already supplied verification and review.
 

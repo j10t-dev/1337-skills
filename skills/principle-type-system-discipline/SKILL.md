@@ -1,6 +1,6 @@
 ---
 name: principle-type-system-discipline
-description: "Apply when designing types, reviewing a function signature, or writing code in any statically-typed language. Make illegal states unrepresentable, brand semantic primitives, parse external data at boundaries, refuse to lie to the compiler, exhaust variants, derive from authoritative schemas."
+description: "Use when designing types or APIs, writing statically-typed code, or reviewing code changes involving types or function signatures. Read-only investigation alone does not trigger this skill."
 user-invocable: false
 ---
 
