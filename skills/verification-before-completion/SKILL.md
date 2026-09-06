@@ -33,7 +33,12 @@ BEFORE claiming completion:
 2. READ: Inspect existing results.
 3. RUN: Perform missing or invalidated checks.
 4. VERIFY: Do the results support the claim?
-5. REPORT: State the checked scope, result and remaining gaps.
+5. CHECK OUTSTANDING WORK: Inspect recorded failures, repair work items,
+   findings and rulings. Combined acceptance needs check/review evidence for
+   both original and repair requirements. Final delivery needs every recorded
+   failure resolved unless the user explicitly changed that requirement.
+6. REPORT: State the checked scope, result and remaining gaps. Task-only
+   evidence does not prove a separate repair or the whole feature passed.
 ```
 
 ## Common Failures

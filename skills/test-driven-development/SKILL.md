@@ -176,7 +176,12 @@ Confirm:
 
 **Test fails?** Fix code, not test.
 
-**Other tests fail?** Fix now.
+**Other tests fail?** Investigate within scope. For apparently unrelated
+failures, report the command, actual output and evidence to the controller;
+do not silently expand the task. Continue only independent authorised work.
+The controller records repair requirements and arranges verification and review.
+Resolve recorded failures before final delivery unless the user explicitly
+changes that requirement.
 
 ### REFACTOR - Clean Up
 

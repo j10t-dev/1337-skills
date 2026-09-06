@@ -24,11 +24,16 @@ Pause affected work for these conditions; continue independent authorised work:
 - an irreversible or destructive operation
 - a security-sensitive action
 - an integration or side effect the user reserves, meaning rebase, split, squash, amending an accepted commit, push, submit, PR work, or any bookmark movement beyond the declared feature bookmark
-- ledger and repository state that no `Durable Progress` recovery row matches exactly
+- ledger and repository state that no `recovery.md` row matches exactly
+- a genuine Critical/Important defect remaining after three fix rounds without an explicit user exception
 - a plan so broken that every path forward is a guess
 - a consequential choice not settled by the approved requirements
 
-Everything else is a ruling.
+Resolve routine matters with evidence-backed rulings. A ruling cannot defer a genuine Critical/Important defect into acceptance.
+
+Load [recovery.md](recovery.md) on resume, interruption or unexplained state. Load [review-handling.md](review-handling.md) for findings, unverifiable requirements or implementer escalation, including apparently unrelated failures. Ordinary execution needs neither reference immediately.
+
+**Acceptance gate:** Obtain independent task review with both spec-compliance and quality verdicts. Accept only when applicable checks pass, every unverifiable requirement is resolved, and blocking findings are resolved by passing review after genuine fixes, evidence-backed rejection of factually false findings, or an explicit user exception. A false finding needs no replacement passing verdict and consumes no fix round. Genuine Critical/Important defects require fixes and re-review; after three fix rounds, escalate rather than accept by controller deferral. Record Minor findings for final triage. Combined repairs require checks and review covering both original and repair requirements. Final delivery also requires resolution of separately managed failures unless the user explicitly changes that requirement.
 
 ## When to Use
 
@@ -71,15 +76,15 @@ digraph process {
     "Dispatch implementer; answer questions as needed" [shape=box];
     "Implementer edits, tests, and self-reviews in undescribed @" [shape=box];
     "Run scripts/review-package @- @ and dispatch task reviewer" [shape=box];
-    "Both task-review verdicts pass" [shape=diamond];
+    "Acceptance gate met after evidence triage?" [shape=diamond];
     "Fix round R of 3: R<3 resume implementer; R=3 fresh implementer, more capable model" [shape=box];
     "R = 3 with findings open?" [shape=diamond];
-    "Adjudicate open findings, park with rulings" [shape=box];
+    "Escalate genuine defects to user" [shape=box];
     "Controller accepts task with planned subject" [shape=box];
     "Empty @ above advanced Feature Bookmark" [shape=box];
     "Next task or final review" [shape=diamond];
     "Run stable final review from run base through Feature Bookmark" [shape=box];
-    "Final review passes?" [shape=diamond];
+    "Final gate met after triage?" [shape=diamond];
     "Record pending fix subject, dispatch one fixer, review run base through @" [shape=box];
     "Controller accepts reviewed final fix" [shape=box];
     "Clean scratch and use finishing-development" [shape=box style=filled fillcolor=lightgreen];
@@ -88,22 +93,24 @@ digraph process {
     "Write Task N -> in progress" -> "Dispatch implementer; answer questions as needed";
     "Dispatch implementer; answer questions as needed" -> "Implementer edits, tests, and self-reviews in undescribed @";
     "Implementer edits, tests, and self-reviews in undescribed @" -> "Run scripts/review-package @- @ and dispatch task reviewer";
-    "Run scripts/review-package @- @ and dispatch task reviewer" -> "Both task-review verdicts pass";
-    "Both task-review verdicts pass" -> "R = 3 with findings open?" [label="no"];
+    "Run scripts/review-package @- @ and dispatch task reviewer" -> "Acceptance gate met after evidence triage?";
+    "Acceptance gate met after evidence triage?" -> "R = 3 with findings open?" [label="no"];
     "R = 3 with findings open?" -> "Fix round R of 3: R<3 resume implementer; R=3 fresh implementer, more capable model" [label="no - next round"];
-    "R = 3 with findings open?" -> "Adjudicate open findings, park with rulings" [label="yes - cap reached"];
+    "R = 3 with findings open?" -> "Escalate genuine defects to user" [label="yes - cap reached"]; 
     "Fix round R of 3: R<3 resume implementer; R=3 fresh implementer, more capable model" -> "Run scripts/review-package @- @ and dispatch task reviewer" [label="same boundary"];
-    "Adjudicate open findings, park with rulings" -> "Controller accepts task with planned subject";
-    "Both task-review verdicts pass" -> "Controller accepts task with planned subject" [label="yes"];
+    "Escalate genuine defects to user" -> "Controller accepts task with planned subject" [label="only explicit user exception and other gates met"];
+    "Acceptance gate met after evidence triage?" -> "Controller accepts task with planned subject" [label="yes"]; 
     "Controller accepts task with planned subject" -> "Empty @ above advanced Feature Bookmark";
     "Empty @ above advanced Feature Bookmark" -> "Next task or final review";
     "Next task or final review" -> "Write Task N -> in progress" [label="next task"];
     "Next task or final review" -> "Run stable final review from run base through Feature Bookmark" [label="all tasks complete"];
-    "Run stable final review from run base through Feature Bookmark" -> "Final review passes?";
-    "Final review passes?" -> "Clean scratch and use finishing-development" [label="yes"];
-    "Final review passes?" -> "Record pending fix subject, dispatch one fixer, review run base through @" [label="no"];
-    "Record pending fix subject, dispatch one fixer, review run base through @" -> "Controller accepts reviewed final fix" [label="clean re-review"];
-    "Controller accepts reviewed final fix" -> "Clean scratch and use finishing-development" [label="same reviewed tree and requirements"];
+    "Run stable final review from run base through Feature Bookmark" -> "Final gate met after triage?";
+    "Final gate met after triage?" -> "Clean scratch and use finishing-development" [label="yes - repairs resolved and rulings reported"];
+    "Final gate met after triage?" -> "Record pending fix subject, dispatch one fixer, review run base through @" [label="genuine defects, below cap"];
+    "Final gate met after triage?" -> "Escalate final defects; delivery blocked" [label="genuine defects at cap"];
+    "Escalate final defects; delivery blocked" -> "Final gate met after triage?" [label="explicit user exception or approved resolution"];
+    "Record pending fix subject, dispatch one fixer, review run base through @" -> "Controller accepts reviewed final fix" [label="re-review and acceptance gate met"];
+    "Controller accepts reviewed final fix" -> "Clean scratch and use finishing-development" [label="same reviewed tree and requirements; repairs resolved; rulings reported"];
     "Controller accepts reviewed final fix" -> "Run stable final review from run base through Feature Bookmark" [label="intervening content or requirement change"];
 }
 ```
@@ -117,15 +124,15 @@ Exactly one implementation plan is active. The controller owns every VCS mutatio
 | Run entry | Follow `Pre-Flight Plan Review`; matching existing state continues through `Durable Progress` |
 | Task starts | Write `Task N -> in progress`; dispatch only after the ledger write succeeds |
 | Task work | Keep non-empty `@` undescribed with the feature bookmark at `@-` |
-| Task review | Run `scripts/review-package @- @`; fix and re-run the same boundary |
-| Both task verdicts pass | Accept the task using its exact plan subject |
+| Task review | Run `scripts/review-package @- @`; triage findings, fix genuine defects and re-review the same boundary |
+| Acceptance gate met after both verdicts | Accept using the exact plan subject, amended prospectively for a combined repair |
 | Final review | Compare the recorded run-base commit with `Feature Bookmark` |
 | Final fix starts | Record its exact pending `fix:` subject before dispatching the fixer |
-| Final fix passes re-review | Accept the fix using its pending ledger subject |
+| Final fix re-reviewed and gate met | Accept the fix using its pending ledger subject |
 
 ### Accepting a Task or Final Fix
 
-After the applicable verification/review gate:
+After the acceptance gate above, including both scopes for a combined repair and the applicable final review for a final fix:
 
 1. Confirm `@` is non-empty, undescribed, has one parent, and that parent is the feature bookmark. Reconcile the completed ledger entries as one exact-subject, exact-parent path from the run base. Stop on any mismatch.
 2. Read the task subject from its `**Commit:**` field, or the final-fix subject from its pending ledger entry.
@@ -133,7 +140,7 @@ After the applicable verification/review gate:
 4. Run `jj bookmark set "<Feature Bookmark>" -r @-`.
 5. Read `@-` with `jj log -r @- --no-graph -T 'change_id ++ " " ++ commit_id'` and replace the pending ledger line with its full IDs and `(complete)`.
 
-Never amend an accepted commit or improvise rollback, rebase, split, squash, amend, or any bookmark movement beyond the declared feature bookmark. If interruption leaves the commit, bookmark, and ledger out of step, use the recovery table below.
+Never amend an accepted commit or improvise rollback, rebase, split, squash, amend, or any bookmark movement beyond the declared feature bookmark. If interruption leaves the commit, bookmark, and ledger out of step, load `recovery.md`.
 
 ## Pre-Flight Plan Review
 
@@ -184,37 +191,7 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If they are about correctness or scope, address them before review. If they are observations (e.g. "this file is getting large"), note them and proceed to review.
 
-**NEEDS_CONTEXT:** The implementer needs information that wasn't provided. Provide the missing context and re-dispatch.
-
-**BLOCKED:** The implementer cannot complete the task. Assess the blocker:
-1. If it's a context problem, provide more context and re-dispatch with the same model
-2. If the task requires more reasoning, re-dispatch with a more capable model
-3. If the task is too large, break it into smaller pieces
-4. If the plan itself is wrong, rule on the correction, record the ruling, and re-dispatch with that ruling carried in the brief
-
-**Never** ignore an escalation or force the same model to retry without changes. If the implementer said it's stuck, something needs to change.
-
-## Handling Reviewer ⚠️ Items
-
-The task reviewer may report "⚠️ Cannot verify from diff" items — requirements that live in unchanged code or span tasks. These do not block the rest of the review, but you must resolve each one yourself before accepting both task verdicts: you hold the plan and cross-task context the reviewer lacks. If you confirm an item is a real gap, treat it as a failed spec review — send it back to the implementer and re-review. Record how you resolved each item as a ruling.
-
-## Fix Rounds
-
-Resume the same implementer for Critical and Important review fixes, and re-review after every round. Rounds one and two go back to the same implementer. Round three goes to a fresh implementer on the most capable model available to you; where the run already uses that model, round three is still a fresh implementer on it, because the fresh context is the point. Three rounds is the cap.
-
-Record the round on the task's in-progress ledger line before you dispatch it. The round is durable state, not a ruling. After a compaction you cannot otherwise tell whether to resume, escalate, or adjudicate.
-
-At the cap, stop dispatching fixes and adjudicate every finding still open. You hold the plan and the cross-task context the reviewer lacks:
-
-- if the reviewer is wrong or the point is arguable, park it with a ruling saying why the code stands
-- if it is real but nothing later builds on it, park it with a ruling saying it is real and deferred
-- if it is real and later work depends on it, or it exposes a plan defect, rule on the smallest change that unblocks the dependent work and dispatch it as its own fix against its own boundary
-
-Never fold that unblocking change into the next task's dispatch. The next implementer is scoped to its own brief and its reviewer receives only that brief and the binding constraints, so inherited work arrives with no requirement behind it. The reviewer either rejects it as unrelated or passes it unexamined. Give it a pending fix entry of its own, dispatch it with the ruling as its stated requirements, review it against that boundary, and accept it through `Accepting a Task or Final Fix` before the next task dispatches.
-
-Adjudication closes the task. Accept it through `Accepting a Task or Final Fix`, and point the final whole-branch review at the parked findings alongside the Minor ones.
-
-Adjudicate only at the cap. Adjudicating at round two to end the loop early is pre-judging under another name.
+For **NEEDS_CONTEXT**, **BLOCKED**, or an apparently unrelated failure, load [review-handling.md](review-handling.md) before disposition. Continue only independent authorised work.
 
 ## Constructing Reviewer Prompts
 
@@ -234,14 +211,15 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
   `RUN_BASE` is the full run-base commit ID recorded in the ledger.
 - Every fix round carries the implementer contract: the implementer re-runs the tests covering its change and reports the results. Name the covering test files in the assignment — a one-line fix does not need the whole suite. Before re-dispatching the reviewer, confirm the fix report contains the covering tests, the command run, and the output.
 - A final-review fixer follows the same VCS ban as an implementer. A `**Commit:**` line belongs to the controller, does not authorise VCS commands, and must be ignored while the fixer edits and verifies.
-- If the final whole-branch review returns findings, append this exact durable entry before dispatching ONE fix subagent with the complete findings list:
+- If the final whole-branch review returns findings, load `review-handling.md` and triage first. If fixes remain, append this exact durable entry before dispatching ONE fix subagent with the complete unresolved findings list:
 
   ```text
   Final review fix 1 -> pending (subject `fix: address final review findings`)
   ```
 
-  After its run-base-through-`@` package receives a clean re-review, use `Accepting a Task or Final Fix`. Confirm acceptance preserved the reviewed tree and requirements; reuse that review rather than repeating it solely because commit metadata changed. Never amend a task commit.
-- Scratch cleanup occurs only after final review passes and no pending fix exists. Remove `.agents/sdd/` then; another plan may start only after cleanup.
+  Track final-review fix rounds in the fix report without changing ledger forms; three rounds is also the cap for those findings. After its run-base-through-`@` package receives re-review and the acceptance gate is met, use root `SKILL.md`, `Accepting a Task or Final Fix`. Confirm acceptance preserved the reviewed tree and requirements; reuse that review rather than repeating it solely because commit metadata changed. Never amend a task commit.
+- Final review receives original rejected findings, their evidence-backed rulings, Minor findings and every repair work item. It may reassess them independently.
+- Scratch cleanup occurs only after the final acceptance gate is met, no unresolved repair or pending fix exists, and every ruling has been reported. Explicit user changes to delivery requirements must be recorded and reported before cleanup. Another plan may start only after cleanup.
 
 ## File Handoffs
 
@@ -250,7 +228,7 @@ Everything you paste into a dispatch prompt — and everything a subagent prints
 - **Task-scoped context boundary:** Every implementer, fixer, and task-reviewer dispatch must state that its supplied brief, context, and named artefacts are its complete boundary. The subagent must not locate the parent plan, neighbouring tasks, progress ledger, prior-task materials, or session history. Missing requirements are escalated to the controller rather than discovered by broadening scope. This restriction does not apply to the final whole-branch reviewer.
 - **Task brief:** before dispatching an implementer, run this skill's `scripts/task-brief PLAN_FILE N` — it extracts the task's full text to a file and prints the path. Compose the dispatch so the brief stays the single source of requirements. Your dispatch should contain: (1) one line on where this task fits; (2) the brief path, introduced as "read this first — it is your requirements, with the exact values to use verbatim"; (3) interfaces and decisions from earlier tasks that the brief cannot know; (4) your resolution of any ambiguity you noticed in the brief; (5) the report-file path and report contract. Exact values (numbers, magic strings, signatures, test cases) appear only in the brief. Retain binding interfaces/decisions, exclusions, concrete cases and verification verbatim. Complete contracts do not require routine production or test bodies: dispatch the implementer to construct them, parameterising the same behaviour's cases with independent expectations and choosing equivalent private mechanics. Preserve explicit illustrative/binding snippet labels; missing necessary decisions go to the controller, not a search of the full design or neighbouring tasks.
 - **Report file:** name the implementer's report file after the brief (`…/task-N-brief.md` → `…/task-N-report.md`) and put it in the dispatch prompt. The implementer writes the full report there and returns only status, a one-line test summary, and concerns.
-- **Reviewer inputs:** the task reviewer gets three paths — the same brief file, the report file, and the review package — plus the global constraints that bind the task.
+- **Reviewer inputs:** the task reviewer gets the same brief file, report file and review package, plus binding global constraints. For a combined repair, also name the repair brief and report explicitly and require verdicts covering each scope.
 - Fix rounds append their report (with test results) to the same report file and return a short summary; re-reviews read the updated file.
 
 ## Durable Progress
@@ -274,9 +252,9 @@ Final review fix 1 -> change eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee, commit ffffffffff
 
 The numbered state lines are mutually exclusive format examples. Synthetic IDs only illustrate width; completed entries contain the real full change and commit IDs from jj.
 
-The fix-round suffix is part of the in-progress line, rewritten in place as each round dispatches. No suffix means no fix round has run. A resumed task resumes at its recorded round, so a task carrying `fix round 3 of 3` has reached the cap and adjudicates rather than dispatching again.
+The fix-round suffix is part of the in-progress line, rewritten in place as each round dispatches. No suffix means no fix round has run. A resumed task resumes at its recorded round, so a task carrying `fix round 3 of 3` has reached the cap and triages remaining findings, escalating genuine Critical/Important defects rather than dispatching again.
 
-An unblocking fix entry has the same pending and complete shapes as a final review fix, and the recovery rows below that name a final fix apply to it identically.
+An unblocking fix entry has the same pending and complete shapes as a final review fix, and the recovery rows in `recovery.md` that name a final fix apply to it identically.
 
 Rulings are records, not state. Append each one where you make it, in exactly this form:
 
@@ -286,35 +264,11 @@ Ruling: <what you decided> -- <why> -- <what it costs if wrong>
 
 Reconciliation and recovery read only the `->` state lines; a ruling line never resolves to a change, a commit, or a task.
 
-Legacy, stale, or foreign ledger formats have no migration or compatibility path: stop rather than guessing or converting.
-
-Before any redispatch, prove:
-
-- every completed ledger change ID and commit ID still resolve to the same snapshot;
-- described commits after run base form one path in plan order;
-- each recovered task has the exact plan subject and expected parent;
-- completed task commits are never amended or redispatched.
-
-After those checks, perform only the action in the first matching recovery row:
-
-| Observed state | One recovery action |
-|---|---|
-| initialised ledger, absent feature bookmark, no task commits | Create the missing bookmark at run base. |
-| next exact task commit present while bookmark and ledger are behind | Advance the bookmark, then record its full identities. |
-| bookmark advanced while ledger still says in progress | Record the commit's full identities. |
-| completed final-fix commit with bookmark or ledger behind | Advance the bookmark, then record its full identities. |
-| pending final fix plus empty `@` and no matching child | Resume the recorded final-fix wave. |
-| pending final fix plus non-empty undescribed `@` | Resume run-base-through-`@` re-review. |
-| task in progress plus empty `@` | Dispatch or resume the recorded task. |
-| task in progress plus non-empty undescribed `@` | Dispatch or resume the recorded task. |
-| empty `@` above feature bookmark with no pending entry | Start the first uncompleted task or final review. |
-| unexplained non-empty `@`, described active `@`, divergence, or identity mismatch | Ambiguous: stop and ask. |
-
-Do not use `jj op log` as a substitute ledger and do not repair any state outside this table. If no row matches exactly, stop and ask.
+On resume or unexplained state, load [recovery.md](recovery.md) and reconcile before redispatch. Rulings for combined repairs preserve scope and prospective subject intent, never commit identity. Incomplete or inconsistent intent stops affected work.
 
 ## Finish
 
-Before removing `.agents/sdd/`, collect every `Ruling:` line in the ledger into your final message under "Rulings I made", in the order you made them, each with what it costs if wrong. That means the conflict scan's rulings, the parked findings, the ⚠️ resolutions, and the plan-mandated findings. The list is exhaustive. If the ledger holds a ruling, the list holds it.
+Before removing `.agents/sdd/`, collect every `Ruling:` line in the ledger into your final message under "Rulings I made", in the order you made them, each with what it costs if wrong. That means the conflict scan's rulings, the rejected findings and repair rulings, the ⚠️ resolutions, and the plan-mandated findings. The list is exhaustive. If the ledger holds a ruling, the list holds it.
 
 This list is the only place the decisions you took on the user's behalf reach them, and it is what they read to find what needs reworking. Delete the scratch directory first and those decisions are gone unreported.
 
@@ -351,7 +305,7 @@ Task 2: Recovery modes
 [Run scripts/review-package @- @; dispatch task reviewer]
 Task reviewer: Spec ❌. Task quality: Needs fixes.
 
-[Resume the implementer; keep @ undescribed]
+[Load review-handling.md; verify the finding is genuine; record round 1 and resume the implementer; keep @ undescribed]
 [Re-run scripts/review-package @- @; re-dispatch task reviewer]
 Task reviewer: Spec ✅. Task quality: Approved.
 [Accept Task 2 using `Accepting a Task or Final Fix`]
@@ -360,11 +314,11 @@ Task reviewer: Spec ✅. Task quality: Approved.
 
 [Run scripts/review-package RUN_BASE FEATURE_BOOKMARK; dispatch final reviewer]
 Final reviewer: Important findings.
-[Append "Final review fix 1 -> pending (subject `fix: address final review findings`)" before fixer dispatch]
+[Triage evidence; reject false findings with durable rulings; for genuine defects append "Final review fix 1 -> pending (subject `fix: address final review findings`)" before fixer dispatch]
 [Dispatch ONE final-review fixer; run scripts/review-package RUN_BASE @]
 Final reviewer: Clean re-review.
 [Accept the reviewed final fix with its pending subject]
-[Confirm the accepted tree and requirements match the clean re-review; reuse it unless intervening changes invalidate it. With no pending fix, report every ledger Ruling: line under "Rulings I made", then remove .agents/sdd/]
+[Confirm the accepted tree and requirements match the clean re-review; reuse it unless intervening changes invalidate it. With no pending fix or unresolved repair, report every ledger Ruling: line under "Rulings I made", then remove .agents/sdd/]
 ```
 
 ## Advantages
@@ -404,22 +358,22 @@ Final reviewer: Clean re-review.
 **Never:**
 - Build implementation work directly on the trunk bookmark (main/master) without explicit user consent — start a new change for the run
 - Skip task review, or accept a report missing either verdict (spec compliance AND task quality are both required)
-- Proceed with unfixed Critical/Important issues before the fix-round cap, or past it without a recorded ruling
+- Accept genuine Critical/Important defects without fixes and re-review or an explicit user exception, including at the cap
 - Dispatch multiple implementation subagents into the shared working copy in parallel (conflicts). Independent read-only research may run concurrently.
 - Make a subagent read the whole plan file (hand it its task brief — `scripts/task-brief` — instead)
 - Let a task-scoped subagent locate or read the parent plan, neighbouring tasks, progress ledger, prior-task materials, or session history
 - Skip scene-setting context (subagent needs to understand where the task fits)
 - Ignore subagent questions (answer before letting them proceed)
-- Accept "close enough" on spec compliance (reviewer found spec issues = not done)
-- Skip review loops (reviewer found issues = implementer fixes = review again)
+- Accept unresolved spec gaps or unverifiable requirements
+- Skip re-review after genuine Critical/Important fixes; reject false findings only with durable evidence
 - Let implementer self-review replace actual review (both are needed)
 - Tell a reviewer what not to flag, or pre-rate a finding's severity in the dispatch prompt ("treat it as Minor at most")
 - Dispatch a task reviewer without a diff file — generate it first (`scripts/review-package @- @`) and name the printed path in the prompt
-- Move to the next task while Critical/Important findings are open and unruled
+- Move to the next task while genuine Critical/Important findings remain unresolved without an explicit user exception
 - Re-dispatch a task the progress ledger already marks complete — reconcile the ledger and committed path after any compaction or resume
 - Let a subagent run jj or git commands — every VCS mutation belongs to the controller
 - Park the run on a routine question the approved design, plan or repository evidence answers. Rule, record it and continue; ask before a consequential redesign.
-- Remove `.agents/sdd/` before every ruling in it has been reported to the user
+- Remove `.agents/sdd/` with unresolved work or before every ruling in it has been reported to the user
 
 **If subagent asks questions:**
 - Answer clearly and completely
@@ -427,7 +381,7 @@ Final reviewer: Clean re-review.
 - Don't rush them into implementation
 
 **If subagent fails task:**
-- Dispatch a fix subagent with specific instructions
+- Load `review-handling.md`; scope a repair or escalate before dispatch
 - Don't try to fix it manually (context pollution)
 
 ## Integration

@@ -24,6 +24,21 @@ WHEN receiving code review feedback:
 6. IMPLEMENT: One item at a time, test each
 ```
 
+## Controller triage
+
+At any round, resolve a factually false finding with a durable ruling containing
+the original finding, evidence, reason and cost if wrong. Retain both finding and
+ruling for independent final review. Rejection requires no fix or replacement
+passing verdict and consumes no fix round. Scoped implementers supply evidence;
+the controller owns disposition.
+
+Genuine Critical/Important defects need fixes, verification and re-review. After
+three fix rounds, escalate remaining genuine defects to the user; controller-only
+deferral cannot permit acceptance. Record explicit user exceptions. Track Minor
+findings for final triage. Apparently unrelated failures belong in controller-managed
+repair work, not silent scope expansion. Continue independent authorised work;
+resolve recorded failures before delivery unless the user changes that requirement.
+
 ## Forbidden Responses
 
 **NEVER:**

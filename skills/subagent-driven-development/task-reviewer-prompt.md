@@ -22,6 +22,12 @@ Subagent/delegation tool (general-purpose):
 
     Read the task brief: [BRIEF_FILE]
 
+    For a combined repair, the controller also supplies the repair brief and
+    repair report as named artefacts. Explicitly review both the original and
+    repair requirements against the combined diff, giving spec and quality
+    verdicts for each scope. Verify applicable check evidence for both. The
+    repair is authorised scope, not an unexplained addition.
+
     Global constraints from the spec/design that bind this task:
     [GLOBAL_CONSTRAINTS]
 
@@ -32,7 +38,8 @@ Subagent/delegation tool (general-purpose):
     ## Context Boundary
 
     The supplied task brief, global constraints, implementer report, and diff
-    package are your complete review boundary.
+    package, plus any explicitly supplied repair brief/report, are your
+    complete review boundary.
 
     Do not locate or read the parent implementation plan, neighbouring tasks,
     progress ledger, prior reviews, or session history. Read additional
@@ -211,8 +218,10 @@ Subagent/delegation tool (general-purpose):
     #### Important (Should Fix)
     #### Minor (Nice to Have)
 
-    For each issue: file:line, what's wrong, why it matters, how to fix
-    (if not obvious).
+    For each issue: file:line, the violated requirement or concrete defect,
+    supporting evidence, why it matters, and how to fix if not obvious.
+    Distinguish observed facts from assumptions or missing evidence so the
+    controller can investigate and rule without guessing.
 
     ### Assessment
 

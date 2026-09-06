@@ -89,7 +89,12 @@ Subagent/delegation tool (general-purpose):
 
     **While you work:** Investigate unexpected behaviour within scope. Ask the
     controller when missing requirements or a consequential choice block the
-    task; routine recoverable failures do not require a permission round-trip.
+    task; routine recoverable failures within scope do not require a permission
+    round-trip. For apparently unrelated failures, report the command, actual
+    output and evidence for why they appear unrelated. The controller decides
+    disposition and supplies a separate repair brief if needed. Do not silently
+    expand scope; continue only independent authorised work. A serial repair
+    assignment must preserve the original task edits and verify its own scope.
 
     While iterating, run focused covering tests and the project's required
     checks. Use verification-before-completion for evidence reuse. Broaden or

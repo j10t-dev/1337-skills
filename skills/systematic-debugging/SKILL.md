@@ -45,7 +45,13 @@ Use for ANY technical issue:
 
 ## The Four Phases
 
-You MUST complete each phase before proceeding to the next.
+You MUST complete each phase before proceeding to the next, within the assigned
+scope and tool permissions. Investigation is not repair authority. For an
+apparently unrelated failure, report the command, actual output, investigation
+and evidence of unrelatedness to the controller. Pause affected work and continue
+only independent authorised work. The controller records a repair brief and
+arranges verification/review; substantial repairs or consequential redesign need
+user approval. Standalone execution carries that controller responsibility.
 
 ### Phase 1: Root Cause Investigation
 
@@ -65,7 +71,8 @@ You MUST complete each phase before proceeding to the next.
 
 3. **Check Recent Changes**
    - What changed that could cause this?
-   - Current VCS diff, recent jj changes, or relevant repository history
+   - Supplied diff and relevant repository evidence within the task boundary;
+     use VCS/history only when the assignment permits it
    - New dependencies, config changes
    - Environmental differences
 
@@ -273,7 +280,8 @@ If systematic investigation reveals issue is truly environmental, timing-depende
 
 1. You've completed the process
 2. Document what you investigated
-3. Implement appropriate handling (retry, timeout, error message)
+3. Implement appropriate handling within authorised scope, or escalate the
+   evidence for a separately scoped repair
 4. Add monitoring/logging for future investigation
 
 **But:** 95% of "no root cause" cases are incomplete investigation.
