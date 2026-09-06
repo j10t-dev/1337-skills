@@ -8,7 +8,7 @@ If you were dispatched as a subagent for a specific task (implementation, review
 </SUBAGENT-STOP>
 
 <EXTREMELY-IMPORTANT>
-If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+Invoke a skill when the user requests it, its description matches the current action, or the active workflow explicitly requires it. Reading a skill as review material does not activate its workflow.
 
 IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 
@@ -21,9 +21,9 @@ This is not negotiable. You cannot rationalise your way out of this.
 
 **Before entering plan mode:** if you haven't already brainstormed, invoke the brainstorming skill first.
 
-Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it has a checklist, track EACH item in the current harness's task tracker (or an explicit visible checklist if none exists) — checklists without visible tracking = steps get skipped, every time.
+Follow the skill without announcing its invocation. Track its checklist in the harness, or briefly in chat if no tracker exists.
 
-Load skills through the current harness's native skill-loading mechanism; if the harness exposes no skill tool, read the discovered `SKILL.md` path directly.
+Skill references belong to this pack. Use the loader's exact name, including its namespace, e.g. `1337-skills:brainstorming`. Without a loader, read the discovered `SKILL.md`.
 
 ## Skill Priority
 
@@ -53,6 +53,8 @@ These thoughts mean STOP—you're rationalising:
 
 ## User Instructions
 
-User and project instructions (direct requests, AGENTS.md, repository and harness instructions) take precedence over skills, which in turn override default behaviour. Only skip skill workflows when your human partner has explicitly told you to.
+User instructions override skill defaults, including instructions to stop or change course. System and harness rules still apply.
 
-Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows — specific instructions = clear requirements = workflows matter MOST.
+Do the requested work. Ask for decisions the requirements do not settle; continue independent work. Keep the user's VCS and external-action restrictions.
+
+When a rule blocks work, cite its file, quote the rule and state the decision needed.

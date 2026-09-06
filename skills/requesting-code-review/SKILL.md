@@ -35,16 +35,19 @@ Every review request must name the smallest accurate jj boundary:
 
 Assume task workflows create reliable jj changes. Do not ask the reviewer to infer scope from full session history.
 
+Reuse reviews of unchanged code and requirements. Use `verification-before-completion` for test evidence.
+
 **2. Dispatch code-reviewer subagent:**
 
 Use the current harness's subagent/delegation tool with the code-reviewer type if available, filling the template at `code-reviewer.md`
 
-Every path in the dispatch prompt is absolute and already expanded. The reviewer does not activate skills and does not read your shell environment, so an unexpanded `$DOCS_ROOT`, `$projectName`, or leading `~` reaches it as literal text it cannot resolve. Resolve them before dispatching — see the docs-root rules in `writing-plans`.
+Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch;
+reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
 
 **3. Act on feedback:**
 - Fix Critical/Important issues
 - **Re-review Critical/Important fixes** using the smallest scope that proves the issue was resolved: specific files, affected tests, or a narrower jj boundary if appropriate
-- Only proceed when no Critical/Important issues remain
+- Final completion requires Critical/Important findings resolved or explicitly accepted by the user. SDD's task-level exceptions do not waive final review.
 - Note Minor issues for later
 - Push back if reviewer is wrong (with reasoning)
 
@@ -52,8 +55,6 @@ Every path in the dispatch prompt is absolute and already expanded. The reviewer
 
 ```
 [Just completed Task 2: Add verification function]
-
-You: Let me request code review before proceeding.
 
 [Dispatch code-reviewer subagent]
   DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
@@ -93,7 +94,7 @@ You: [Fix progress indicators]
 **Subagent-Driven Development:**
 - Review after EACH task
 - Catch issues before they compound
-- Fix before moving to next task
+- Follow SDD's task-acceptance rules
 
 **Executing Plans:**
 - Review after all tasks complete
@@ -109,7 +110,7 @@ You: [Fix progress indicators]
 - Skip review because "it's simple"
 - Skip re-review after fixing issues
 - Ignore Critical issues
-- Proceed with unfixed Critical/Important issues
+- Bypass the task or final acceptance rules above
 - Proceed without verifying fixes worked
 - Argue with valid technical feedback
 

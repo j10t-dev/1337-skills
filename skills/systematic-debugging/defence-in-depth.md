@@ -2,20 +2,20 @@
 
 ## Overview
 
-When you fix a bug caused by invalid data, adding validation at one place feels sufficient. But that single check can be bypassed by different code paths, refactoring, or mocks.
+When invalid data has multiple independent entry paths, each entry must validate
+it. Use `principle-boundary-discipline` as the authority for placement: construct
+validated domain types at external boundaries and trust their guarantees inside.
 
-**Core principle:** Validate at EVERY layer data passes through. Make the bug structurally impossible.
+**Core principle:** Protect distinct entry paths and live operation hazards, not
+repeat the same immutable-property check in every internal helper.
 
 ## Why Multiple Layers
 
-Single validation: "We fixed the bug"
-Multiple layers: "We made the bug impossible"
-
-Different layers catch different cases:
-- Entry validation catches most bugs
-- Business logic catches edge cases
-- Environment guards prevent context-specific dangers
-- Debug logging helps when other layers fail
+Different responsibilities protect different failure modes:
+- Every external entry path constructs the validated domain value.
+- Internal business logic uses that value without redundant revalidation.
+- Operation guards check mutable authorisation, destination or resource state.
+- Debug logging supplies diagnostic evidence; it is not validation.
 
 ## The Four Layers
 
@@ -37,20 +37,26 @@ function createProject(name: string, workingDirectory: string) {
 }
 ```
 
-### Layer 2: Business Logic Validation
-**Purpose:** Ensure data makes sense for this operation
+### Layer 2: Internal Domain Code
+**Purpose:** Consume the validated contract without repeating boundary checks
 
 ```typescript
-function initializeWorkspace(projectDir: string, sessionId: string) {
-  if (!projectDir) {
-    throw new Error('projectDir required for workspace initialization');
-  }
-  // ... proceed
+function initializeWorkspace(projectDir: ValidatedDirectory, sessionId: SessionId) {
+  // Boundary-owned types establish immutable input properties.
+  // ... proceed without another empty-string check
 }
 ```
 
+A separate external importer must construct these same validated types before
+calling this function; an internal helper is not another trust boundary.
+
 ### Layer 3: Environment Guards
 **Purpose:** Prevent dangerous operations in specific contexts
+
+Check live facts where the operation needs them. A parsed type cannot guarantee
+that filesystem state or permissions have not changed. Use appropriate atomic
+or handle-based operations when a separate pre-check would leave a race. The
+prefix check below illustrates a test guard, not a complete security boundary.
 
 ```typescript
 async function gitInit(directory: string) {
@@ -90,8 +96,8 @@ When you find a bug:
 
 1. **Trace the data flow** - Where does bad value originate? Where used?
 2. **Map all checkpoints** - List every point data passes through
-3. **Add validation at each layer** - Entry, business, environment, debug
-4. **Test each layer** - Try to bypass layer 1, verify layer 2 catches it
+3. **Place checks by responsibility** - Parse each external entry; guard live operation hazards; trust validated types internally
+4. **Test distinct failure modes** - Exercise affected entry paths and operation hazards, rather than asserting duplicate internal checks
 
 ## Example from Session
 
@@ -103,34 +109,32 @@ Bug: Empty `projectDir` caused `git init` in source code
 3. `WorkspaceManager.createWorkspace('')`
 4. `git init` runs in `process.cwd()`
 
-**Four layers added:**
+**Responsibilities under boundary discipline:**
 - Layer 1: `Project.create()` validates not empty/exists/writable
-- Layer 2: `WorkspaceManager` validates projectDir not empty
+- Layer 2: `WorkspaceManager` consumes the boundary-validated directory
 - Layer 3: `WorktreeManager` refuses git init outside tmpdir in tests
 - Layer 4: Stack trace logging before git init
 
-**Result:** All 1847 tests passed, bug impossible to reproduce
+**Historical result:** All 1847 tests passed in that investigation. This is not evidence for a new change; verify the affected behaviour.
 
 ## Red Flags
 
 **Never:**
-- Validate only at one layer ("entry point is enough")
-- Trust that upstream validation happened
-- Skip validation because "this should never be called with bad data"
-- Remove defensive checks after fixing the bug
+- Leave an independent external entry path unvalidated
+- Treat a domain type as proof of mutable external state
+- Add identical checks throughout internal code to compensate for an unclear boundary
 
 **Always:**
-- Validate at every layer data passes through
-- Make invalid states unrepresentable
-- Keep all layers even after fixing immediate bug
-- Add validation when touching code that processes external data
+- Parse external data into a validated domain type
+- Keep operation guards tied to a distinct live hazard
+- Remove redundant internal checks only after confirming the boundary guarantee
+- Explain the failure each retained guard prevents
 
 ## Key Insight
 
-All four layers were necessary. During testing, each layer caught bugs the others missed:
-- Different code paths bypassed entry validation
-- Mocks bypassed business logic checks
-- Edge cases on different platforms needed environment guards
-- Debug logging identified structural misuse
+Independent entry paths can bypass one adapter, and mutable state can invalidate
+an earlier precondition. Protect those cases explicitly. Mocks should preserve
+the real boundary contract; debug logging helps locate a violation.
 
-**Don't stop at one validation point.** Add checks at every layer.
+**Validate at trust boundaries and guard live hazards.** More internal checks do
+not by themselves establish a stronger guarantee.

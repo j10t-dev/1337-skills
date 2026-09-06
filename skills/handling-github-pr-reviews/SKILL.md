@@ -58,8 +58,8 @@ For each comment, before presenting to user:
    - Applies here? Does it affect this specific code?
    - Fits patterns? Conflicts with codebase conventions?
    - Worth it? YAGNI / complexity tradeoff
-3. **Present recommendation with brief reasoning**
-4. **Wait for natural response** (no formal prompt)
+3. **Act within the request:** report recommendations for assessment-only work; implement justified fixes when fixing is already authorised.
+4. **Clarify consequential gaps:** pause dependent fixes, continue independent authorised ones.
 
 **Example output:**
 
@@ -73,9 +73,13 @@ Doesn't conflict with patterns, simple one-line fix.
 
 ### 4. Implement (if fixing)
 
-Make the fix as agreed with user.
+Make the authorised fix. Reuse applicable verification evidence; request a decision only when requirements or authority remain consequentially unclear.
 
 ### 5. Reply to Thread
+
+Confirm that replying is authorised by the user's request or standing instructions.
+Local fixing alone does not grant authority to publish replies or resolve threads.
+Prepare the concrete local result before requesting any missing approval.
 
 Reply in the inline review thread. Do not post a top-level PR comment for inline review feedback.
 

@@ -11,27 +11,25 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 **Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
 
-**Violating the letter of the rules is violating the spirit of the rules.**
-
 ## When to Use
 
 **Always:**
 - New features
 - Bug fixes
-- Refactoring
 - Behaviour changes
 
-**Exceptions require explicit user permission before implementation:**
-- Throwaway prototypes
-- Generated code
-- Configuration-only changes where no meaningful executable test exists
+For refactoring, reuse existing coverage; test uncovered behaviour first.
 
-Thinking "skip TDD just this once"? Stop. That's rationalisation.
+Where no useful executable test exists, inspect prose, validate configuration or
+check generated output through its generator. Do not add tests that merely mirror
+implementation. Required project checks still apply.
+
+Throwaway prototypes and other exceptions to test-first require user permission.
 
 ## The Iron Law
 
 ```
-NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
+NO NEW BEHAVIOUR OR BUG FIX WITHOUT A FAILING TEST FIRST
 ```
 
 Write code before the test? Delete it. Start over.
@@ -41,8 +39,6 @@ Write code before the test? Delete it. Start over.
 - Don't "adapt" it while writing tests
 - Don't look at it
 - Delete means delete
-
-Implement fresh from tests. Period.
 
 ## Red-Green-Refactor
 
@@ -213,7 +209,7 @@ When writing or changing any test, read [writing-good-tests.md](writing-good-tes
 
 | Excuse | Reality |
 |--------|---------|
-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
+| "Too simple to test" | Test behaviour, not implementation details. |
 | "I'll test after" | Tests passing immediately prove nothing. |
 | "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
 | "Already manually tested" | Ad-hoc ≠ systematic. No record, can't re-run. |
@@ -286,16 +282,16 @@ Extract validation for multiple fields if needed.
 
 Before marking work complete:
 
-- [ ] Every new function/method has a test
+- [ ] New behaviour and bug fixes have meaningful coverage
 - [ ] Watched each test fail before implementing
 - [ ] Each test failed for expected reason (feature missing, not typo)
 - [ ] Wrote minimal code to pass each test
-- [ ] All tests pass
+- [ ] Applicable tests and required project checks pass
 - [ ] Output pristine (no errors, warnings)
 - [ ] Tests use real code (mocks only if unavoidable)
 - [ ] Edge cases and errors covered
 
-Can't check all boxes? You skipped TDD. Start over.
+Apply the checklist where test-first is required.
 
 ## When Stuck
 
@@ -315,11 +311,9 @@ Never fix bugs without a test.
 ## Final Rule
 
 ```
-Production code → test exists and failed first
-Otherwise → not TDD
+New behaviour or bug fix → test exists and failed first
+Otherwise → do not claim test-first
 ```
-
-No exceptions without your human partner's permission.
 
 ## Integration with Other Skills
 

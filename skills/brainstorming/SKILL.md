@@ -13,20 +13,14 @@ consequential design choice takes the direct path. Everything else keeps the
 full design and planning path.
 
 <HARD-GATE>
-Take no implementation action until the user has explicitly approved either a
-direct-path brief or a full-path design.
+Full-path implementation needs design approval. Direct work needs an authorised
+brief; the user's request can supply that authority.
 </HARD-GATE>
-
-**Announce after classification:**
-- Direct: "I'm using the brainstorming skill to prepare a direct implementation brief."
-- Full: "I'm using the brainstorming skill to refine this change into a design."
 
 ## Anti-pattern: skipping the gate
 
-Small work may skip a design document. It never skips classification, a
-four-field brief, or explicit approval. If the brief cannot name the files and
-verification, continue exploration or clarification until one of the full-path
-triggers can be named.
+Small work still needs classification and a four-field brief. Name the files
+and verification before proceeding; investigate further if either is unclear.
 
 ## Checklist
 
@@ -36,7 +30,7 @@ applicable branch in order:
 1. **Explore project context** - check files, docs, recent changes, and representative existing execution paths
 2. **Clarify only what is needed** - establish purpose, constraints, success criteria, task boundaries, and consequential design choices
 3. **Classify** - evaluate both full-path triggers, the file diagnostic, and any user override
-4. **Direct path** - present classification and brief in one message, then wait for explicit approval
+4. **Direct path** - present classification and brief; proceed if authorised
 5. **Direct execution** - invoke `test-driven-development`, then mandatory `requesting-code-review`, then `finishing-development` at Step 3
 6. **Full path** - compare approaches, present and approve the design, write and review it, then invoke `writing-plans`
 7. **Upgrade when needed** - stop direct work that fires a trigger and re-enter at clarification
@@ -49,6 +43,7 @@ digraph brainstorming {
     "Clarify only what is needed" [shape=box];
     "Classify" [shape=diamond];
     "Present classification and brief" [shape=box];
+    "Brief authorised?" [shape=diamond];
     "User approves brief?" [shape=diamond];
     "Escalate or revise?" [shape=diamond];
     "Invoke test-driven-development" [shape=box];
@@ -58,14 +53,16 @@ digraph brainstorming {
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
     "Write and review design" [shape=box];
-    "User reviews written design?" [shape=diamond];
+    "Written design preserves approval?" [shape=diamond];
     "Invoke writing-plans" [shape=doublecircle];
 
     "Explore project context and execution paths" -> "Clarify only what is needed";
     "Clarify only what is needed" -> "Classify";
     "Classify" -> "Present classification and brief" [label="direct"];
     "Classify" -> "Propose 2-3 approaches" [label="full"];
-    "Present classification and brief" -> "User approves brief?";
+    "Present classification and brief" -> "Brief authorised?";
+    "Brief authorised?" -> "Invoke test-driven-development" [label="yes"];
+    "Brief authorised?" -> "User approves brief?" [label="no"];
     "User approves brief?" -> "Invoke test-driven-development" [label="yes"];
     "User approves brief?" -> "Escalate or revise?" [label="no"];
     "Escalate or revise?" -> "Propose 2-3 approaches" [label="escalate"];
@@ -76,9 +73,9 @@ digraph brainstorming {
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
     "User approves design?" -> "Write and review design" [label="yes"];
-    "Write and review design" -> "User reviews written design?";
-    "User reviews written design?" -> "Write and review design" [label="changes requested"];
-    "User reviews written design?" -> "Invoke writing-plans" [label="approved"];
+    "Write and review design" -> "Written design preserves approval?";
+    "Written design preserves approval?" -> "User approves design?" [label="no - material revision"];
+    "Written design preserves approval?" -> "Invoke writing-plans" [label="yes"];
 }
 ```
 
@@ -94,7 +91,7 @@ subsystems, identify the pieces, their relationship, and their delivery order
 before continuing. Ask one question at a time. Prefer open questions with two to
 four concrete examples when examples help. Clarify only enough to establish the
 purpose, constraints, success criteria, task boundaries, and consequential
-design choices.
+design choices. Look up facts yourself; questions block only dependent work.
 
 ## Classification
 
@@ -132,16 +129,12 @@ Present the classification and brief in one message. The brief contains:
 - **Verification:** the failing test, focused pass, and integrated check.
 - **Exclusions:** adjacent work deliberately left unchanged.
 
-Then wait for explicit approval. Approval of the request itself is not approval
-of the brief.
-
-If the user refuses the gate, ask one bounded question: "Escalate to the full
-design path, or revise the brief?" Escalation resumes at approach comparison.
-Revision produces a corrected classification-and-brief message and waits again.
+The request authorises a brief within its scope. Ask for approval only for added
+scope or a checkpoint the user requested. Revise the brief when corrected.
 
 ## Direct-path execution
 
-After explicit brief approval, use this execution contract:
+Once the brief is authorised:
 
 ```text
 1. test-driven-development
@@ -149,18 +142,18 @@ After explicit brief approval, use this execution contract:
 2. requesting-code-review
    JJ_BOUNDARY: @
    DESCRIPTION: direct-path implementation
-   REQUIREMENTS: <inline the approved brief verbatim>
+   REQUIREMENTS: <inline the authorised brief verbatim>
    REVIEW_EXIT: fix and re-review Critical or Important findings until none remain
 3. finishing-development
    Entry: Step 3
 ```
 
-The approved brief is the complete requirement boundary. Code review is
+The authorised brief is the complete requirement boundary. Code review is
 unconditional. `REQUIREMENTS` replaces `PLAN_REFERENCE`; a direct path has no
 plan. Enter `finishing-development` at Step 3 because TDD plus the mandatory
 review already supplied verification and review.
 
-Report direct-path completion with all four facts:
+Keep these four facts in the task record; report only those useful to the user:
 
 ```text
 Durable artefacts: code and tests
@@ -171,13 +164,9 @@ Commit authority: explicit user instruction required
 
 ## Upgrade from direct to full
 
-If implementation reveals another separately committed task or an unresolved
-consequential design choice, stop immediately. Name the fired trigger and
-present all work completed so far. Ask whether to keep that work as a starting
-point or revert it. Apply the user's decision, then re-enter this skill at
-clarification. Carry the original exploration forward unchanged and add the new
-evidence. Never carry implementation work into the design or discard it without
-that decision.
+If a full-path trigger emerges, preserve completed work, name the trigger and
+return to clarification. Pause dependent implementation; continue independent
+work. Do not revert edits without permission.
 
 ## Full path
 
@@ -192,9 +181,8 @@ cycle.
 ### Present the design
 
 Read `design-document-template.md` from this skill directory and use it as the
-output contract. Present the design in manageable sections, checking after each
-section whether it is correct so far. Scale each section to its complexity.
-Return to clarification when an assumption or boundary remains unsettled.
+output contract. Scale sections to complexity. Approve the design together unless
+an earlier decision determines later sections. Clarify unresolved assumptions.
 
 Design units around one clear responsibility, explicit dependencies, and
 interfaces consumers can understand without reading internals. Follow the
@@ -233,11 +221,10 @@ Before sharing the written design, self-review it for:
 
 Fix any issue found by self-review. Then load `requesting-document-review` and
 run it with `type=design` and no design reference. This review is mandatory.
-When its loop terminates, ask the user to review the written design file. Apply
-requested changes and repeat self-review before proceeding.
+Present the written design. Existing approval covers unchanged decisions; ask
+for approval of material revisions. Apply corrections and repeat affected checks.
 
-After the user approves the written design, invoke `writing-plans`. This is the
-full path's terminal state.
+Once approved, invoke `writing-plans`. This is the full path's terminal state.
 
 ## Key principles
 
@@ -246,4 +233,4 @@ full path's terminal state.
 - **Evidence before assumptions.** Establish current execution paths from the repository.
 - **YAGNI.** Exclude work that does not serve the accepted outcome.
 - **Full-path alternatives.** Compare two or three approaches when the full path fires.
-- **Full-path validation.** Present the design in sections and validate each one.
+- **Full-path validation.** Keep design sections explicit; approve decisions without repeated checkpoints.

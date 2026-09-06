@@ -6,7 +6,7 @@ user-invocable: false
 
 # Boundary Discipline
 
-Place validation, type narrowing, and error handling at system boundaries. Trust internal code unconditionally. Business logic lives in pure functions; the shell is thin and mechanical.
+Place validation, type narrowing, and error handling at system boundaries. Trust validated domain types inside the system. Business logic lives in pure functions; the shell is thin and mechanical.
 
 **Why:** Scattered validation is noisy, redundant, and gives a false sense of safety. Validate data once at the boundary. Keep logic out of framework wiring so it can be tested without the framework.
 
@@ -14,6 +14,11 @@ Place validation, type narrowing, and error handling at system boundaries. Trust
 - **At boundaries** (CLI args, config files, external APIs, network protocols): validate, return errors, handle defensively.
 - **Inside the system:** typed data, error propagation, no re-validation. Trust the types.
 - **Across the boundary.** Expose domain concepts, not the boundary's private representation. Keep general-purpose mechanism inside and special-purpose policy at the edge.
+
+A type guarantees its encoded properties, not mutable external facts. Guard live
+authorisation, resource state and destructive-operation destinations at the point
+of effect when they can change after parsing. Each independent external entry
+must construct the validated domain type.
 
 **Applications:**
 
@@ -30,5 +35,5 @@ Code organisation:
 - Scoring and assessment: pure transforms from state to results
 
 **The tests:**
-- "Is this data crossing a system boundary right now?" If not, validation is redundant.
+- "Is this data crossing a system boundary, or does this operation depend on a live fact that could have changed?" Place the check there; do not repeat checks for properties the domain type already guarantees.
 - "Can this be a pure function that the shell just calls?" If yes, extract it.

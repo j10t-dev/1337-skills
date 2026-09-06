@@ -2,7 +2,8 @@
 
 Use this template when dispatching a task reviewer subagent. The reviewer
 reads the task's diff once and returns two verdicts: spec compliance and
-code quality.
+code quality. If the harness exposes only a known inherited model, omit the
+model field under SDD's inheritance exception.
 
 **Purpose:** Verify one task's implementation matches its requirements (nothing
 more, nothing less) and is well-built (clean, tested, maintainable)
