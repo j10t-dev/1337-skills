@@ -3,211 +3,32 @@ name: receiving-code-review
 description: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable
 ---
 
-# Code Review Reception
+# Receiving code review
 
-## Overview
+Read the complete feedback, understand the requirements, verify against the codebase, then implement or push back with evidence. Technical correctness matters more than agreement.
 
-Code review requires technical evaluation, not emotional performance.
+## Controller triage
 
-**Core principle:** Verify before implementing. Ask before assuming. Technical correctness over social comfort.
+At any round, resolve a factually false finding with a durable ruling containing the original finding, evidence, reason and cost if wrong. Retain both finding and ruling for independent final review. Rejection requires no fix or replacement passing verdict and consumes no fix round. Scoped implementers supply evidence; the controller owns disposition.
 
-## The Response Pattern
+Genuine Critical/Important defects need fixes, verification and re-review. After three fix rounds, escalate remaining genuine defects to the user; controller-only deferral cannot permit acceptance. Record explicit user exceptions. Track Minor findings for final triage. Apparently unrelated failures belong in controller-managed repair work, not silent scope expansion. Continue independent authorised work; resolve recorded failures before delivery unless the user changes that requirement.
 
-```
-WHEN receiving code review feedback:
+## Evaluate feedback
 
-1. READ: Complete feedback without reacting
-2. UNDERSTAND: Restate requirement in own words (or ask)
-3. VERIFY: Check against codebase reality
-4. EVALUATE: Technically sound for THIS codebase?
-5. RESPOND: Technical acknowledgment or reasoned pushback
-6. IMPLEMENT: One item at a time, test each
-```
+- Treat the human partner's instructions as trusted once understood; clarify unclear scope.
+- Check external reviewers' claims against current functionality, reasons for the implementation, platform/version compatibility and the reviewer's context. Investigate within authorised scope; ask for inaccessible facts or consequential decisions.
+- Resolve routine discrepancies against approved requirements. Ask before changing consequential or architectural decisions, while continuing independent fixes.
+- Check actual usage before adding a suggested "professional" feature. If unused, propose removal rather than build unnecessary machinery.
+- Push back when a suggestion is technically wrong, breaks functionality, ignores compatibility, adds unused scope or conflicts with approved architecture. Cite code/tests and ask specific questions. If uncomfortable challenging feedback, name the tension and the concrete issue. If verification is unavailable, state the limitation and ask for direction rather than proceeding on assumption.
 
-## Forbidden Responses
+## Implement feedback
 
-**NEVER:**
-- "You're absolutely right!" (explicit instruction-file violation)
-- "Great point!" / "Excellent feedback!" (performative)
-- "Let me implement that now" (before verification)
+Identify dependencies among unclear items. Ask about consequential gaps and pause only dependent work; implement understood, independent fixes within scope.
 
-**INSTEAD:**
-- Restate the technical requirement
-- Ask clarifying questions
-- Push back with technical reasoning if wrong
-- Just start working (actions > words)
+Handle blocking or security issues first, then simple fixes, then complex logic/refactoring. Implement one item at a time, test each, verify no regressions and request re-review of fixes, including the mandatory Critical/Important gate above.
 
-## Handling Unclear Feedback
+## Respond factually
 
-```
-IF an item is unclear:
-  Establish which other fixes depend on its answer.
-  Ask about the consequential missing requirement.
-  Implement understood, independent fixes within the authorised scope.
-  Pause only dependent work.
+State the requirement, fix and location, ask a specific question, or give technical reasons for disagreement. Action alone is sufficient. Avoid performative agreement, praise, gratitude and promises to implement before verification.
 
-WHY: Related fixes share assumptions; independent fixes need not wait.
-```
-
-**Example:**
-```
-your human partner: "Fix 1-6"
-You understand 1,2,3,6. Unclear on 4,5.
-
-✅ If independent: "I'll fix 1,2,3,6. Which records should 4 and 5 cover?"
-✅ If dependent: explain the shared assumption and pause the affected fixes.
-```
-
-## Source-Specific Handling
-
-### From your human partner
-- **Trusted** - implement after understanding
-- **Still ask** if scope unclear
-- **No performative agreement**
-- **Skip to action** or technical acknowledgment
-
-### From External Reviewers
-```
-BEFORE implementing:
-  1. Check: Technically correct for THIS codebase?
-  2. Check: Breaks existing functionality?
-  3. Check: Reason for current implementation?
-  4. Check: Works on all platforms/versions?
-  5. Check: Does reviewer understand full context?
-
-IF suggestion seems wrong:
-  Push back with technical reasoning
-
-IF can't easily verify:
-  Investigate within the authorised scope. Ask only for inaccessible facts or consequential decisions.
-
-IF conflicts with your human partner's prior decisions:
-  Resolve routine discrepancies against the approved requirements. Ask before changing consequential decisions; continue independent fixes.
-```
-
-**your human partner's rule:** "External feedback - be skeptical, but check carefully"
-
-## YAGNI Check for "Professional" Features
-
-```
-IF reviewer suggests "implementing properly":
-  grep codebase for actual usage
-
-  IF unused: "This endpoint isn't called. Remove it (YAGNI)?"
-  IF used: Then implement properly
-```
-
-**your human partner's rule:** "You and reviewer both report to me. If we don't need this feature, don't add it."
-
-## Implementation Order
-
-```
-FOR multi-item feedback:
-  1. Clarify consequential gaps and identify dependencies; progress independent fixes
-  2. Then implement in this order:
-     - Blocking issues (breaks, security)
-     - Simple fixes (typos, imports)
-     - Complex fixes (refactoring, logic)
-  3. Test each fix individually
-  4. Verify no regressions
-  5. Request re-review to confirm fixes worked (especially for Critical/Important issues)
-```
-
-## When To Push Back
-
-Push back when:
-- Suggestion breaks existing functionality
-- Reviewer lacks full context
-- Violates YAGNI (unused feature)
-- Technically incorrect for this stack
-- Legacy/compatibility reasons exist
-- Conflicts with your human partner's architectural decisions
-
-**How to push back:**
-- Use technical reasoning, not defensiveness
-- Ask specific questions
-- Reference working tests/code
-- Involve your human partner if architectural
-
-**If you're uncomfortable pushing back out loud:** Name that tension, then tell your partner about the issue you've seen. They'll appreciate your honesty.
-
-## Acknowledging Correct Feedback
-
-When feedback IS correct:
-```
-✅ "Fixed. [Brief description of what changed]"
-✅ "Good catch - [specific issue]. Fixed in [location]."
-✅ [Just fix it and show in the code]
-
-❌ "You're absolutely right!"
-❌ "Great point!"
-❌ "Thanks for catching that!"
-❌ "Thanks for [anything]"
-❌ ANY gratitude expression
-```
-
-**Why no thanks:** Actions speak. Just fix it. The code itself shows you heard the feedback.
-
-**If you catch yourself about to write "Thanks":** DELETE IT. State the fix instead.
-
-## Gracefully Correcting Your Pushback
-
-If you pushed back and were wrong:
-```
-✅ "You were right - I checked [X] and it does [Y]. Implementing now."
-✅ "Verified this and you're correct. My initial understanding was wrong because [reason]. Fixing."
-
-❌ Long apology
-❌ Defending why you pushed back
-❌ Over-explaining
-```
-
-State the correction factually and move on.
-
-## Common Mistakes
-
-| Mistake | Fix |
-|---------|-----|
-| Performative agreement | State requirement or just act |
-| Blind implementation | Verify against codebase first |
-| Batch without testing | One at a time, test each |
-| Assuming reviewer is right | Check if breaks things |
-| Avoiding pushback | Technical correctness > comfort |
-| Unclear item blocks unrelated fixes | Clarify dependencies; progress independent authorised fixes |
-| Can't verify, proceed anyway | State limitation, ask for direction |
-| Skipping re-review after fixes | Request re-review to verify fixes worked |
-
-## Real Examples
-
-**Performative Agreement (Bad):**
-```
-Reviewer: "Remove legacy code"
-❌ "You're absolutely right! Let me remove that..."
-```
-
-**Technical Verification (Good):**
-```
-Reviewer: "Remove legacy code"
-✅ "Checking... build target is 10.15+, this API needs 13+. Need legacy for backward compat. Current impl has wrong bundle ID - fix it or drop pre-13 support?"
-```
-
-**YAGNI (Good):**
-```
-Reviewer: "Implement proper metrics tracking with database, date filters, CSV export"
-✅ "Grepped codebase - nothing calls this endpoint. Remove it (YAGNI)? Or is there usage I'm missing?"
-```
-
-**Unclear Item (Good):**
-```
-your human partner: "Fix items 1-6"
-You understand 1,2,3,6. Unclear on 4,5.
-✅ "I'll implement independent items 1,2,3,6. Which records should the changes in 4 and 5 cover?"
-```
-
-## The Bottom Line
-
-**External feedback = suggestions to evaluate, not orders to follow.**
-
-Verify. Question. Then implement.
-
-No performative agreement. Technical rigor always.
+If your pushback was wrong, state what you checked and why your understanding changed, then correct it. Skip long apologies, defensiveness and over-explanation. External review is advice to evaluate, not an instruction to obey blindly.

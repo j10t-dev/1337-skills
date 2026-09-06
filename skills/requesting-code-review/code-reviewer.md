@@ -53,6 +53,14 @@ You are the only reviewer this boundary gets. Reach your verdict from your own r
 
 Use the supplied brief or request when no plan exists.
 
+For final review, the controller supplies original rejected findings, their
+rulings and evidence, and all repair work items with briefs, reports and recorded
+resolution or user exceptions. Independently reassess that evidence; a controller
+rejection is not an instruction to suppress a finding. Check both original and
+repair requirements, including separately managed failures. Flag missing evidence
+or unresolved work that blocks delivery. For combined repair re-review, both
+scopes must be explicitly included in the supplied requirements.
+
 **Diff File (preferred):**
 {DIFF_FILE}
 

@@ -45,13 +45,36 @@ Subagent/delegation tool (general-purpose):
     Resolve routine private mechanics from the brief and repository patterns;
     continue independent specified work while a question remains open.
 
+    ## Contract-Based Implementation
+
+    The brief supplies binding behaviour, interfaces, decisions, exclusions,
+    concrete cases and verification, not necessarily production or test bodies.
+    Construct those bodies yourself. Private helper choice, local algorithms and
+    local fixture construction need no permission when requirements are preserved.
+    Explicitly illustrative snippets show an approach, not required syntax;
+    binding snippets remain constraints.
+
+    Preserve exact case values and expected outcomes. Parameterise cases that
+    exercise the same behaviour with different inputs; keep independently different
+    operations in separate behaviour tests. Derive expectations independently of
+    production code and its helpers, following test-driven-development's
+    writing-good-tests.md. An omitted routine body is not missing context; an
+    undocumented behaviour boundary (such as expiry equality) is. Ask the
+    controller to clarify it before dependent implementation.
+
+    Changes to public results or interfaces, dependencies, security properties or
+    architectural boundaries are consequential, not private mechanics. Escalate to
+    the controller for resolution and any required user approval.
+
     ## Your Job
 
     Once you're clear on requirements:
     1. Implement exactly what the task specifies
     2. Keep the work scoped to this task as one coherent reviewable unit
-    3. Follow TDD: write or update the failing test first, verify it fails for
-       the expected reason, then implement the minimal fix
+    3. Follow TDD: construct or update the failing test from the specified cases,
+       verify it fails for the expected reason, then implement the minimal fix.
+       Where no useful executable test exists, use TDD's prose/configuration
+       exception; required project checks still apply
     4. Verify implementation works
     5. Self-review (see below)
     6. Report back
@@ -66,7 +89,12 @@ Subagent/delegation tool (general-purpose):
 
     **While you work:** Investigate unexpected behaviour within scope. Ask the
     controller when missing requirements or a consequential choice block the
-    task; routine recoverable failures do not require a permission round-trip.
+    task; routine recoverable failures within scope do not require a permission
+    round-trip. For apparently unrelated failures, report the command, actual
+    output and evidence for why they appear unrelated. The controller decides
+    disposition and supplies a separate repair brief if needed. Do not silently
+    expand scope; continue only independent authorised work. A serial repair
+    assignment must preserve the original task edits and verify its own scope.
 
     While iterating, run focused covering tests and the project's required
     checks. Use verification-before-completion for evidence reuse. Broaden or

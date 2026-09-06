@@ -16,7 +16,7 @@ Guide completion of development work by presenting clear options and handling ch
 ### Step 1: Verify Tests
 
 Use `verification-before-completion` to reuse existing results and fill gaps.
-If verification and review are complete, enter Step 3.
+If verification and review are complete, enter Step 3, retaining its outstanding-work gate.
 
 ```bash
 # Run project's test suite
@@ -29,10 +29,11 @@ Tests failing (<N> failures). Must fix before completing:
 
 [Show failures]
 
-Cannot proceed until tests pass.
+Cannot deliver until tests pass or the user explicitly changes the delivery requirement.
 ```
 
-Stop. Don't proceed to Step 2.
+Stop affected delivery. If the user explicitly changes the delivery requirement,
+record the exception and remaining evidence gap before proceeding.
 
 **If tests pass:** Continue to Step 2.
 
@@ -69,8 +70,8 @@ Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch;
 reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
 
 **After review:**
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
+- Triage findings under `requesting-code-review`; reject factually false findings with evidence-backed rulings
+- Fix and re-review genuine Critical/Important issues before proceeding, unless the user explicitly accepts an exception
 - Note Minor issues
 
 **If user skips review:**
@@ -79,6 +80,12 @@ reviewers do not inherit your environment. See `writing-plans` for docs-root rul
 A formally executed feature already consists of accepted task commits plus any separately reviewed final-fix commits, and its feature bookmark identifies the accepted tip. Leave that curated local stack unchanged unless the user explicitly requests history reshaping or integration.
 
 ### Step 3: Present Completion Options
+
+Before delivery, check all recorded failures and separate repair work items,
+including non-blocking unrelated failures. Resolve them with applicable checks
+and review, or obtain an explicit user change to the delivery requirement.
+Otherwise block delivery. Report all rulings before scratch cleanup; preserve
+unresolved work. Task-only passing evidence does not satisfy this gate.
 
 Report the outcome and evidence. Carry out the requested next step; ask only for
 an unresolved decision. Do not append a standard menu.
@@ -98,7 +105,7 @@ an unresolved decision. Do not append a standard menu.
 ## Red Flags
 
 **Never:**
-- Proceed with failing tests
+- Deliver with unresolved failures without an explicit user change to the delivery requirement
 - Delete work without confirmation
 - Push, submit, move bookmarks, or rewrite shared history without explicit request
 

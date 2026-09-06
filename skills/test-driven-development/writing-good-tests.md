@@ -38,6 +38,28 @@ expect(buildSearchQuery({ tag: 'urgent' })).toBe(expected);
 expect(buildSearchQuery({ tag: 'urgent' })).toBe('tag:"urgent"');
 ```
 
+**Parameterise one behaviour.**
+
+When cases exercise the same behaviour with different inputs, use one
+parameterised case table with explicit, independently derived expected values
+and side effects. Plans specify the actual cases and outcomes; implementers
+construct test bodies and local fixtures. Fixture helpers may arrange inputs,
+but production code or its helpers must not compute expectations.
+
+Example contract: one acceptance operation rejects expiry at or before `now`.
+Parameterise these supplied cases:
+
+| Input | Expected result | Expected effects |
+| --- | --- | --- |
+| `expiresAt < now` | expired | No writes |
+| `expiresAt == now` | expired | No writes |
+| `expiresAt > now` | Successful acceptance | Successful acceptance effects |
+
+Keep independently different operations, such as invitation revocation, in
+separate behaviour tests rather than forcing them into an artificial shared
+table. If a required boundary is undocumented, clarify it before implementing
+the dependent behaviour; do not derive its expected result from existing code.
+
 **No change detectors.** If only intentional decisions can fail a test —
 a constant's value, exact message wording, private structure — it fires
 on redesign and sleeps through bugs. Test the behaviour that depends on
@@ -173,7 +195,8 @@ test as tautological.
 | When you... | Do |
 |-------------|-----|
 | Write any test | Name the break it catches — a bug, not a decision |
-| Build an expected value | Derive it by hand; never with the code under test |
+| Build an expected value | Derive it by hand; never with the code under test or its helpers |
+| Vary inputs for one behaviour | Parameterise concrete cases and expected effects; keep distinct behaviours separate |
 | Test a script or document | Run it / pressure-test its consumer; never grep its text |
 | Reach for a dependency test | Test your boundary contract, not their documented mechanics |
 | Want to assert on a mocked element | Test the real component, or unmock it |

@@ -22,6 +22,12 @@ Subagent/delegation tool (general-purpose):
 
     Read the task brief: [BRIEF_FILE]
 
+    For a combined repair, the controller also supplies the repair brief and
+    repair report as named artefacts. Explicitly review both the original and
+    repair requirements against the combined diff, giving spec and quality
+    verdicts for each scope. Verify applicable check evidence for both. The
+    repair is authorised scope, not an unexplained addition.
+
     Global constraints from the spec/design that bind this task:
     [GLOBAL_CONSTRAINTS]
 
@@ -32,7 +38,8 @@ Subagent/delegation tool (general-purpose):
     ## Context Boundary
 
     The supplied task brief, global constraints, implementer report, and diff
-    package are your complete review boundary.
+    package, plus any explicitly supplied repair brief/report, are your
+    complete review boundary.
 
     Do not locate or read the parent implementation plan, neighbouring tasks,
     progress ledger, prior reviews, or session history. Read additional
@@ -109,7 +116,23 @@ Subagent/delegation tool (general-purpose):
 
     ## Part 1: Spec Compliance
 
-    Compare the diff against What Was Requested:
+    Compare the diff against What Was Requested. Review binding behaviour,
+    interfaces, decisions, exclusions, concrete case outcomes and verification,
+    not a transcription of illustrative syntax. Public contracts, security
+    properties, dependencies, architectural boundaries and explicitly binding
+    snippets remain constraints. Changed public results or added dependencies
+    require controller escalation and any required user approval.
+
+    A complete brief can omit routine production and test bodies: the implementer
+    owns their construction. Accept different private helpers, local algorithms
+    and local fixtures when contracts and outcomes are identical. Equivalent
+    correct code differing from an explicitly illustrative snippet is not a
+    conformance defect solely because its syntax differs. Missing necessary
+    decisions, such as an undocumented expiry equality boundary, require controller
+    clarification rather than reviewer or implementer invention.
+
+    For instruction changes, trace each case through every affected writer,
+    executor and reviewer in the supplied diff, not only the authoring skill.
 
     - **Missing:** requirements they skipped, missed, or claimed without
       implementing
@@ -132,7 +155,15 @@ Subagent/delegation tool (general-purpose):
 
     **Tests:**
     - Do the new and changed tests verify real behaviour, not mocks?
-    - Are the task's edge cases covered?
+    - Are the task's exact cases, edge boundaries and side effects covered with
+      expectations derived independently of production code and its helpers?
+    - Are inputs for the same behaviour parameterised, with distinct behaviours
+      kept in separate tests? For the example expiry contract, `expiresAt < now`,
+      `expiresAt == now` and `expiresAt > now` belong in one table: first two
+      return expired with no writes; third follows successful acceptance.
+      Invitation revocation is a separate operation, not another expiry row.
+    - For prose/configuration under TDD's exception, does the report provide
+      applicable inspection/validation and required project-check evidence?
 
     **Structure:**
     - Does each file have one clear responsibility with a well-defined interface?
@@ -187,8 +218,10 @@ Subagent/delegation tool (general-purpose):
     #### Important (Should Fix)
     #### Minor (Nice to Have)
 
-    For each issue: file:line, what's wrong, why it matters, how to fix
-    (if not obvious).
+    For each issue: file:line, the violated requirement or concrete defect,
+    supporting evidence, why it matters, and how to fix if not obvious.
+    Distinguish observed facts from assumptions or missing evidence so the
+    controller can investigate and rule without guessing.
 
     ### Assessment
 

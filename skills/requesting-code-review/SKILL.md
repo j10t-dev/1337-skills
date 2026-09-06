@@ -45,11 +45,11 @@ Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch;
 reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
 
 **3. Act on feedback:**
-- Fix Critical/Important issues
-- **Re-review Critical/Important fixes** using the smallest scope that proves the issue was resolved: specific files, affected tests, or a narrower jj boundary if appropriate
-- Final completion requires Critical/Important findings resolved or explicitly accepted by the user. SDD's task-level exceptions do not waive final review.
-- Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
+- Triage findings against requirements and repository evidence at any round.
+- Resolve a factually false finding with a durable ruling containing the original finding, evidence, rejection reason and cost if wrong. No fix or replacement passing verdict is needed solely to confirm rejection; it consumes no fix round.
+- Fix genuine Critical/Important defects and re-review the smallest scope that proves resolution. After three fix rounds, escalate remaining genuine defects to the user; controller-only deferral cannot permit acceptance. Explicit user exceptions remain possible.
+- Record Minor issues for final triage. Keep original rejected findings, rulings and all repair work items available to final review for independent reassessment.
+- Combined repair review explicitly covers both original and repair requirements and their check evidence. Final delivery also requires resolution of separately managed failures unless the user explicitly changes that requirement.
 
 ## Example
 
@@ -117,6 +117,6 @@ You: [Fix progress indicators]
 **If reviewer wrong:**
 - Push back with technical reasoning
 - Show code/tests that prove it works
-- Request clarification
+- Record an evidence-backed rejection when factually disproved; ask for clarification when evidence remains insufficient
 
 See template at: requesting-code-review/code-reviewer.md

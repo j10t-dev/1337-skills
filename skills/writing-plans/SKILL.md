@@ -7,9 +7,7 @@ description: Use when design is complete and you need detailed implementation ta
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD.
-
-Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+Write implementation plans as behaviour contracts for a skilled engineer with no session history. Supply the decisions, interfaces, concrete cases, files and verification needed for each reviewable task. The implementer writes routine production and test bodies, choosing private mechanics within those contracts. DRY. YAGNI. TDD.
 
 **Determine filenames from project conventions:**
 - Use the user-provided feature slug, current jj bookmark/change description, or ask for a slug
@@ -50,7 +48,7 @@ replacement, and exact conflict before stopping. Do not hide a material redesign
 in a task brief.
 
 Private helpers, local algorithms, and equivalent implementation mechanics may
-be resolved in the plan when they preserve approved behaviour, boundaries, and
+be left to the implementer when they preserve approved behaviour, boundaries, and
 contracts. Binding an approved dependency as private state of the unit that owns
 an unchanged method is equivalent local mechanics when the design leaves binding
 unspecified; it does not permit ambient or global state or a new public contract.
@@ -59,8 +57,8 @@ unspecified; it does not permit ambient or global state or a new public contract
 
 Before defining tasks, map every approved programme-design file to its created,
 modified, or removed plan path and responsibility. Preserve the approved
-boundaries; planning fills in private details but does not redesign public
-structure.
+boundaries; planning supplies necessary contract decisions but leaves routine
+private details to implementation.
 
 - Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
 - You reason best about code you can hold in context at once, and your edits are more reliable when files are focused. Prefer smaller, focused files over large ones that do too much.
@@ -84,8 +82,9 @@ This structure informs the task decomposition. Each task should produce self-con
 - Failing test, minimal implementation, focused verification, refactor, and
   integrated outcome verification.
 
-**Step = Individual action (2–5 minutes)**
-- Exact content, command, and expected result.
+**Step = Meaningful implementation or verification action**
+- State the requirement or exact check and expected result; size steps by the
+  meaningful work.
 
 A normal task is one reviewable vertical behaviour increment. Write every task,
 including a decomposition-only or outline response, with each bold field below
@@ -98,6 +97,10 @@ in this order:
 **Dependencies:** Earlier tasks required before this task
 **Files:** Every cross-layer file created, modified, or removed
 **Interfaces:** Exact contracts consumed and produced
+**Implementation decisions:** Binding choices and implementer discretion
+**Exclusions:** Explicit non-goals
+**Concrete cases:** Inputs, preconditions and independently derived expected outcomes
+**Verification:** Exact commands, expected results and integrated outcome check
 ```
 
 ## Vertical Task Boundaries
@@ -159,7 +162,7 @@ to increase apparent parallelism.
 
 `Builds On` must resolve to exactly one existing local bookmark target. `Feature Bookmark` must be absent at fresh-run start. `Feature Bookmark` is the new local output bookmark. The first feature may build on `main`; every dependent feature names the preceding feature bookmark. No value is guessed from an older plan, current working copy, plan slug, or stale ledger. A plan missing either field is incomplete and must not execute until the user supplies it.
 
-`Design` is the absolute path to the approved design in `$DOCS_ROOT/$projectName/designs/`. Expand it. A literal `$DOCS_ROOT`, `$projectName`, or `~` reaches the executor as text it cannot resolve. The controller and document reviewer use the design. Implementers use the plan or task brief and ask the controller for missing requirements.
+`Design` is the absolute path to the approved design in `$DOCS_ROOT/$projectName/designs/`. Expand it. A literal `$DOCS_ROOT`, `$projectName`, or `~` reaches the executor as text it cannot resolve. The controller and document reviewer use the design. Task-scoped implementers use only their brief, supplied context and explicitly named artefacts; they ask the controller for missing requirements rather than locating the design, parent plan or neighbouring task materials.
 
 **Tech Stack:** [Key technologies/libraries]
 
@@ -183,79 +186,104 @@ include this section.]
 ---
 ```
 
-## Task Structure
+## Task Contract
+
+Retain `## Task N:` headings and all plan metadata. Every task requires exactly
+one `**Commit:**` conventional-commit subject describing delivered behaviour,
+with no task number, plan slug, run ID or metadata. This is the exact subject
+supplied to the controller helper. A missing subject blocks execution until the
+user supplies it.
+
+Use the fields above to make each extracted brief self-sufficient. Copy exact
+values, signatures, cases and constraints verbatim; supply producer/consumer
+contracts without requiring access to neighbouring tasks. The controller keeps
+the full design and plan; task-scoped agents receive only their brief, supplied
+context and explicitly named artefacts.
+
+**Binding:** Behaviour, scenario, observable outcome, dependencies, files,
+public contracts, security properties, architectural boundaries and explicitly
+required decisions or snippets constrain implementation. Include exact consumed
+and produced names, parameters, return/error contracts and necessary boundary
+decisions. State exclusions. Escalate consequential redesign for controller
+resolution and any required user approval.
+
+**Private mechanics:** Leave routine function and test bodies, private helpers,
+local algorithms and fixture construction to the implementer. Equivalent
+mechanics need no permission when binding requirements stay unchanged. Mark
+optional snippets explicitly **Illustrative**; equivalent correct code need not
+match their syntax. A snippet marked **Binding** remains a constraint.
+
+**Cases and verification:** Specify actual inputs, preconditions, expected
+results and side effects. Require one parameterised case table when inputs
+exercise the same behaviour; keep independently different behaviours in separate
+tests. Derive expectations independently of implementation (see
+@../test-driven-development/writing-good-tests.md). Require TDD's RED before
+implementation, focused GREEN and integrated outcome verification, with exact
+commands and expected results. Apply TDD's prose/configuration exception when no
+useful executable test exists; required project checks still apply.
+
+### Representative Task (Illustrative)
+
+This example describes a hypothetical Python invitation service, not this skill
+repository. Its paths and check command are illustrative, not commands to run
+here. Within such a task, the interfaces, decisions and case outcomes are
+binding; routine production and test bodies are intentionally absent.
 
 ```markdown
-## Task N: [Observable behaviour]
+## Task 1: Reject expired invitation acceptance without writes
 
-**Commit:** `feat: add recovery modes`
+**Commit:** `feat: reject expired invitation acceptance`
 
-This is the exact conventional-commit subject supplied to the controller helper. It describes delivered behaviour and contains no task number, plan slug, run ID, or metadata. A plan missing this field for any task is incomplete and must not execute until the user supplies it.
-
-**Behaviour:** [What becomes possible]
-**Scenario:** [Exact approved call tree or branch]
-**Observable outcome:** [Human or automated integrated observation]
-**Dependencies:** [Task references or `None`]
+**Behaviour:** Acceptance rejects expired invitations without changing stored state.
+**Scenario:** Existing acceptance entrypoint -> expiry decision -> existing successful acceptance path when unexpired.
+**Observable outcome:** Expired acceptance returns expired with no writes; unexpired acceptance returns accepted and stores the acceptance.
+**Dependencies:** None.
 
 **Files:**
-- Create: `exact/path/to/file.py`
-- Modify: `exact/path/to/existing.py:123-145`
-- Test: `tests/exact/path/to/test.py`
+- Modify: `src/invitations/acceptance.py`
+- Create: `tests/invitations/test_acceptance.py` (test)
 
 **Interfaces:**
-- Consumes: [exact names, parameters, and return types from approved design or earlier tasks]
-- Produces: [exact names, parameters, and return types later tasks use]
+- Preserve `accept_invitation(invitation_id: str, now: datetime) -> Literal["expired", "accepted"]`.
+- Existing invitation records expose `expiresAt: datetime`; both timestamps are UTC-aware.
+- Preserve existing repository reads and successful acceptance writes.
 
-### Subtask N.1: Write and verify the failing behaviour test
+**Implementation decisions:** `expiresAt <= now` is expired. Check expiry before any write. Private helper choice and local fixtures belong to the implementer. Public results, dependencies and architectural responsibilities stay unchanged.
+**Exclusions:** Invitation revocation, new dependencies and changes to other acceptance preconditions.
 
-**Step 1:** Write the failing test
+**Concrete cases:** One parameterised acceptance test table. In every row the invitation exists, is pending, and meets all other acceptance preconditions; `now` is `2030-01-01T12:00:00Z`.
 
-```python
-def test_specific_behaviour():
-    result = function(input)
-    assert result == expected
+| Case | expiresAt | Expected result | Expected effects |
+| --- | --- | --- | --- |
+| `expiresAt < now` | `2030-01-01T11:59:59Z` | `expired` | No writes; stored state unchanged |
+| `expiresAt == now` | `2030-01-01T12:00:00Z` | `expired` | No writes; stored state unchanged |
+| `expiresAt > now` | `2030-01-01T12:00:01Z` | `accepted` | Existing successful acceptance writes; acceptance stored |
+
+**Verification:**
+1. Construct the parameterised test against the acceptance entrypoint with controlled storage and independently derived expectations. Run `pytest tests/invitations/test_acceptance.py::test_acceptance_expiry -v`; verify RED for the missing expiry behaviour, not fixture or syntax errors.
+2. Implement the expiry decision; run the same command for GREEN: three cases pass.
+3. That entrypoint test must verify returned results and persisted state/write effects together, demonstrating the integrated outcome. Run the project's required checks as well.
 ```
 
-**Step 2:** Run the test to verify RED
+## Completeness, Not Full Bodies
 
-Run: `pytest tests/path/test.py::test_specific_behaviour -v`
-Expected: FAIL for the missing behaviour, not a fixture or syntax error.
+An omitted routine production or test body is not a placeholder. A plan with
+complete contracts and cases is ready for implementer-written code and tests.
+These remain blocking gaps:
 
-### Subtask N.2: Implement and verify the behaviour
-
-**Step 1:** Write the minimal approved implementation
-
-```python
-def function(input):
-    return expected
-```
-
-**Step 2:** Run focused verification
-
-Run: `pytest tests/path/test.py::test_specific_behaviour -v`
-Expected: PASS.
-
-**Step 3:** Verify the observable integrated outcome
-
-Run: `[exact entrypoint or integration-test command]`
-Expected: `[exact externally observable output, state transition, or effect]`.
-```
-
-## No Placeholders
-
-Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
-
-- "TBD", "TODO", "implement later", "fill in details"
-- "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code)
-- "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
-- Steps that describe what to do without showing how (code blocks required for code steps)
-- References to types, functions, or methods not defined in any task
+- Necessary behaviour or decisions left as "TBD", "TODO", "add validation" or
+  "handle edge cases" without actual rules and outcomes.
+- Tests requested without concrete cases and independently derived expectations.
+- An undecided boundary, such as whether `expiresAt == now` is expired; clarify
+  before dependent implementation.
+- "Similar to Task N" instead of the requirements the extracted brief needs.
+- Consumed types, functions or contracts neither supplied nor available in
+  explicitly named repository context.
 
 ## Remember
 - Exact file paths always
-- Complete code in plan (not "add validation")
-- Exact commands with expected output
+- Complete behaviour contracts and concrete cases, not routine bodies
+- Exact commands with expected results; label illustrative commands
 - Reference relevant skills with @ syntax
 - DRY, YAGNI, TDD
 - Plan reviewable units that build cleanly on each other and can be revised independently
@@ -270,11 +298,12 @@ Review the plan yourself before sharing it.
 - **File accuracy:** Every referenced file path exists or is explicitly marked `Create:`.
 - **Task boundaries:** Each task is large enough to justify subagent context transfer, but small enough to review independently.
 - **Dependency order:** Sequential dependencies are ordered; independent tasks are marked as safe to parallelise only if they do not edit the same files.
-- **TDD shape:** Behaviour changes include failing-test steps before implementation steps.
-- **Verification:** Every task has exact commands and expected output.
-- **No placeholders:** Scan for the patterns in the No Placeholders section above and fix them.
+- **TDD shape:** Behaviour changes specify concrete cases and RED before implementation, then GREEN; apply TDD's prose/configuration exception where appropriate.
+- **Verification:** Every task has exact commands and expected results, with illustrative commands clearly labelled.
+- **Contract completeness:** Every task contains all required fields, necessary decisions and independently derived case expectations; routine bodies may be absent. Parameterise the same behaviour's inputs; keep distinct behaviours separate.
+- **Binding versus illustrative:** Optional snippets are explicitly illustrative; public contracts, security, dependencies, architectural boundaries and required decisions remain binding.
 - **Type consistency:** Types, method signatures, and property names used in later tasks match what earlier tasks defined. A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
-- **Context sufficiency:** A competent executor with no session history can complete the task from the plan plus listed required files.
+- **Context sufficiency:** A competent task-scoped executor can complete the task from its extracted brief, supplied context and named artefacts alone, with exact values preserved and no need to locate the full design or neighbouring tasks.
 - **Linear position:** `Builds On` resolves to exactly one existing local bookmark target and `Feature Bookmark` is a distinct semantic output bookmark absent at fresh-run start; dependent plans form one explicit stack.
 - **Commit subjects:** Every task has exactly one suitable conventional-commit subject describing its delivered behaviour, with no task number or plan/run metadata.
 - **Programme-design conformance:** Planned files, responsibilities, public interfaces, consequential seams, and scenario paths match the approved `Program Design`; material conflicts returned to design revision.
