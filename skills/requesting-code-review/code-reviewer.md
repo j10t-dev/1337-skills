@@ -48,7 +48,10 @@ You are the only reviewer this boundary gets. Reach your verdict from your own r
 {DESCRIPTION}
 
 **Requirements/Plan:**
+{REQUIREMENTS}
 {PLAN_REFERENCE}
+
+Use the supplied brief or request when no plan exists.
 
 **Diff File (preferred):**
 {DIFF_FILE}
@@ -78,6 +81,11 @@ You are the only reviewer this boundary gets. Reach your verdict from your own r
 - Security concerns?
 
 **Testing:**
+Reuse inspected test evidence for the current code/configuration under
+`verification-before-completion`. Run a focused check only for missing or
+invalidated evidence or a concrete unresolved doubt; do not repeat a suite
+merely because another agent or workflow phase supplied the result.
+
 - Tests actually test logic (not mocks)?
 - Edge cases covered?
 - Integration tests where needed?

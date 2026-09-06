@@ -11,8 +11,6 @@ Write comprehensive implementation plans assuming the engineer has zero context 
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
-**Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
-
 **Determine filenames from project conventions:**
 - Use the user-provided feature slug, current jj bookmark/change description, or ask for a slug
 - Design and plan documents always live in an external docs repo, separate from the code repo
@@ -128,8 +126,10 @@ A separate foundation task must state:
 Every task ends with integrated verification of its observable outcome. Unit
 checks alone are insufficient when the approved scenario crosses boundaries.
 
-Mark tasks parallel only when they do not conflict in files, interfaces,
-migrations, or state transitions. Reduced parallelism is preferable to
+Mark implementation tasks parallel only when they do not conflict in files,
+interfaces, migrations or state transitions and the executor provides isolated
+working copies. Shared-copy SDD implementation stays serial; independent
+read-only legwork may run alongside it. Reduced parallelism is preferable to
 deferring integration. Sequence shared entrypoints and stateful changes rather
 than claiming unsafe independence.
 
@@ -159,7 +159,7 @@ to increase apparent parallelism.
 
 `Builds On` must resolve to exactly one existing local bookmark target. `Feature Bookmark` must be absent at fresh-run start. `Feature Bookmark` is the new local output bookmark. The first feature may build on `main`; every dependent feature names the preceding feature bookmark. No value is guessed from an older plan, current working copy, plan slug, or stale ledger. A plan missing either field is incomplete and must not execute until the user supplies it.
 
-`Design` is the absolute path to the approved design in `$DOCS_ROOT/$projectName/designs/`. Expand it. A literal `$DOCS_ROOT`, `$projectName`, or `~` reaches the executor as text it cannot resolve. The plan argues from the design, so the executor reads both, and the design wins wherever the two disagree.
+`Design` is the absolute path to the approved design in `$DOCS_ROOT/$projectName/designs/`. Expand it. A literal `$DOCS_ROOT`, `$projectName`, or `~` reaches the executor as text it cannot resolve. The controller and document reviewer use the design. Implementers use the plan or task brief and ask the controller for missing requirements.
 
 **Tech Stack:** [Key technologies/libraries]
 
@@ -300,13 +300,20 @@ Fix any issues inline before sharing the plan.
 
 ## Execution Handoff
 
-**VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks.** Proceed directly to offering execution choice:
+**VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks.**
+
+If the user requested planning only, report the saved plan and stop. If they
+already requested implementation and the plan preserves the approved design,
+continue with their chosen executor without another approval prompt. Otherwise
+use SDD when native subagents are available, or inline execution when they are
+not, provided this preserves required review guarantees. Ask about the options
+below only when that choice genuinely needs the user's decision:
 
 **"Plan complete and saved to `<plan-file>`. Two execution options:**
 
 **1. Subagent-Driven (recommended where the harness supports subagents)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
 
-**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
+**2. Inline Execution** - Execute tasks in this session using executing-plans, with its verification and final-review gates
 
 **Which approach?"**
 
@@ -319,4 +326,4 @@ If the current harness has no subagent support, skip the question and use Inline
 
 **If Inline Execution chosen:**
 - Load the `executing-plans` skill via the current harness's skill-loading mechanism
-- Batch execution with checkpoints for review
+- Continuous execution with verification and final review; pause only for consequential decisions or missing authority

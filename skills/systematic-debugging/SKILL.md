@@ -13,8 +13,6 @@ Random fixes waste time and create new bugs. Quick patches mask underlying issue
 
 **Violating the letter of this process is violating the spirit of debugging.**
 
-**Announce at start:** "I'm using the systematic-debugging skill to find the root cause."
-
 ## The Iron Law
 
 ```
@@ -196,7 +194,7 @@ You MUST complete each phase before proceeding to the next.
    - Count: How many fixes have you tried?
    - If < 3: Return to Phase 1, re-analyse with new information
    - **If ≥ 3: STOP and question the architecture (step 5 below)**
-   - DON'T attempt Fix #4 without architectural discussion
+   - Reassess before Fix #4; ask if a consequential architectural decision is needed
 
 5. **If 3+ Fixes Failed: Question Architecture**
 
@@ -210,9 +208,12 @@ You MUST complete each phase before proceeding to the next.
    - Are we "sticking with it through sheer inertia"?
    - Should we refactor architecture vs. continue fixing symptoms?
 
-   **Discuss with your human partner before attempting more fixes**
+   Reassess the evidence before another fix. Resolve local causes within the
+   approved design; discuss consequential architectural changes with the user.
+   Honour the active workflow's fix-round cap.
 
-   This is NOT a failed hypothesis - this is a wrong architecture.
+   Repeated failures are a reason to investigate architecture, not proof that
+   the architecture is wrong.
 
 ## Red Flags - STOP and Follow Process
 
@@ -255,7 +256,7 @@ If you catch yourself thinking:
 | "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
 | "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
-| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. |
+| "One more fix attempt" (after 2+ failures) | Reassess the evidence and architecture; respect the active workflow's fix-round cap. |
 
 ## Quick Reference
 
@@ -282,7 +283,7 @@ If systematic investigation reveals issue is truly environmental, timing-depende
 These techniques are part of systematic debugging and available in this directory:
 
 - **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
-- **`defence-in-depth.md`** - Add validation at multiple layers after finding root cause
+- **`defence-in-depth.md`** - Protect independent entry paths and live hazards under `principle-boundary-discipline`
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
 - **`find-polluter.sh`** - Bisection script to find which test creates pollution
 - **`condition-based-waiting-example.ts`** - Complete implementation from real debugging session

@@ -16,32 +16,31 @@ Claiming work is complete without verification is dishonesty, not efficiency.
 ## The Iron Law
 
 ```
-NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
+NO COMPLETION CLAIMS WITHOUT APPLICABLE VERIFICATION EVIDENCE
 ```
 
-If you haven't run the verification command in this message, you cannot claim it passes.
+Read existing results first. Evidence survives handoffs and formatting differences:
+fix the report, not the test run. Rerun only for missing evidence, relevant code,
+configuration or environment changes, failures, or a specific doubt. Complete
+required checks; do not broaden the suite by default.
 
 ## The Gate Function
 
 ```
-BEFORE claiming any status or expressing satisfaction:
+BEFORE claiming completion:
 
-1. IDENTIFY: What command proves this claim?
-2. RUN: Execute the FULL command (fresh, complete)
-3. READ: Full output, check exit code, count failures
-4. VERIFY: Does output confirm the claim?
-   - If NO: State actual status with evidence
-   - If YES: State claim WITH evidence
-5. ONLY THEN: Make the claim
-
-Skip any step = lying, not verifying
+1. IDENTIFY: What proves the claim?
+2. READ: Inspect existing results.
+3. RUN: Perform missing or invalidated checks.
+4. VERIFY: Do the results support the claim?
+5. REPORT: State the checked scope, result and remaining gaps.
 ```
 
 ## Common Failures
 
 | Claim | Requires | Not Sufficient |
 |-------|----------|----------------|
-| Tests pass | Test command output: 0 failures | Previous run, "should pass" |
+| Tests pass | Applicable command output: 0 failures, with scope | A stale result or "should pass" |
 | Linter clean | Linter output: 0 errors | Partial check, extrapolation |
 | Build succeeds | Build command: exit 0 | Linter passing, logs look good |
 | Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
@@ -55,10 +54,10 @@ Skip any step = lying, not verifying
 - Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
 - About to describe/save local changes, ask the user to advance the target bookmark, submit externally, create a PR, or mark a task complete without verification
 - Trusting agent success reports
-- Relying on partial verification
+- Claiming a broader result than the verification covers
 - Thinking "just this once"
 - Tired and wanting work over
-- **ANY wording implying success without having run verification**
+- **ANY wording implying success without applicable verification evidence**
 
 ## Rationalisation Prevention
 
@@ -68,9 +67,9 @@ Skip any step = lying, not verifying
 | "I'm confident" | Confidence ≠ evidence |
 | "Just this once" | No exceptions |
 | "Linter passed" | Linter ≠ compiler |
-| "Agent said success" | Verify independently |
+| "Agent said success" | Read the code and recorded results |
 | "I'm tired" | Exhaustion ≠ excuse |
-| "Partial check is enough" | Partial proves nothing |
+| "Partial check is enough" | Claim only the checked scope and complete required checks |
 | "Different words so rule doesn't apply" | Spirit over letter |
 
 ## Key Patterns
@@ -101,7 +100,7 @@ Skip any step = lying, not verifying
 
 **Agent delegation:**
 ```
-✅ Agent reports success → Check VCS diff → Verify changes → Report actual state
+✅ Agent report → Inspect diff and results → Run missing checks → Report state
 ❌ Trust agent report
 ```
 
@@ -112,24 +111,13 @@ Skip any step = lying, not verifying
 
 ## When To Apply
 
-**ALWAYS before:**
-- ANY variation of success/completion claims
-- ANY expression of satisfaction
-- ANY positive statement about work state
-- Describing/saving local changes, asking the user to advance the target bookmark, external submission, PR creation, task completion
-- Moving to next task
-- Delegating to agents
-
-**Rule applies to:**
-- Exact phrases
-- Paraphrases and synonyms
-- Implications of success
-- ANY communication suggesting completion/correctness
+Before claiming completion, accepting work, moving to the next task or submitting
+externally. Changing the wording of a claim does not change its evidence needs.
 
 ## The Bottom Line
 
 **No shortcuts for verification.**
 
-Run the command. Read the output. THEN claim the result.
+Read the evidence. Fill gaps. Report the result.
 
 This is non-negotiable.

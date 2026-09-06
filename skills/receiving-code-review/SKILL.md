@@ -40,11 +40,13 @@ WHEN receiving code review feedback:
 ## Handling Unclear Feedback
 
 ```
-IF any item is unclear:
-  STOP - do not implement anything yet
-  ASK for clarification on unclear items
+IF an item is unclear:
+  Establish which other fixes depend on its answer.
+  Ask about the consequential missing requirement.
+  Implement understood, independent fixes within the authorised scope.
+  Pause only dependent work.
 
-WHY: Items may be related. Partial understanding = wrong implementation.
+WHY: Related fixes share assumptions; independent fixes need not wait.
 ```
 
 **Example:**
@@ -52,8 +54,8 @@ WHY: Items may be related. Partial understanding = wrong implementation.
 your human partner: "Fix 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
 
-❌ WRONG: Implement 1,2,3,6 now, ask about 4,5 later
-✅ RIGHT: "I understand items 1,2,3,6. Need clarification on 4 and 5 before proceeding."
+✅ If independent: "I'll fix 1,2,3,6. Which records should 4 and 5 cover?"
+✅ If dependent: explain the shared assumption and pause the affected fixes.
 ```
 
 ## Source-Specific Handling
@@ -77,10 +79,10 @@ IF suggestion seems wrong:
   Push back with technical reasoning
 
 IF can't easily verify:
-  Say so: "I can't verify this without [X]. Should I [investigate/ask/proceed]?"
+  Investigate within the authorised scope. Ask only for inaccessible facts or consequential decisions.
 
 IF conflicts with your human partner's prior decisions:
-  Stop and discuss with your human partner first
+  Resolve routine discrepancies against the approved requirements. Ask before changing consequential decisions; continue independent fixes.
 ```
 
 **your human partner's rule:** "External feedback - be skeptical, but check carefully"
@@ -101,7 +103,7 @@ IF reviewer suggests "implementing properly":
 
 ```
 FOR multi-item feedback:
-  1. Clarify anything unclear FIRST
+  1. Clarify consequential gaps and identify dependencies; progress independent fixes
   2. Then implement in this order:
      - Blocking issues (breaks, security)
      - Simple fixes (typos, imports)
@@ -171,7 +173,7 @@ State the correction factually and move on.
 | Batch without testing | One at a time, test each |
 | Assuming reviewer is right | Check if breaks things |
 | Avoiding pushback | Technical correctness > comfort |
-| Partial implementation | Clarify all items first |
+| Unclear item blocks unrelated fixes | Clarify dependencies; progress independent authorised fixes |
 | Can't verify, proceed anyway | State limitation, ask for direction |
 | Skipping re-review after fixes | Request re-review to verify fixes worked |
 
@@ -199,7 +201,7 @@ Reviewer: "Implement proper metrics tracking with database, date filters, CSV ex
 ```
 your human partner: "Fix items 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
-✅ "Understand 1,2,3,6. Need clarification on 4 and 5 before implementing."
+✅ "I'll implement independent items 1,2,3,6. Which records should the changes in 4 and 5 cover?"
 ```
 
 ## The Bottom Line

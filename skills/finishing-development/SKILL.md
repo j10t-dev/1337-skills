@@ -11,13 +11,12 @@ Guide completion of development work by presenting clear options and handling ch
 
 **Core principle:** Verify tests → Present options → Execute choice → Clean up.
 
-**Announce at start:** "I'm using the finishing-development skill to complete this work."
-
 ## The Process
 
 ### Step 1: Verify Tests
 
-**Before presenting options, verify tests pass:**
+Use `verification-before-completion` to reuse existing results and fill gaps.
+If verification and review are complete, enter Step 3.
 
 ```bash
 # Run project's test suite
@@ -39,7 +38,8 @@ Stop. Don't proceed to Step 2.
 
 ### Step 2: Optional Code Review
 
-**Ask user if they want code review** using the current harness's user-question mechanism:
+Reuse completed review. Otherwise perform required review, or ask about optional
+review if a specific concern merits it:
 
 ```
 Question: "Tests pass. Want code review before finishing?"
@@ -65,7 +65,8 @@ Subagent/delegation tool (code-reviewer):
     Do not infer scope from session history or auto-detect from ambient repository state.
 ```
 
-Every path in the dispatch prompt is absolute and already expanded. The reviewer does not activate skills and does not read your shell environment, so an unexpanded `$DOCS_ROOT`, `$projectName`, or leading `~` reaches it as literal text it cannot resolve. Plans live in `$DOCS_ROOT/$projectName/plans/<slug>.md`; resolve that to an absolute path before dispatching — see the docs-root rules in `writing-plans`.
+Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch;
+reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
 
 **After review:**
 - Fix Critical issues immediately
@@ -79,15 +80,8 @@ A formally executed feature already consists of accepted task commits plus any s
 
 ### Step 3: Present Completion Options
 
-Inform user:
-```
-Implementation complete and tests pass. Choose next step:
-
-1. Review the final changes together
-2. Leave changes as-is for user review
-3. Prepare a summary for external submission/PR
-4. Continue with another task
-```
+Report the outcome and evidence. Carry out the requested next step; ask only for
+an unresolved decision. Do not append a standard menu.
 
 **Do not perform integration operations** (rebase shared work, move bookmarks, submit externally, create/update PRs, or advance the target bookmark) unless the user explicitly asks. The user controls final jj/git-colocated integration.
 
@@ -99,7 +93,7 @@ Implementation complete and tests pass. Choose next step:
 
 **Open-ended questions**
 - **Problem:** "What should I do next?" → ambiguous
-- **Fix:** Present exactly 4 structured options
+- **Fix:** Ask for the specific decision needed
 
 ## Red Flags
 

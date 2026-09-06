@@ -17,15 +17,16 @@ Execute a plan by dispatching a fresh implementer subagent per task, a task revi
 
 **Continuous execution:** Do not pause to check in between tasks. Execute all tasks from the plan without stopping. "Should I continue?" prompts and progress summaries waste the partner's time — they asked you to execute the plan, so execute it.
 
-**Rulings, not stalls.** A running plan does not wait on a human. Decide the conflicts, the ambiguities, the plan defects, the review finding that contradicts the plan's text. The approved design is the binding authority, the plan is its argument from that design, and your judgement settles what neither answers. Record every decision in the ledger as a ruling and keep going. A wrong ruling costs rework the user can see and undo. A run parked on a question costs their whole session and buys nothing.
+**Rulings, not stalls.** Resolve routine conflicts, ambiguities and plan defects against the approved design. Record material decisions as rulings and keep going. A ruling cannot override a consequential design decision or expand action authority. Follow `using-skills` for user precedence and pause diagnostics; a later user correction can stop or redirect this run.
 
-Five things stop the run, and only these:
+Pause affected work for these conditions; continue independent authorised work:
 
 - an irreversible or destructive operation
 - a security-sensitive action
 - an integration or side effect the user reserves, meaning rebase, split, squash, amending an accepted commit, push, submit, PR work, or any bookmark movement beyond the declared feature bookmark
 - ledger and repository state that no `Durable Progress` recovery row matches exactly
 - a plan so broken that every path forward is a guess
+- a consequential choice not settled by the approved requirements
 
 Everything else is a ruling.
 
@@ -59,7 +60,7 @@ digraph when_to_use {
 
 > "Dispatch X subagent" below means delegate to a fresh agent via the current harness's subagent/delegation mechanism.
 
-**SDD model requirement:** Every implementer, fixer, and task-reviewer dispatch explicitly supplies a model selected under `working-with-subagents`; these SDD calls use general-purpose delegation rather than matching preconfigured roles. Every final-review dispatch does the same. Resumed implementers retain their original model. The final whole-branch reviewer handles architecture and high-risk judgement, so use the most capable available model.
+**SDD model requirement:** Every implementer, fixer, and task-reviewer dispatch explicitly supplies a model selected under `working-with-subagents`; these SDD calls use general-purpose delegation rather than matching preconfigured roles. Every final-review dispatch does the same. If the harness exposes only a known inherited model, record and use inheritance instead of inventing an explicit model ID. Resumed implementers retain their original model. The final whole-branch reviewer handles architecture and high-risk judgement, so use the most capable available model.
 
 ```dot
 digraph process {
@@ -102,7 +103,8 @@ digraph process {
     "Final review passes?" -> "Clean scratch and use finishing-development" [label="yes"];
     "Final review passes?" -> "Record pending fix subject, dispatch one fixer, review run base through @" [label="no"];
     "Record pending fix subject, dispatch one fixer, review run base through @" -> "Controller accepts reviewed final fix" [label="clean re-review"];
-    "Controller accepts reviewed final fix" -> "Run stable final review from run base through Feature Bookmark";
+    "Controller accepts reviewed final fix" -> "Clean scratch and use finishing-development" [label="same reviewed tree and requirements"];
+    "Controller accepts reviewed final fix" -> "Run stable final review from run base through Feature Bookmark" [label="intervening content or requirement change"];
 }
 ```
 
@@ -232,7 +234,7 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
   Final review fix 1 -> pending (subject `fix: address final review findings`)
   ```
 
-  After its run-base-through-`@` package receives a clean re-review, use `Accepting a Task or Final Fix`. Never amend a task commit.
+  After its run-base-through-`@` package receives a clean re-review, use `Accepting a Task or Final Fix`. Confirm acceptance preserved the reviewed tree and requirements; reuse that review rather than repeating it solely because commit metadata changed. Never amend a task commit.
 - Scratch cleanup occurs only after final review passes and no pending fix exists. Remove `.agents/sdd/` then; another plan may start only after cleanup.
 
 ## File Handoffs
@@ -310,7 +312,7 @@ Before removing `.agents/sdd/`, collect every `Ruling:` line in the ledger into 
 
 This list is the only place the decisions you took on the user's behalf reach them, and it is what they read to find what needs reworking. Delete the scratch directory first and those decisions are gone unreported.
 
-Then hand off with finishing-development.
+Then pass the existing verification and final-review evidence to finishing-development at Step 3.
 
 ## Prompt Templates
 
@@ -356,7 +358,7 @@ Final reviewer: Important findings.
 [Dispatch ONE final-review fixer; run scripts/review-package RUN_BASE @]
 Final reviewer: Clean re-review.
 [Accept the reviewed final fix with its pending subject]
-[Repeat stable final review; after it passes with no pending fix, report every ledger Ruling: line under "Rulings I made", then remove .agents/sdd/]
+[Confirm the accepted tree and requirements match the clean re-review; reuse it unless intervening changes invalidate it. With no pending fix, report every ledger Ruling: line under "Rulings I made", then remove .agents/sdd/]
 ```
 
 ## Advantages
@@ -397,7 +399,7 @@ Final reviewer: Clean re-review.
 - Build implementation work directly on the trunk bookmark (main/master) without explicit user consent — start a new change for the run
 - Skip task review, or accept a report missing either verdict (spec compliance AND task quality are both required)
 - Proceed with unfixed Critical/Important issues before the fix-round cap, or past it without a recorded ruling
-- Dispatch multiple implementation subagents in parallel (conflicts)
+- Dispatch multiple implementation subagents into the shared working copy in parallel (conflicts). Independent read-only research may run concurrently.
 - Make a subagent read the whole plan file (hand it its task brief — `scripts/task-brief` — instead)
 - Let a task-scoped subagent locate or read the parent plan, neighbouring tasks, progress ledger, prior-task materials, or session history
 - Skip scene-setting context (subagent needs to understand where the task fits)
@@ -410,7 +412,7 @@ Final reviewer: Clean re-review.
 - Move to the next task while Critical/Important findings are open and unruled
 - Re-dispatch a task the progress ledger already marks complete — reconcile the ledger and committed path after any compaction or resume
 - Let a subagent run jj or git commands — every VCS mutation belongs to the controller
-- Park the run on a question the design, the plan, or your own judgement can answer. Rule, record it, carry on
+- Park the run on a routine question the approved design, plan or repository evidence answers. Rule, record it and continue; ask before a consequential redesign.
 - Remove `.agents/sdd/` before every ruling in it has been reported to the user
 
 **If subagent asks questions:**
