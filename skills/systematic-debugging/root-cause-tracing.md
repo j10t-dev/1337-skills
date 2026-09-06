@@ -121,9 +121,9 @@ Runs tests one-by-one, stops at first polluter. See script for usage.
 
 **Fix:** Made tempDir a getter that throws if accessed before beforeEach
 
-**Also added defence-in-depth:**
+**Boundary-discipline application to this example:**
 - Layer 1: Project.create() validates directory
-- Layer 2: WorkspaceManager validates not empty
+- Layer 2: WorkspaceManager consumes the boundary-validated directory
 - Layer 3: NODE_ENV guard refuses git init outside tmpdir
 - Layer 4: Stack trace logging before git init
 
@@ -136,8 +136,8 @@ digraph principle {
     "Trace backwards" [shape=box];
     "Is this the source?" [shape=diamond];
     "Fix at source" [shape=box];
-    "Add validation at each layer" [shape=box];
-    "Bug impossible" [shape=doublecircle];
+    "Protect independent boundaries and live hazards" [shape=box];
+    "Verify the regression" [shape=doublecircle];
     "NEVER fix just the symptom" [shape=octagon, style=filled, fillcolor=red, fontcolor=white];
 
     "Found immediate cause" -> "Can trace one level up?";
@@ -146,8 +146,8 @@ digraph principle {
     "Trace backwards" -> "Is this the source?";
     "Is this the source?" -> "Trace backwards" [label="no - keeps going"];
     "Is this the source?" -> "Fix at source" [label="yes"];
-    "Fix at source" -> "Add validation at each layer";
-    "Add validation at each layer" -> "Bug impossible";
+    "Fix at source" -> "Protect independent boundaries and live hazards";
+    "Protect independent boundaries and live hazards" -> "Verify the regression";
 }
 ```
 
@@ -165,7 +165,7 @@ digraph principle {
 - Trace back through full call chain
 - Find the original trigger
 - Fix at the source, not the symptom
-- Add defence-in-depth validation at each layer after fixing
+- Follow `principle-boundary-discipline` and `defence-in-depth.md`: validate independent external entries, trust validated types internally, and guard mutable facts at the operation that needs them
 
 ## Stack Trace Tips
 

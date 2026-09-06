@@ -1,6 +1,7 @@
 # Implementer Subagent Prompt Template
 
-Use this template when dispatching an implementer subagent.
+Use this template when dispatching an implementer subagent. If the harness exposes
+only a known inherited model, omit the model field under SDD's inheritance exception.
 
 ```
 Subagent/delegation tool (general-purpose):
@@ -40,7 +41,9 @@ Subagent/delegation tool (general-purpose):
     - Dependencies or assumptions
     - Anything unclear in the task description
 
-    **Ask them now.** Raise any concerns before starting work.
+    Ask the controller about missing requirements or consequential choices.
+    Resolve routine private mechanics from the brief and repository patterns;
+    continue independent specified work while a question remains open.
 
     ## Your Job
 
@@ -61,11 +64,14 @@ Subagent/delegation tool (general-purpose):
     A `**Commit:**` line belongs to the controller. It does not authorise you to run
     VCS commands; ignore it while editing and verifying the task.
 
-    **While you work:** If you encounter something unexpected or unclear, **ask
-    questions**. It's always OK to pause and clarify. Don't guess.
+    **While you work:** Investigate unexpected behaviour within scope. Ask the
+    controller when missing requirements or a consequential choice block the
+    task; routine recoverable failures do not require a permission round-trip.
 
-    While iterating, run the focused test for what you're changing; run the
-    full suite once before reporting back, not after every edit.
+    While iterating, run focused covering tests and the project's required
+    checks. Use verification-before-completion for evidence reuse. Broaden or
+    repeat checks only for relevant changes, failures or concrete unresolved
+    concerns; a full suite is not automatic at every task handoff.
 
     ## Code Organisation
 
@@ -90,7 +96,7 @@ Subagent/delegation tool (general-purpose):
     **STOP and escalate (status BLOCKED or NEEDS_CONTEXT) when:**
     - The task requires architectural decisions with multiple valid approaches
     - You need to understand code beyond what was provided and can't find clarity
-    - You feel uncertain about whether your approach is correct
+    - A concrete correctness concern remains after focused investigation
     - The task involves restructuring existing code the plan didn't anticipate
 
     ## Before Reporting Back: Self-Review

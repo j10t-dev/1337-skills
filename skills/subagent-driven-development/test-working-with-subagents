@@ -30,8 +30,8 @@ reject_text() {
 
 require_text "$generic" 'name: working-with-subagents'
 require_text "$generic" 'description: Use when delegating to a subagent'
-require_text "$generic" 'OpenAI (most to least capable): gpt-5.6-sol > gpt-5.6-terra > gpt-5.6-luna'
-require_text "$generic" 'Anthropic (most to least capable): fable > opus > sonnet'
+require_text "$generic" 'Use the active catalogue and supported reasoning settings'
+require_text "$generic" 'If only a known inherited model is exposed, use inheritance'
 require_text "$sdd" '@../working-with-subagents/SKILL.md'
 reject_text "$sdd" '## Model'" Selection"
 require_text "$sdd" 'Every implementer, fixer, and task-reviewer dispatch explicitly supplies a model'
