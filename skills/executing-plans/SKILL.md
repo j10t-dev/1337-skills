@@ -10,6 +10,24 @@ Execute inline when requested or subagents are unavailable.
 The plan and supplied context are your requirements. Ask the controller for
 missing context, or the user when executing standalone. Do not read the design.
 
+## Contract Discretion
+
+Execute the binding behaviour, interfaces, decisions, exclusions, concrete cases
+and verification. Complete contracts may omit routine production and test bodies;
+construct them yourself under TDD. Private helper choice, local algorithms and
+fixture construction need no permission. Explicitly illustrative snippets are not
+syntax requirements; binding snippets remain constraints.
+
+Preserve exact cases and outcomes. Parameterise inputs exercising the same
+behaviour with independently derived expectations; keep distinct operations in
+separate behaviour tests (see test-driven-development's writing-good-tests.md).
+An undocumented boundary such as expiry equality needs clarification before
+dependent work; an omitted routine body does not. Escalate changes to public
+results or interfaces, dependencies, security properties or architectural
+boundaries to the controller (or user standalone) for resolution and any required
+approval. Use TDD's prose/configuration exception where no useful executable test
+exists, retaining required checks and the execution gates below.
+
 ## Start or Resume
 
 1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task. Stop on missing, duplicate or ambiguous metadata.

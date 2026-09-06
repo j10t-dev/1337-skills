@@ -109,7 +109,23 @@ Subagent/delegation tool (general-purpose):
 
     ## Part 1: Spec Compliance
 
-    Compare the diff against What Was Requested:
+    Compare the diff against What Was Requested. Review binding behaviour,
+    interfaces, decisions, exclusions, concrete case outcomes and verification,
+    not a transcription of illustrative syntax. Public contracts, security
+    properties, dependencies, architectural boundaries and explicitly binding
+    snippets remain constraints. Changed public results or added dependencies
+    require controller escalation and any required user approval.
+
+    A complete brief can omit routine production and test bodies: the implementer
+    owns their construction. Accept different private helpers, local algorithms
+    and local fixtures when contracts and outcomes are identical. Equivalent
+    correct code differing from an explicitly illustrative snippet is not a
+    conformance defect solely because its syntax differs. Missing necessary
+    decisions, such as an undocumented expiry equality boundary, require controller
+    clarification rather than reviewer or implementer invention.
+
+    For instruction changes, trace each case through every affected writer,
+    executor and reviewer in the supplied diff, not only the authoring skill.
 
     - **Missing:** requirements they skipped, missed, or claimed without
       implementing
@@ -132,7 +148,15 @@ Subagent/delegation tool (general-purpose):
 
     **Tests:**
     - Do the new and changed tests verify real behaviour, not mocks?
-    - Are the task's edge cases covered?
+    - Are the task's exact cases, edge boundaries and side effects covered with
+      expectations derived independently of production code and its helpers?
+    - Are inputs for the same behaviour parameterised, with distinct behaviours
+      kept in separate tests? For the example expiry contract, `expiresAt < now`,
+      `expiresAt == now` and `expiresAt > now` belong in one table: first two
+      return expired with no writes; third follows successful acceptance.
+      Invitation revocation is a separate operation, not another expiry row.
+    - For prose/configuration under TDD's exception, does the report provide
+      applicable inspection/validation and required project-check evidence?
 
     **Structure:**
     - Does each file have one clear responsibility with a well-defined interface?

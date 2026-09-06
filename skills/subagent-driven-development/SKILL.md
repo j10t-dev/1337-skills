@@ -163,8 +163,14 @@ These fixed-width IDs are synthetic format illustrations. Real entries come from
 Scan the plan once for conflicts before Task 1 dispatches, and write the result to the ledger as a table. The scan produces rows, not a verdict.
 
 - one row per pair of tasks sharing a file or an interface, naming the two tasks, what one produces against what the other consumes, and what you found
-- one row per task, recording whether its own text agrees with itself: the tests it specifies against the code it specifies, the files it creates against the files it later touches
+- one row per task, recording whether its requirements agree with themselves: behaviour and boundary decisions against concrete test outcomes and side effects, binding interfaces/decisions against each other, and the files it creates against the files it later touches; omitted routine implementation/test bodies are not conflicts
 - one row per plan instruction the reviewer rubric treats as a defect, such as a test that asserts nothing or verbatim duplication of a logic block
+
+Check producer/consumer signatures and outcomes, not absent implementation code.
+For example, expiry equality must have a decided result and write policy before
+dependent work; equivalent private helpers or illustrative syntax differences
+are not conflicts. Public contract, dependency, security or architectural changes
+remain consequential and require escalation beyond routine private mechanics.
 
 "The scan is clean" without those rows is not a scan you ran.
 
@@ -242,7 +248,7 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
 Everything you paste into a dispatch prompt — and everything a subagent prints back — stays resident in your context for the rest of the session and is re-read on every later turn. Hand artifacts over as files:
 
 - **Task-scoped context boundary:** Every implementer, fixer, and task-reviewer dispatch must state that its supplied brief, context, and named artefacts are its complete boundary. The subagent must not locate the parent plan, neighbouring tasks, progress ledger, prior-task materials, or session history. Missing requirements are escalated to the controller rather than discovered by broadening scope. This restriction does not apply to the final whole-branch reviewer.
-- **Task brief:** before dispatching an implementer, run this skill's `scripts/task-brief PLAN_FILE N` — it extracts the task's full text to a file and prints the path. Compose the dispatch so the brief stays the single source of requirements. Your dispatch should contain: (1) one line on where this task fits; (2) the brief path, introduced as "read this first — it is your requirements, with the exact values to use verbatim"; (3) interfaces and decisions from earlier tasks that the brief cannot know; (4) your resolution of any ambiguity you noticed in the brief; (5) the report-file path and report contract. Exact values (numbers, magic strings, signatures, test cases) appear only in the brief.
+- **Task brief:** before dispatching an implementer, run this skill's `scripts/task-brief PLAN_FILE N` — it extracts the task's full text to a file and prints the path. Compose the dispatch so the brief stays the single source of requirements. Your dispatch should contain: (1) one line on where this task fits; (2) the brief path, introduced as "read this first — it is your requirements, with the exact values to use verbatim"; (3) interfaces and decisions from earlier tasks that the brief cannot know; (4) your resolution of any ambiguity you noticed in the brief; (5) the report-file path and report contract. Exact values (numbers, magic strings, signatures, test cases) appear only in the brief. Retain binding interfaces/decisions, exclusions, concrete cases and verification verbatim. Complete contracts do not require routine production or test bodies: dispatch the implementer to construct them, parameterising the same behaviour's cases with independent expectations and choosing equivalent private mechanics. Preserve explicit illustrative/binding snippet labels; missing necessary decisions go to the controller, not a search of the full design or neighbouring tasks.
 - **Report file:** name the implementer's report file after the brief (`…/task-N-brief.md` → `…/task-N-report.md`) and put it in the dispatch prompt. The implementer writes the full report there and returns only status, a one-line test summary, and concerns.
 - **Reviewer inputs:** the task reviewer gets three paths — the same brief file, the report file, and the review package — plus the global constraints that bind the task.
 - Fix rounds append their report (with test results) to the same report file and return a short summary; re-reviews read the updated file.
