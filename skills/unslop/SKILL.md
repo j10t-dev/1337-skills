@@ -21,6 +21,7 @@ Have opinions and react to facts. Vary sentence rhythm, acknowledge complexity, 
 
 ## Style
 
+- Keep each prose paragraph on one source line, including prose in prompt and Markdown templates. Preserve list items, tables, deliberate line breaks and code formatting; do not hard-wrap prose to a column limit.
 - Separate thoughts with periods or commas. Avoid em dashes, parentheses, en dashes and hyphen-as-dash substitutes.
 - Use colons before lists or examples, not as mid-sentence connectors or comparison framing.
 - Keep bold sparse. Replace bold-label-and-colon lists that merely restate the label with prose. A bold lead-in ending in a period is fine when the following text adds detail.

@@ -21,10 +21,7 @@ Genuine Critical/Important defects need fixes, verification and re-review. After
 - Check actual usage before adding a suggested "professional" feature. If unused, propose removal rather than build unnecessary machinery.
 - Push back when a suggestion is technically wrong, breaks functionality, ignores compatibility, adds unused scope or conflicts with approved architecture. Cite code/tests and ask specific questions. If uncomfortable challenging feedback, name the tension and the concrete issue. If verification is unavailable, state the limitation and ask for direction rather than proceeding on assumption.
 
-Keep review history in responses or ignored scratch storage. Correct operative
-instructions when needed, but do not append reviewer comments to plans or designs.
-The approved design is the source of truth; added behaviour or architectural
-machinery needs user approval even when a reviewer recommends it.
+Keep review history in responses or ignored scratch storage. Correct operative instructions when needed, but do not append reviewer comments to plans or designs. The approved design is the source of truth; added behaviour or architectural machinery needs user approval even when a reviewer recommends it.
 
 ## Implement feedback
 

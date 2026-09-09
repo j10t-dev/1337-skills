@@ -9,8 +9,7 @@ New features, behaviour changes and bug fixes require a failing test before impl
 
 For refactoring, reuse existing coverage; test uncovered behaviour first. Where no useful executable test exists, inspect prose, validate configuration or check generated output through its generator. Do not add tests that merely mirror implementation. Required project checks still apply.
 
-Before source edits, establish the required-check baseline under
-`verification-before-completion`. Planning-only work does not need that test run.
+Before source edits, establish the required-check baseline under `verification-before-completion`. Planning-only work does not need that test run.
 
 ## Red, green, refactor
 
@@ -18,11 +17,7 @@ Before source edits, establish the required-check baseline under
 2. **Green.** Write the simplest implementation that passes. Keep the cycle within one reviewable unit, without extra features or unrelated refactoring. Run the test and applicable existing coverage. Fix code, not the test, when implementation fails. Investigate failures and new warnings against the baseline; distinguish expected diagnostics from defects.
 3. **Refactor.** Only after green, remove duplication, improve names or extract helpers. Keep tests green and add no behaviour. Repeat with the next failing test.
 
-For other failures, report the command, actual output and evidence to the controller.
-Never dismiss a failure as pre-existing without evidence, or treat a passing rerun
-as a diagnosis. Fix introduced regressions within scope; agree broader repairs
-with the user. Resolve failures before delivery unless the user explicitly accepts
-a stated limitation. Continue only independent authorised work while blocked.
+For other failures, report the command, actual output and evidence to the controller. Never dismiss a failure as pre-existing without evidence, or treat a passing rerun as a diagnosis. Fix introduced regressions within scope; agree broader repairs with the user. Resolve failures before delivery unless the user explicitly accepts a stated limitation. Continue only independent authorised work while blocked.
 
 ## Test quality
 

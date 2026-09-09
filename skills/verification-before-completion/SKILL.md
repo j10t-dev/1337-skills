@@ -9,17 +9,9 @@ Make completion claims only with applicable verification evidence. This applies 
 
 ## Baseline before implementation
 
-Before source edits, run required project checks on the starting revision. Record
-that revision, commands, exit statuses and concise results in ignored scratch
-storage. Resolve a failed or unavailable baseline with the user before proceeding.
-Planning-only work does not require a development test run. On resume, retain
-applicable baseline evidence; post-edit results do not establish a baseline.
+Before source edits, run required project checks on the starting revision. Record that revision, commands, exit statuses and concise results in ignored scratch storage. Resolve a failed or unavailable baseline with the user before proceeding. Planning-only work does not require a development test run. On resume, retain applicable baseline evidence; post-edit results do not establish a baseline.
 
-Investigate later failures against this evidence, changed code and environment.
-A pre-existing claim needs evidence; a green rerun alone does not explain an
-intermittent failure. Fix introduced regressions within scope and agree broader
-repairs with the user. Resolve failures before delivery unless the user explicitly
-accepts a stated limitation.
+Investigate later failures against this evidence, changed code and environment. A pre-existing claim needs evidence; a green rerun alone does not explain an intermittent failure. Fix introduced regressions within scope and agree broader repairs with the user. Resolve failures before delivery unless the user explicitly accepts a stated limitation.
 
 ## Evidence gate
 
@@ -27,7 +19,7 @@ accepts a stated limitation.
 2. Read existing results. Evidence survives handoffs and formatting differences; fix the report, not the test run.
 3. Run missing or invalidated checks. Rerun for relevant code, configuration or environment changes, failures or a specific doubt. Complete required project checks without broadening the suite by default.
 4. Verify actual output supports the claim, including exit status, failures and checked scope. Inspect delegated changes and recorded results rather than trusting a success report.
-5. The controller inspects the actual diff before task acceptance and the resulting implementation across affected execution paths before delivery. Check correctness against approved requirements, unexpected paths and unnecessary complexity. Reviewer approval and passing tests are supporting evidence, not substitutes.
+5. For delegated work, the controller inspects actual changes before accepting the task. During finishing, inspect the resulting implementation across affected execution paths for correctness against approved requirements and unnecessary complexity. Passing tests support that judgement; they do not replace it. This verification skill does not add a review stage to inline execution.
 6. Inspect recorded failures and agreed repairs. Combined acceptance needs evidence for both scopes. Resolve failures or record explicit user-accepted limitations before delivery.
 7. Report checked scope, actual results and remaining gaps concisely. Keep detailed evidence in scratch storage, not plans, designs, commits or permanent review documents. Task-only evidence does not prove the whole feature passed.
 

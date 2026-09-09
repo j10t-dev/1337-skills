@@ -34,30 +34,15 @@ If the design covers multiple independent subsystems, it should have been broken
 
 ## Design Conformance
 
-Read the approved design's `Program Design` section before choosing files or
-tasks. Treat its file layout, unit boundaries and responsibilities, public
-interfaces and consequential internal seams, and representative scenario call
-paths as constraints.
+Read the approved design's `Program Design` section before choosing files or tasks. Treat its file layout, unit boundaries and responsibilities, public interfaces and consequential internal seams, and representative scenario call paths as constraints.
 
-Validate those artefacts against the repository before planning. If the plan
-would move a responsibility, restructure approved files, introduce a public
-dependency, change a public signature or error contract, or replace an approved
-orchestration path, return `DesignRevisionRequired`, stop planning, and route the
-change through design revision and review. Name the approved artefact, proposed
-replacement, and exact conflict before stopping. Do not hide a material redesign
-in a task brief.
+Validate those artefacts against the repository before planning. If the plan would move a responsibility, restructure approved files, introduce a public dependency, change a public signature or error contract, or replace an approved orchestration path, return `DesignRevisionRequired`, stop planning, and route the change through design revision and review. Name the approved artefact, proposed replacement, and exact conflict before stopping. Do not hide a material redesign in a task brief.
 
-Specify private helpers, algorithms and integration code in the plan. Implementers
-may make local syntax or naming adjustments that preserve the planned structure,
-behaviour and contracts. Binding an approved dependency as private state of the unit that owns
-an unchanged method is equivalent local mechanics when the design leaves binding
-unspecified; it does not permit ambient or global state or a new public contract.
+Specify private helpers, algorithms and integration code in the plan. Implementers may make local syntax or naming adjustments that preserve the planned structure, behaviour and contracts. Binding an approved dependency as private state of the unit that owns an unchanged method is equivalent local mechanics when the design leaves binding unspecified; it does not permit ambient or global state or a new public contract.
 
 ## File Structure
 
-Before defining tasks, map every approved programme-design file to its created,
-modified, or removed plan path and responsibility. Preserve the approved
-boundaries and supply the concrete implementation within them.
+Before defining tasks, map every approved programme-design file to its created, modified, or removed plan path and responsibility. Preserve the approved boundaries and supply the concrete implementation within them.
 
 - Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
 - You reason best about code you can hold in context at once, and your edits are more reliable when files are focused. Prefer smaller, focused files over large ones that do too much.
@@ -72,22 +57,17 @@ This structure informs the task decomposition. Each task should produce self-con
 - The complete approved change and its implementation sequence.
 
 **Task = One reviewable vertical behaviour increment**
-- One subagent and one fresh review gate per task.
+- SDD uses one implementer and task review per task. Inline execution verifies tasks and hands off to finishing for review.
 - Normally suitable for one commit.
-- Traverses every affected layer needed to demonstrate one behaviour; it need
-  not span UI to persistence when the affected system has fewer layers.
+- Traverses every affected layer needed to demonstrate one behaviour; it need not span UI to persistence when the affected system has fewer layers.
 
 **Subtask = Logical phase within a task**
-- Failing test, minimal implementation, focused verification, refactor, and
-  integrated outcome verification.
+- Failing test, minimal implementation, focused verification, refactor, and integrated outcome verification.
 
 **Step = Meaningful implementation or verification action**
-- State the requirement or exact check and expected result; size steps by the
-  meaningful work.
+- State the requirement or exact check and expected result; size steps by the meaningful work.
 
-A normal task is one reviewable vertical behaviour increment. Write every task,
-including a decomposition-only or outline response, with each bold field below
-in this order:
+A normal task is one reviewable vertical behaviour increment. Write every task, including a decomposition-only or outline response, with each bold field below in this order:
 
 ```markdown
 **Behaviour:** What becomes possible after this task
@@ -104,20 +84,9 @@ in this order:
 
 ## Vertical Task Boundaries
 
-Choose the smallest increment that has its own test cycle, observable integrated
-outcome, and meaningful review gate. The first task is normally a tracer bullet
-through the primary approved scenario, proving the boundaries and main call
-path. Then prefer core behaviour, the smallest viable slice, highest novelty or
-integration risk, remaining scenario branches, and finally hardening or polish
-that cannot fit naturally into an earlier slice.
+Choose the smallest increment that has its own test cycle, observable integrated outcome, and meaningful review gate. The first task is normally a tracer bullet through the primary approved scenario, proving the boundaries and main call path. Then prefer core behaviour, the smallest viable slice, highest novelty or integration risk, remaining scenario branches, and finally hardening or polish that cannot fit naturally into an earlier slice.
 
-Split an oversized task by smaller observable behaviour or scenario branch, not
-by technical layer. Treat each independently observable branch as a separate task
-by default. Combine branches only when they form one coherent outcome and
-coupling or task size would make separation impractical. Migrations, shared
-infrastructure, scaffolding, and preparatory refactors belong to the first
-behaviour slice that needs them unless
-they form an independently safe, testable, and reviewable prerequisite.
+Split an oversized task by smaller observable behaviour or scenario branch, not by technical layer. Treat each independently observable branch as a separate task by default. Combine branches only when they form one coherent outcome and coupling or task size would make separation impractical. Migrations, shared infrastructure, scaffolding, and preparatory refactors belong to the first behaviour slice that needs them unless they form an independently safe, testable, and reviewable prerequisite.
 
 A separate foundation task must state:
 
@@ -125,26 +94,15 @@ A separate foundation task must state:
 - the independently verifiable state it produces;
 - the later behaviour that consumes it.
 
-Every task ends with integrated verification of its observable outcome. Unit
-checks alone are insufficient when the approved scenario crosses boundaries.
+Every task ends with integrated verification of its observable outcome. Unit checks alone are insufficient when the approved scenario crosses boundaries.
 
-Mark implementation tasks parallel only when they do not conflict in files,
-interfaces, migrations or state transitions and the executor provides isolated
-working copies. Shared-copy SDD implementation stays serial; independent
-read-only legwork may run alongside it. Reduced parallelism is preferable to
-deferring integration. Sequence shared entrypoints and stateful changes rather
-than claiming unsafe independence.
+Mark implementation tasks parallel only when they do not conflict in files, interfaces, migrations or state transitions and the executor provides isolated working copies. Shared-copy SDD implementation stays serial; independent read-only legwork may run alongside it. Reduced parallelism is preferable to deferring integration. Sequence shared entrypoints and stateful changes rather than claiming unsafe independence.
 
-Retain practical sizing discipline: normally 1–5 tasks per plan and 10 minutes
-to 2 hours of work per task. A task must justify fresh subagent context transfer,
-remain small enough for one review gate, and group files that change together.
-Do not create micro-tasks for setup overhead or split tightly coupled files only
-to increase apparent parallelism.
+Retain practical sizing discipline: normally 1–5 tasks per plan and 10 minutes to 2 hours of work per task. A task must justify fresh subagent context transfer, remain small enough for one review gate, and group files that change together. Do not create micro-tasks for setup overhead or split tightly coupled files only to increase apparent parallelism.
 
 ## Plan Document Header
 
-Keep global constraints, shared contracts and required repository context before
-the first task heading so `scripts/task-brief` includes them in every handoff.
+Keep global constraints, shared contracts and required repository context before the first task heading so `scripts/task-brief` includes them in every handoff.
 
 **Every plan MUST start with this header:**
 
@@ -180,10 +138,7 @@ the first task heading so `scripts/task-brief` includes them in every handoff.
 
 ## Global Constraints
 
-[The spec's project-wide requirements — version floors, dependency limits,
-naming and copy rules, platform requirements — one line each, with exact
-values copied verbatim from the spec. Every task's requirements implicitly
-include this section.]
+[The spec's project-wide requirements — version floors, dependency limits, naming and copy rules, platform requirements — one line each, with exact values copied verbatim from the spec. Every task's requirements implicitly include this section.]
 
 ## Shared contracts
 
@@ -194,44 +149,19 @@ include this section.]
 
 ## Task implementation
 
-Retain `## Task N:` headings and all plan metadata. Every task requires exactly
-one `**Commit:**` conventional-commit subject describing delivered behaviour,
-with no task number, plan slug, run ID or metadata. This is the exact subject
-supplied to the controller helper. A missing subject blocks execution until the
-user supplies it.
+Retain `## Task N:` headings and all plan metadata. Every task requires exactly one `**Commit:**` conventional-commit subject describing delivered behaviour, with no task number, plan slug, run ID or metadata. This is the exact subject supplied to the controller helper. A missing subject blocks execution until the user supplies it.
 
-Use the fields above to make each extracted brief self-sufficient. Copy exact
-values, signatures, cases and constraints verbatim; supply producer/consumer
-contracts without requiring access to neighbouring tasks. The controller keeps
-the full design and plan; task-scoped agents receive only their brief, supplied
-context and explicitly named artefacts.
+Use the fields above to make each extracted brief self-sufficient. Copy exact values, signatures, cases and constraints verbatim; supply producer/consumer contracts without requiring access to neighbouring tasks. The controller keeps the full design and plan; task-scoped agents receive only their brief, supplied context and explicitly named artefacts.
 
-**Binding:** Behaviour, scenario, observable outcome, dependencies, files,
-public contracts, security properties, architectural boundaries and explicitly
-required decisions or snippets constrain implementation. Include exact consumed
-and produced names, parameters, return/error contracts and necessary boundary
-decisions. State exclusions. Escalate consequential redesign for controller
-resolution and any required user approval.
+**Binding:** Behaviour, scenario, observable outcome, dependencies, files, public contracts, security properties, architectural boundaries and explicitly required decisions or snippets constrain implementation. Include exact consumed and produced names, parameters, return/error contracts and necessary boundary decisions. State exclusions. Escalate consequential redesign for controller resolution and any required user approval.
 
-**Code:** Include complete changed function bodies, new helpers, test bodies and
-fixture construction. Name the existing code to reuse and show integration edits.
-The plan fixes implementation structure as well as behaviour. An equivalent public
-result does not justify a different private architecture. Local syntax or naming
-adjustments are acceptable; missing implementation decisions go to the controller.
+**Code:** Include complete changed function bodies, new helpers, test bodies and fixture construction. Name the existing code to reuse and show integration edits. The plan fixes implementation structure as well as behaviour. An equivalent public result does not justify a different private architecture. Local syntax or naming adjustments are acceptable; missing implementation decisions go to the controller.
 
-**Cases and verification:** Specify actual inputs, preconditions, expected
-results and side effects. Require one parameterised case table when inputs
-exercise the same behaviour; keep independently different behaviours in separate
-tests. Derive expectations independently of implementation (see
-@../test-driven-development/writing-good-tests.md). Require TDD's RED before
-implementation, focused GREEN and integrated outcome verification, with exact
-commands and expected results. Apply TDD's prose/configuration exception when no
-useful executable test exists; required project checks still apply.
+**Cases and verification:** Specify actual inputs, preconditions, expected results and side effects. Require one parameterised case table when inputs exercise the same behaviour; keep independently different behaviours in separate tests. Derive expectations independently of implementation (see @../test-driven-development/writing-good-tests.md). Require TDD's RED before implementation, focused GREEN and integrated outcome verification, with exact commands and expected results. Apply TDD's prose/configuration exception when no useful executable test exists; required project checks still apply.
 
 ### Representative task
 
-This hypothetical Python invitation service illustrates the required code detail.
-Its paths and commands are examples, not checks to run in this skill repository.
+This hypothetical Python invitation service illustrates the required code detail. Its paths and commands are examples, not checks to run in this skill repository.
 
 ````markdown
 ## Task 1: Reject expired invitation acceptance
@@ -292,16 +222,12 @@ def accept_invitation(
 
 Code steps require actual code. These are blocking gaps:
 
-- Necessary behaviour or decisions left as "TBD", "TODO", "add validation" or
-  "handle edge cases" without actual rules and outcomes.
-- Production or test bodies left to the implementer, including generic instructions
-  to add validation, helpers, fixtures or integration without showing the code.
+- Necessary behaviour or decisions left as "TBD", "TODO", "add validation" or "handle edge cases" without actual rules and outcomes.
+- Production or test bodies left to the implementer, including generic instructions to add validation, helpers, fixtures or integration without showing the code.
 - Tests requested without concrete cases and independently derived expectations.
-- An undecided boundary, such as whether `expiresAt == now` is expired; clarify
-  before dependent implementation.
+- An undecided boundary, such as whether `expiresAt == now` is expired; clarify before dependent implementation.
 - "Similar to Task N" instead of the requirements the extracted brief needs.
-- Consumed types, functions or contracts neither supplied nor available in
-  explicitly named repository context.
+- Consumed types, functions or contracts neither supplied nor available in explicitly named repository context.
 
 ## Remember
 - Exact file paths always
@@ -342,36 +268,23 @@ Fix any issues inline before sharing the plan.
 
 ## Independent Review
 
-- Load the `requesting-document-review` skill and run it on the plan document
-  you just wrote (`type=plan`, `design-ref` = the design document this plan
-  implements).
-- This handoff always runs — there is no trivial-skip path for "the plan
-  looks fine."
-- Once that skill's loop terminates, proceed to Execution Handoff with the
-  resulting plan.
+- Load the `requesting-document-review` skill and run it on the plan document you just wrote (`type=plan`, `design-ref` = the design document this plan implements).
+- This handoff always runs — there is no trivial-skip path for "the plan looks fine."
+- Once that skill's loop terminates, proceed to Execution Handoff with the resulting plan.
 
 ## Execution Handoff
 
 **VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks.**
 
-Keep approved designs and plans after delivery. Review history, task reports and
-verification logs remain in ignored scratch storage, outside commits. Amend plans
-only for operative corrections or approved requirement changes. The executor runs
-and records the required-check baseline before source edits; planning-only work
-does not need a development test run.
+Keep approved designs and plans after delivery. Review history, task reports and verification logs remain in ignored scratch storage, outside commits. Amend plans only for operative corrections or approved requirement changes. The executor runs and records the required-check baseline before source edits; planning-only work does not need a development test run.
 
-If the user requested planning only, report the saved plan and stop. If they
-already requested implementation and the plan preserves the approved design,
-continue with their chosen executor without another approval prompt. Otherwise
-use SDD when native subagents are available, or inline execution when they are
-not, provided this preserves required review guarantees. Ask about the options
-below only when that choice genuinely needs the user's decision:
+If the user requested planning only, report the saved plan and stop. If they already requested implementation and the plan preserves the approved design, continue with their chosen executor without another approval prompt. Otherwise use SDD when native subagents are available, or inline execution when they are not, provided this preserves required review guarantees. Ask about the options below only when that choice genuinely needs the user's decision:
 
 **"Plan complete and saved to `<plan-file>`. Two execution options:**
 
 **1. Subagent-Driven (recommended where the harness supports subagents)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
 
-**2. Inline Execution** - Execute tasks in this session using executing-plans, with its verification and final-review gates
+**2. Inline Execution** - Execute and verify tasks in this session using executing-plans, then hand off to finishing-development
 
 **Which approach?"**
 
@@ -384,4 +297,4 @@ If the current harness has no subagent support, skip the question and use Inline
 
 **If Inline Execution chosen:**
 - Load the `executing-plans` skill via the current harness's skill-loading mechanism
-- Continuous execution with verification and final review; pause only for consequential decisions or missing authority
+- Execute and verify, then hand off to finishing-development for final review and delivery; pause execution for consequential decisions or missing authority

@@ -51,21 +51,11 @@ You are the only reviewer this boundary gets. Reach your verdict from your own r
 {REQUIREMENTS}
 {PLAN_REFERENCE}
 
-Use the supplied brief or request when no plan exists. The approved design is the
-source of truth. Check both requested behaviour and implementation complexity;
-identical outputs do not justify extra machinery. Proposed scope or architectural
-changes require user approval, not merely a reviewer recommendation.
+Use the supplied brief or request when no plan exists. The approved design is the source of truth. Check both requested behaviour and implementation complexity; identical outputs do not justify extra machinery. Proposed scope or architectural changes require user approval, not merely a reviewer recommendation.
 
-Return findings in your response or the controller's assigned ignored scratch file.
-Do not write review history into plans/designs or permanent review directories.
+Return findings in your response or the controller's assigned ignored scratch file. Do not write review history into plans/designs or permanent review directories.
 
-For final review, the controller supplies original rejected findings, their
-rulings and evidence, and all repair work items with briefs, reports and recorded
-resolution or user exceptions. Independently reassess that evidence; a controller
-rejection is not an instruction to suppress a finding. Check both original and
-repair requirements, including separately managed failures. Flag missing evidence
-or unresolved work that blocks delivery. For combined repair re-review, both
-scopes must be explicitly included in the supplied requirements.
+For final review, the controller supplies original rejected findings, their rulings and evidence, and all repair work items with briefs, reports and recorded resolution or user exceptions. Independently reassess that evidence; a controller rejection is not an instruction to suppress a finding. Check both original and repair requirements, including separately managed failures. Flag missing evidence or unresolved work that blocks delivery. For combined repair re-review, both scopes must be explicitly included in the supplied requirements.
 
 **Diff File (preferred):**
 {DIFF_FILE}
@@ -95,10 +85,7 @@ scopes must be explicitly included in the supplied requirements.
 - Security concerns?
 
 **Testing:**
-Reuse inspected test evidence for the current code/configuration under
-`verification-before-completion`. Run a focused check only for missing or
-invalidated evidence or a concrete unresolved doubt; do not repeat a suite
-merely because another agent or workflow phase supplied the result.
+Reuse inspected test evidence for the current code/configuration under `verification-before-completion`. Run a focused check only for missing or invalidated evidence or a concrete unresolved doubt; do not repeat a suite merely because another agent or workflow phase supplied the result.
 
 - Tests actually test logic (not mocks)?
 - Edge cases covered?
@@ -120,14 +107,9 @@ merely because another agent or workflow phase supplied the result.
 
 ## Calibration
 
-Categorise issues by actual severity. Not everything is Critical.
-Acknowledge what was done well before listing issues — accurate praise
-helps the implementer trust the rest of the feedback.
+Categorise issues by actual severity. Not everything is Critical. Acknowledge what was done well before listing issues — accurate praise helps the implementer trust the rest of the feedback.
 
-If you find significant deviations from the plan, flag them specifically
-so the implementer can confirm whether the deviation was intentional.
-If you find issues with the plan itself rather than the implementation,
-say so.
+If you find significant deviations from the plan, flag them specifically so the implementer can confirm whether the deviation was intentional. If you find issues with the plan itself rather than the implementation, say so.
 
 ## Output Format
 

@@ -1,6 +1,6 @@
 # Review handling
 
-Load for review findings, unverifiable requirements or implementer escalation. Root `SKILL.md` retains the acceptance gate and controller-only VCS authority. Inline controllers use the triage and repair rules with `../executing-plans/SKILL.md`'s verification and final-review pattern, not SDD's per-task dispatch or verdict requirements. Its inline repair sequence replaces the SDD dispatch steps below.
+Load for review findings, unverifiable requirements or implementer escalation. Root `SKILL.md` retains the acceptance gate and controller-only VCS authority. These are SDD controller rules, not an inline execution step. Inline execution reports blockers to its caller; `finishing-development` owns its subsequent review and review fixes.
 
 ## Findings and Handling Reviewer items
 
@@ -26,20 +26,11 @@ For BLOCKED, assess the evidence. Supply missing context or use a more capable m
 
 ## Apparently unrelated failures
 
-Investigate failures against the recorded baseline, changed code and environment.
-The implementer reports commands, actual output and evidence; the controller checks
-the attribution. A pre-existing claim needs evidence, and a passing rerun alone is
-not a diagnosis. Fix introduced regressions within scope. Agree broader repairs
-or a stated delivery limitation with the user before proceeding; finding a defect
-does not authorise a repair programme. Keep investigation and review records in
-ignored scratch storage.
+Investigate failures against the recorded baseline, changed code and environment. The implementer reports commands, actual output and evidence; the controller checks the attribution. A pre-existing claim needs evidence, and a passing rerun alone is not a diagnosis. Fix introduced regressions within scope. Agree broader repairs or a stated delivery limitation with the user before proceeding; finding a defect does not authorise a repair programme. Keep investigation and review records in ignored scratch storage.
 
 ### Bounded blocking repair in the active change
 
-Use this exception only for a bounded repair needed to pass the active task's
-required checks. Obtain user agreement first if it extends approved scope. Keep
-the repair and regression coverage limited to the demonstrated defect; diagnostics
-do not justify a new framework. No action permissions expand.
+Use this exception only for a bounded repair needed to pass the active task's required checks. Obtain user agreement first if it extends approved scope. Keep the repair and regression coverage limited to the demonstrated defect; diagnostics do not justify a new framework. No action permissions expand.
 
 1. Record a scope ruling identifying the failure, evidence, repair brief/report paths and why the repair is bounded and blocking. Keep the task in progress; this repair is not a separately accepted commit or a new ledger state.
 2. Before combined acceptance, record the original and replacement prospective commit subjects and reason in a ruling. Amend only the still-unaccepted task's `**Commit:**` subject in the plan. This narrow plan-text authority grants neither documentation-repository VCS nor accepted-commit amendment. Regenerate its task brief so exact-subject reconciliation uses the amended plan.
@@ -51,11 +42,6 @@ If the repair exceeds its agreed scope or needs architectural changes, stop affe
 
 ### Non-blocking separate repair
 
-Report unrelated findings with evidence and obtain user agreement on disposition.
-For an agreed separate repair, use the existing unblocking/final-fix pending subject
-form with a scratch brief and evidence. Dispatch serially after active-task acceptance,
-then verify, independently review and inspect the actual changes before acceptance.
-Resolve failures before delivery unless the user explicitly accepts a stated limitation.
-Expected diagnostic output and advisory polish do not automatically become repairs.
+Report unrelated findings with evidence and obtain user agreement on disposition. For an agreed separate repair, use the existing unblocking/final-fix pending subject form with a scratch brief and evidence. Dispatch serially after active-task acceptance, then verify, independently review and inspect the actual changes before acceptance. Resolve failures before delivery unless the user explicitly accepts a stated limitation. Expected diagnostic output and advisory polish do not automatically become repairs.
 
 Final review receives all repair work items, original rejected findings and rulings and may reassess them independently. Cleanup must preserve unresolved work and unreported consequential decisions, except work covered by an explicit user-accepted limitation.

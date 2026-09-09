@@ -38,20 +38,9 @@ Subagent/delegation tool (general-purpose):
     ## Calibration
 
     **Only flag issues that would cause real problems during implementation.**
-    An implementer building the wrong thing or getting stuck is an issue.
-    Minor wording, stylistic preferences, and "nice to have" suggestions are not.
+    An implementer building the wrong thing or getting stuck is an issue. Minor wording, stylistic preferences, and "nice to have" suggestions are not.
 
-    Approve unless there are serious gaps — missing requirements from the design,
-    contradictory requirements, missing necessary decisions, or tasks so vague they can't be acted on.
-    Behaviour contracts do not replace implementation and test bodies. Require
-    actual code, existing context and integration edits. Accept harmless syntax or
-    naming differences, but not unspecified private architecture. The approved
-    design is the source of truth; review cannot add behaviour or machinery without
-    user approval. Return findings in your response, not a permanent review file,
-    and do not delegate further.
-    Return Issues Found for missing, duplicate, malformed, ambiguous, or unresolved `Builds On` values. Return Issues Found for missing, duplicate, malformed, or pre-existing `Feature Bookmark` values. Return Issues Found for guessed or unsuitable commit-subject values.
-    Do not require UI-to-database breadth when the affected system has fewer layers.
-    Prefer the simplest code that implements the approved scenario.
+    Approve unless there are serious gaps — missing requirements from the design, contradictory requirements, missing necessary decisions, or tasks so vague they can't be acted on. Behaviour contracts do not replace implementation and test bodies. Require actual code, existing context and integration edits. Accept harmless syntax or naming differences, but not unspecified private architecture. The approved design is the source of truth; review cannot add behaviour or machinery without user approval. Return findings in your response, not a permanent review file, and do not delegate further. Return Issues Found for missing, duplicate, malformed, ambiguous, or unresolved `Builds On` values. Return Issues Found for missing, duplicate, malformed, or pre-existing `Feature Bookmark` values. Return Issues Found for guessed or unsuitable commit-subject values. Do not require UI-to-database breadth when the affected system has fewer layers. Prefer the simplest code that implements the approved scenario.
 
     ## Output Format
 

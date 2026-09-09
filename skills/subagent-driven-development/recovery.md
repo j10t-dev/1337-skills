@@ -13,9 +13,11 @@ Before any redispatch, prove:
 
 ## Combined repair intent
 
-Before applying a recovery row to an unaccepted combined task, inspect its repair brief, reports and scope/subject rulings. Rulings explain intent, not completion; only `->` state lines identify accepted work.
+Before applying a recovery row to an unaccepted combined task, inspect its recorded repair requirements, evidence and scope/subject rulings. Rulings explain intent, not completion; only `->` state lines identify accepted work.
 
-If interrupted after repair scope was recorded but before subject amendment, reconcile the recorded original and replacement prospective subjects and reason against the still-unaccepted task. Complete the narrow plan-text correction only when that intent and repository state agree exactly. If the replacement is missing, contradictory or otherwise incomplete, stop affected work and ask rather than guessing. Regenerate the task brief from the amended plan before review. Resume only the recorded serial repair or dual-scope review, preserving its fix round; do not redispatch an original-only brief over repair edits.
+If interrupted after repair scope was recorded but before subject amendment, reconcile the recorded original and replacement prospective subjects and reason against the still-unaccepted task. Complete the narrow plan-text correction only when that intent and repository state agree exactly. If the replacement is missing, contradictory or otherwise incomplete, stop affected work and ask rather than guessing.
+
+For SDD, regenerate the task brief from the amended plan before review. Resume only the recorded serial repair or dual-scope review, preserving its fix round; do not redispatch an original-only brief over repair edits. For inline execution, resume implementation and verification of the recorded task and repair, preserving both sets of edits. Review remains with the finishing workflow.
 
 After combined acceptance, use the amended plan's exact subject and the existing commit/ledger identities. A ruling never substitutes for those identities or authorises accepted-commit amendment.
 
@@ -23,12 +25,7 @@ After combined acceptance, use the amended plan's exact subject and the existing
 
 After those checks, perform only the action in the first matching recovery row. An unblocking fix uses the final-fix rows identically.
 
-A recorded non-blocking follow-up does not own the active task's edits. While a
-task is in progress, reconcile and resume that task first; pending-fix rows apply
-only once the active task is accepted and the recorded repair owns the working
-change. If the brief/ruling evidence does not establish ownership, stop and ask.
-For inline execution, resume inline work or its existing final review rather
-than adding a task subagent. The state and identity checks are unchanged.
+A recorded non-blocking follow-up does not own the active task's edits. While a task is in progress, reconcile and resume that task first; pending-fix rows apply only once the active task is accepted and the recorded repair owns the working change. If the brief/ruling evidence does not establish ownership, stop and ask. For inline plans, resume task work in `executing-plans`; final-review and final-fix states return to `finishing-development` or the caller that owns finishing. Do not add a task subagent or move review into execution. The state and identity checks are unchanged.
 
 | Observed state | One recovery action |
 |---|---|
@@ -43,4 +40,4 @@ than adding a task subagent. The state and identity checks are unchanged.
 | empty `@` above feature bookmark with no pending entry | Start the first uncompleted task or final review. |
 | unexplained non-empty `@`, described active `@`, divergence, or identity mismatch | Ambiguous: stop and ask. |
 
-Do not use `jj op log` as a substitute ledger and do not repair any state outside this table. If no row matches exactly, stop and ask. Acceptance follows root `SKILL.md`, Accepting a Task or Final Fix.
+Do not use `jj op log` as a substitute ledger and do not repair any state outside this table. If no row matches exactly, stop and ask. SDD acceptance follows root `SKILL.md`, Accepting a Task or Final Fix. Inline task acceptance follows `executing-plans`; its final-fix acceptance belongs to `finishing-development`.

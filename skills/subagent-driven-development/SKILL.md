@@ -176,9 +176,7 @@ Scan the plan once for conflicts before Task 1 dispatches, and write the result 
 - one row per task, checking supplied production/test code against behaviour, interfaces, cases and side effects; missing bodies or integration decisions block dispatch
 - one row per plan instruction the reviewer rubric treats as a defect, such as a test that asserts nothing or verbatim duplication of a logic block
 
-Check that code steps are complete and producer/consumer signatures agree. Allow
-local syntax or naming adjustments, not unspecified implementation structure.
-Additional behaviour, dependencies or architectural machinery require approval.
+Check that code steps are complete and producer/consumer signatures agree. Allow local syntax or naming adjustments, not unspecified implementation structure. Additional behaviour, dependencies or architectural machinery require approval.
 
 "The scan is clean" without those rows is not a scan you ran.
 
@@ -208,8 +206,7 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
 - A finding labelled plan-mandated — or any finding that conflicts with what the plan's text requires — is yours to rule on: weigh the finding against the plan text, decide with the design as the binding authority, and record the ruling before you act on it. Do not dismiss the finding because the plan mandates it, and do not dispatch a fix that contradicts the plan without a recorded ruling.
 - Final review packages use exact revisions appropriate to their state:
   - Stable final review: `scripts/review-package RUN_BASE FEATURE_BOOKMARK`
-  - Pending final-fix re-review: `scripts/review-package RUN_BASE @`
-  `RUN_BASE` is the full run-base commit ID recorded in the ledger.
+  - Pending final-fix re-review: `scripts/review-package RUN_BASE @` `RUN_BASE` is the full run-base commit ID recorded in the ledger.
 - Every fix round carries the implementer contract: the implementer re-runs the tests covering its change and reports the results. Name the covering test files in the assignment — a one-line fix does not need the whole suite. Before re-dispatching the reviewer, confirm the fix report contains the covering tests, the command run, and the output.
 - A final-review fixer follows the same VCS ban as an implementer. A `**Commit:**` line belongs to the controller, does not authorise VCS commands, and must be ignored while the fixer edits and verifies.
 - If the final whole-branch review returns findings, load `review-handling.md` and triage first. If fixes remain, append this exact durable entry before dispatching ONE fix subagent with the complete unresolved findings list:
@@ -224,10 +221,7 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
 
 ## File Handoffs
 
-Use ignored `.agents/sdd/` scratch files for task context and execution evidence.
-Initialise it through `scripts/sdd-workspace` before writing the ledger or reports.
-Keep approved designs and plans in the external docs repository after delivery;
-never append review commentary or archive execution material there.
+Use ignored `.agents/sdd/` scratch files for task context and execution evidence. Initialise it through `scripts/sdd-workspace` before writing the ledger or reports. Keep approved designs and plans in the external docs repository after delivery; never append review commentary or archive execution material there.
 
 - **Task-scoped context boundary:** Every implementer, fixer, and task-reviewer dispatch must state that its supplied brief, context, and named artefacts are its complete boundary. The subagent must not locate the parent plan, neighbouring tasks, progress ledger, prior-task materials, or session history. Missing requirements are escalated to the controller rather than discovered by broadening scope. This restriction does not apply to the final whole-branch reviewer.
 - **Task brief:** run `scripts/task-brief PLAN_FILE N`. It includes the common plan preamble and the selected task, preserving global constraints, shared contracts, required context and complete production/test code. Read the generated brief and check that it contains every requirement the task needs before dispatch. Keep common requirements before the first task in the plan. Add only necessary earlier-task interface facts and resolved operative corrections; never accumulated review history.
@@ -274,15 +268,9 @@ On resume or unexplained state, load [recovery.md](recovery.md) and reconcile be
 
 ## Finish
 
-Complete the controller's final code validation before delivery. Report the
-result, verification and consequential rulings or user-accepted limitations
-concisely. Keep the full review history in scratch until that handoff; do not
-copy it into designs, plans or permanent evidence directories. Remove scratch
-only after the final gate and handoff, with no unresolved work except explicit
-user-accepted limitations.
+Complete the controller's final code validation before delivery. Report the result, verification and consequential rulings or user-accepted limitations concisely. Keep the full review history in scratch until that handoff; do not copy it into designs, plans or permanent evidence directories. Remove scratch only after the final gate and handoff, with no unresolved work except explicit user-accepted limitations.
 
-Pass existing verification and final-review evidence to finishing-development
-at Step 3. Approved designs and plans remain in the external docs repository.
+Pass existing verification and final-review evidence to finishing-development at Step 3. Approved designs and plans remain in the external docs repository.
 
 ## Prompt Templates
 

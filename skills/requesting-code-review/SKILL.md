@@ -41,8 +41,7 @@ Reuse reviews of unchanged code and requirements. Use `verification-before-compl
 
 Use the current harness's subagent/delegation tool with the code-reviewer type if available, filling the template at `code-reviewer.md`
 
-Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch;
-reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
+Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch; reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
 
 **3. Act on feedback:**
 - Triage findings against requirements and repository evidence at any round.
