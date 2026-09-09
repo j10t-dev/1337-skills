@@ -11,13 +11,13 @@ Subagent/delegation tool (general-purpose):
 
     ## Task Description
 
-    Read your task brief first: [BRIEF_FILE] It contains the full task text from the plan.
+    Your task: [TASK_BRIEF, supplied inline or by file reference]
 
     ## Context
 
     [Scene-setting: where this fits, dependencies, architectural context, and any cross-task interfaces (exact signatures) the brief cannot know]
 
-    Applicable baseline: [pre-edit revision, commands, exit statuses and concise results, supplied here or in an explicitly named ignored scratch file]
+    Applicable baseline: [pre-edit revision, commands, exit statuses, elapsed times and results, supplied here or by reference]
 
     ## Context Boundary
 
@@ -62,9 +62,9 @@ Subagent/delegation tool (general-purpose):
 
     A `**Commit:**` line belongs to the controller. It does not authorise you to run VCS commands; ignore it while editing and verifying the task.
 
-    **While you work:** Investigate failures against supplied baseline evidence, changed code and environment. Report the command, actual output and evidence to the controller; do not dismiss a failure as pre-existing or call a rerun a diagnosis. Fix introduced regressions within scope. Broader repairs require controller escalation and user agreement. Continue only independent authorised work while blocked. Write only assigned paths; further delegation requires controller permission. Keep reports/logs in assigned ignored scratch paths, never in plans, designs or permanent review directories.
+    **While you work:** Investigate failures against supplied baseline evidence, changed code and environment. Report the command, actual output and evidence to the controller; do not dismiss a failure as pre-existing or call a rerun a diagnosis. Fix introduced regressions within scope. Broader repairs require controller escalation and user agreement. Continue only independent authorised work while blocked. Write only assigned paths; further delegation requires controller permission.
 
-    While iterating, run focused covering tests and the project's required checks. Use verification-before-completion for evidence reuse. Broaden or repeat checks only for relevant changes, failures or concrete unresolved concerns; a full suite is not automatic at every task handoff.
+    While iterating, run tests that exercise the changed behaviour and the project's required checks. Use verification-before-completion for evidence reuse. Broaden or repeat checks only for relevant changes, failures or concrete unresolved concerns; a full suite is not automatic at every task handoff.
 
     ## Code Organisation
 
@@ -103,33 +103,20 @@ Subagent/delegation tool (general-purpose):
 
     ## After Review Findings
 
-    If a reviewer finds issues and you fix them, re-run the tests that cover the amended code and append the results to your report file. Reviewers will not re-run tests for you — your report is the test evidence.
+    After fixing an issue, run the tests that exercise the change and report the results.
 
-    ## Report Format
+    ## Response
 
-    Write your full report to [REPORT_FILE]:
-    - What you implemented (or what you attempted, if blocked)
-    - What you tested and test results
-    - **TDD Evidence** (if TDD was required):
-      - RED: command run, relevant failing output before implementation, why the failure was expected
-      - GREEN: command run and relevant passing output after implementation
-    - Files changed
-    - Self-review findings (if any)
-    - Any issues or concerns
+    Return your status, what changed, test commands/results with elapsed times, and any concerns. Include the observed RED and GREEN results when TDD applies. Reference a file only if it helps convey lengthy output.
 
-    Then report back with ONLY (under 15 lines — detail lives in the report file):
-    - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    - One-line test summary, including any unexplained output
-    - Your concerns, if any
-    - The report file path
+    **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
 
-    If BLOCKED or NEEDS_CONTEXT, put the specifics in the final message itself — the controller acts on it directly.
+    If BLOCKED or NEEDS_CONTEXT, state what you need from the controller.
 
     Use DONE_WITH_CONCERNS if you completed the work but have doubts about correctness. Use BLOCKED if you cannot complete the task. Use NEEDS_CONTEXT if you need information that wasn't provided. Never silently produce work you're unsure about.
 ```
 
 **Placeholders:**
 - `[MODEL]` — REQUIRED: implementer model selected via `working-with-subagents`
-- `[BRIEF_FILE]` — REQUIRED: `scripts/task-brief PLAN N` prints the path
-- `[REPORT_FILE]` — REQUIRED: name it after the brief (`task-N-report.md`)
+- `[TASK_BRIEF]` — complete task text and shared requirements; `scripts/task-brief PLAN N` can extract them when a file is useful
 - `[directory]` — working directory for the task

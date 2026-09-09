@@ -121,14 +121,7 @@ Before approval, check the proposed design against the user's request and agreed
 
 ### Write and review the design
 
-Design and plan documents live in the external docs repository, separate from the code repository. Resolve `$DOCS_ROOT` from the environment or the default in the active instructions, then expand it to an absolute path. If neither source defines it, ask the user. Never guess or write these documents in the code repository.
-
-Use these paths:
-
-- Design: `$DOCS_ROOT/$projectName/designs/<slug>.md`
-- Plan: `$DOCS_ROOT/$projectName/plans/<slug>.md`
-
-Derive `$projectName` from the repository directory unless the user specifies a different docs project. Use a user-provided slug, a suitable current jj bookmark or change description, or ask for one. Create the design directory if needed.
+Read `../shared/docs-root.md` for document locations and naming, then write the design.
 
 Before sharing the written design, self-review it for:
 

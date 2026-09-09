@@ -13,20 +13,20 @@ Subagent/delegation tool (general-purpose):
 
     ## What Was Requested
 
-    Read the task brief: [BRIEF_FILE]
+    Task requirements: [TASK_BRIEF, supplied inline or by file reference]
 
-    For a combined repair, the controller also supplies the repair brief and repair report as named artefacts. Explicitly review both the original and repair requirements against the combined diff, giving spec and quality verdicts for each scope. Verify applicable check evidence for both. The repair is authorised scope, not an unexplained addition.
+    Include any agreed repair in the review of the task.
 
     Global constraints from the spec/design that bind this task: [GLOBAL_CONSTRAINTS]
 
     ## What the Implementer Claims They Built
 
-    Read the implementer's report: [REPORT_FILE]
-    Applicable baseline: [pre-edit revision, commands, exit statuses and concise results, supplied here or in an explicitly named ignored scratch file]
+    Implementer's response: [IMPLEMENTER_RESULT]
+    Applicable baseline: [pre-edit revision, commands, exit statuses, elapsed times and results]
 
     ## Context Boundary
 
-    The supplied task brief, global constraints, baseline evidence, implementer report and diff package, plus any explicitly supplied repair brief/report, are your complete review boundary.
+    The supplied task, global constraints, baseline, implementer response and diff are your complete review boundary.
 
     Do not locate or read the parent implementation plan, neighbouring tasks, progress ledger, prior reviews, or session history. Read additional repository code only for a concrete risk permitted under Diff Under Review. If a requirement cannot be verified within this boundary, report it as `⚠️ Cannot verify from diff`; do not broaden the review independently.
 
@@ -34,9 +34,9 @@ Subagent/delegation tool (general-purpose):
 
     **Base:** `@-`, `@`'s sole parent
     **Head:** `@`, the undescribed working-copy change containing this task
-    **Diff file:** [DIFF_FILE]
+    **Diff:** [DIFF, supplied inline or by file reference]
 
-    Read the diff file once — it contains a stat summary and the full diff with surrounding context, and it is your view of the change. The diff's context lines ARE the changed files: do not read a changed file separately unless a hunk you must judge is cut off mid-function — and say so in your report. On the normal path, read the supplied package and run no VCS command. If and only if the package is unavailable and the controller prompt explicitly permits fallback, use this narrowly bounded, read-only jj inspection:
+    Read the supplied diff. Inspect additional code for a concrete concern or missing context, not as an open-ended search. If the diff is unavailable and the controller permits it, use this read-only jj inspection:
 
     ```bash
     jj diff --stat --from @- --to @
@@ -59,9 +59,9 @@ Subagent/delegation tool (general-purpose):
 
     The implementer already ran the tests and reported results with TDD evidence for exactly this code. Do not re-run the suite to confirm their report. Run a test only when reading the code raises a specific doubt that no existing run answers — and then a focused test, never a package-wide suite, race detector run, or repeated/high-count loop. If heavy validation seems warranted, recommend it in your report instead of running it. If you cannot run commands in this environment, name the test you would run.
 
-    Compare failures and warnings with supplied baseline evidence. Report concrete defects and unexplained changes; expected diagnostics are not automatically a mandate for cleanup or new diagnostic machinery.
+    Compare failures, warnings and elapsed test times with the supplied baseline. Report concrete defects and unexplained changes; expected diagnostics are not automatically a mandate for cleanup or new diagnostic machinery.
 
-    Failing to read the evidence does not mean the evidence is missing. If the report or its test output looks truncated, or you cannot find the results it claims, re-read the report file at its stated path. Report a result that is genuinely absent or garbled as a gap for the controller. Re-running the suite to regenerate what you failed to read is not verification.
+    Ask for missing or truncated results rather than rerunning checks to replace an unread response.
 
     ## Part 1: Spec Compliance
 
@@ -95,7 +95,7 @@ Subagent/delegation tool (general-purpose):
     - Is the implementation following the file structure from the plan?
     - Did this change create new files that are already large, or significantly grow existing files? (Don't flag pre-existing file sizes — focus on what this change contributed.)
 
-    Your report should point at evidence: file:line references for every finding and for any check you would otherwise answer with a bare "yes." A tight report that cites lines gives the controller everything it needs.
+    Report concrete issues with file:line references.
 
     Your final message is the report itself: begin directly with the spec-compliance verdict. Every line is a verdict, a finding with file:line, or a check you ran — no preamble, no process narration, no closing summary.
 
@@ -119,7 +119,7 @@ Subagent/delegation tool (general-purpose):
     #### Important (Should Fix)
     #### Minor (Nice to Have)
 
-    For each issue: file:line, the violated requirement or concrete defect, supporting evidence, why it matters, and how to fix if not obvious. Distinguish observed facts from assumptions or missing evidence so the controller can investigate and rule without guessing.
+    For each issue: file:line, the defect, why it matters and how to fix it if not obvious.
 
     ### Assessment
 
@@ -130,10 +130,10 @@ Subagent/delegation tool (general-purpose):
 
 **Placeholders:**
 - `[MODEL]` — REQUIRED: reviewer model selected via `working-with-subagents`
-- `[BRIEF_FILE]` — REQUIRED: the task brief file (`scripts/task-brief PLAN N` prints the path; same file the implementer worked from)
+- `[TASK_BRIEF]` — the requirements supplied to the implementer
 - `[GLOBAL_CONSTRAINTS]` — the binding requirements copied verbatim from the plan's Global Constraints section or the spec: exact values, formats, and stated relationships between components (not process rules — those are already in this template)
-- `[REPORT_FILE]` — REQUIRED: the file the implementer wrote its detailed report to
-- `[DIFF_FILE]` — REQUIRED: the path the controller wrote the review package to (`scripts/review-package @- @` prints the unique path it wrote and inspected before review)
+- `[IMPLEMENTER_RESULT]` — the implementer's response, including check results
+- `[DIFF]` — the task diff; `scripts/review-package @- @` can produce a file when useful
 
 **Reviewer returns:** Spec Compliance verdict (✅/❌/⚠️), Strengths, Issues (Critical/Important/Minor), Task quality verdict
 
