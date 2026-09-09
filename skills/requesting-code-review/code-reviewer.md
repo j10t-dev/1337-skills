@@ -51,11 +51,9 @@ You are the only reviewer this boundary gets. Reach your verdict from your own r
 {REQUIREMENTS}
 {PLAN_REFERENCE}
 
-Use the supplied brief or request when no plan exists. The approved design is the source of truth. Check both requested behaviour and implementation complexity; identical outputs do not justify extra machinery. Proposed scope or architectural changes require user approval, not merely a reviewer recommendation.
+Use the supplied brief or request when no plan exists. Review code against approved requirements; scope or architectural changes require user approval. Combined repair reviews must explicitly include both scopes.
 
-Return findings in your response or the controller's assigned ignored scratch file. Do not write review history into plans/designs or permanent review directories.
-
-For final review, the controller supplies original rejected findings, their rulings and evidence, and all repair work items with briefs, reports and recorded resolution or user exceptions. Independently reassess that evidence; a controller rejection is not an instruction to suppress a finding. Check both original and repair requirements, including separately managed failures. Flag missing evidence or unresolved work that blocks delivery. For combined repair re-review, both scopes must be explicitly included in the supplied requirements.
+Return findings in your response, not review files.
 
 **Diff File (preferred):**
 {DIFF_FILE}
@@ -80,8 +78,8 @@ For final review, the controller supplies original rejected findings, their ruli
 
 **Architecture:**
 - Sound design decisions?
-- Simplest implementation for the approved requirements?
-- Performance adequate for the specified workload?
+- Scalability considerations?
+- Performance implications?
 - Security concerns?
 
 **Testing:**
@@ -122,7 +120,7 @@ If you find significant deviations from the plan, flag them specifically so the 
 [Bugs, security issues, data loss risks, broken functionality]
 
 #### Important (Should Fix)
-[Concrete defects, missed approved requirements, or complexity that blocks safe maintenance]
+[Architecture problems, missing features, poor error handling, test gaps]
 
 #### Minor (Nice to Have)
 [Code style, optimisation opportunities, documentation improvements]
@@ -134,7 +132,7 @@ If you find significant deviations from the plan, flag them specifically so the 
 - How to fix (if not obvious)
 
 ### Recommendations
-[Optional improvements within scope; not additional requirements]
+[Improvements for code quality, architecture, or process]
 
 ### Assessment
 
@@ -169,10 +167,10 @@ If you find significant deviations from the plan, flag them specifically so the 
 ### Issues
 
 #### Important
-1. **Cancellation leaves a write running**
+1. **Missing help text in CLI wrapper**
    - File: index-conversations:1-31
-   - Issue: The approved cancellation path returns before its owned write stops
-   - Fix: Join the existing write's cancellation before returning
+   - Issue: No --help flag, users won't discover --concurrency
+   - Fix: Add --help case with usage examples
 
 2. **Date validation missing**
    - File: search.ts:25-27
@@ -186,11 +184,12 @@ If you find significant deviations from the plan, flag them specifically so the 
    - Impact: Users don't know how long to wait
 
 ### Recommendations
-- No additional features recommended.
+- Add progress reporting for user experience
+- Consider config file for excluded projects (portability)
 
 ### Assessment
 
 **Ready for user review: With fixes**
 
-**Reasoning:** Cancellation and date validation need fixes before the implementation meets its approved requirements.
+**Reasoning:** Core implementation is solid with good architecture and tests. Important issues (help text, date validation) are easily fixed and don't affect core functionality.
 ```

@@ -40,7 +40,7 @@ If you catch yourself guessing, stacking changes, skipping tests or proposing fi
 
 ## Environmental, timing-dependent or external causes
 
-Record the investigation in scratch storage. Implement only the handling and regression coverage the demonstrated defect needs; agree broader repairs with the user. Diagnostic probes do not imply permanent monitoring or a new framework. Check that "no root cause" is not merely incomplete investigation.
+Explain what the investigation established and repair only the demonstrated defect; agree broader work with the user.
 
 ## Supporting techniques
 

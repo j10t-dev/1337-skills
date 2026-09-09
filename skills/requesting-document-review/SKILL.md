@@ -20,11 +20,11 @@ Dispatch mechanics — role, model, and result inspection — follow the `workin
    - `design`: the `brainstorming` skill's `spec-document-reviewer-prompt.md`. Resolve `[DESIGN_FILE_PATH]` to the document under review. Supply the user's request and agreed clarifications as `[APPROVAL_CONTEXT]` so review can catch added scope before approval. The approved design remains the source of truth.
    - `plan`: the `writing-plans` skill's `plan-document-reviewer-prompt.md`. Resolve `[PLAN_FILE_PATH]` to the document under review and `[DESIGN_FILE_PATH]` to the design the plan must align with. A plan review always checks the plan against its design, so that reference is required.
 
-   Instruct the reviewer to return only Status, Issues and Recommendations, read-only and without further delegation. Keep review material in the response or ignored scratch storage; do not create permanent review documents.
+   Instruct the reviewer to return only Status, Issues and Recommendations in its response, read-only and without further delegation. Do not create review files.
 
    If the dispatch fails, or the response contains no Status block, that is a failed invocation to diagnose and retry — it is not a review round and consumes nothing from the 3-round review bound. Stop after 2 consecutive failed invocations; report the failure plainly instead of retrying indefinitely.
 
-2. **Load `receiving-code-review` and triage.** Check every finding against the actual document. Correct operative instructions for legitimate defects. Added behaviour or architectural changes require user approval. Reject misreads with a one-line reason. Advisory recommendations do not block approval. Keep findings and review history out of the design and plan.
+2. **Load `receiving-code-review` and triage.** Check every finding against the actual document. Correct operative instructions for legitimate defects. Added behaviour or architectural changes require user approval. Reject misreads with a one-line reason. Advisory recommendations do not block approval.
 
 3. **Dispatch a fresh reviewer** on the revised document.
 

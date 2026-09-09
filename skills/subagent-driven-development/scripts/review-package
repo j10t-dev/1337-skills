@@ -8,9 +8,7 @@
 # Pending final-fix review: review-package RUN_BASE @
 # BASE and HEAD may be any jj revisions that each resolve to one distinct
 # commit. The lifecycle documentation determines which boundary applies.
-# Default OUTFILE: <workspace>/review-<base>..<head>-<ts>-<pid>.diff
-# (the timestamp+PID keeps a re-review after fixes from overwriting the
-# prior package).
+# Default OUTFILE: a new /tmp/review-<base>..<head>.* file
 set -euo pipefail
 
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then
@@ -50,8 +48,7 @@ fi
 if [ $# -eq 3 ]; then
   out=$3
 else
-  dir=$("$(cd "$(dirname "$0")" && pwd)/sdd-workspace")
-  out="$dir/review-${bs}..${hs}-$(date +%Y%m%d%H%M%S)-$$.diff"
+  out=$(mktemp "/tmp/review-${bs}..${hs}.XXXXXX")
 fi
 
 body=$(jj diff --git --from "$bs" --to "$hs")

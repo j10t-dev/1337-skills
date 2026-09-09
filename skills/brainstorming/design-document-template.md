@@ -38,8 +38,7 @@ This design should only contain final feature descripions and not descrine the p
 
 `Approved` only after user approval. The body describes the problem, intended behaviour, decisions, constraints and technical rationale. State genuine technical limitations once, in the relevant section.
 
-Keep document-state narration, approval choreography, agent activity and workflow compliance out of the body. Source-investigation history, working-copy identities, checks run or not run, storage destinations and review history belong in the response or ignored scratch records. Retain technical facts needed to justify a decision, not the story of establishing them.
-
+This document only contains final production design requirements and does not describe the process that lead up to its final form. 
 The first sections describe intended behaviour and system-level decisions. The `Program Design` section describes the proposed code shape compactly enough for a reviewer to assess boundaries, interfaces, and representative execution before planning.
 
 ## Program Design

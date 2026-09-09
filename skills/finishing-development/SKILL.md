@@ -31,13 +31,13 @@ Tests failing (<N> failures). Must fix before completing:
 Cannot deliver until tests pass or the user explicitly changes the delivery requirement.
 ```
 
-Stop affected delivery. If the user explicitly changes the delivery requirement, record the exception and remaining evidence gap before proceeding.
+Stop affected delivery unless the user explicitly accepts the stated limitation.
 
 **If tests pass:** Continue to Step 2.
 
 ### Step 2: Code Review
 
-Reuse completed review. After inline plan execution, this step owns the independent final review from the recorded run base through the feature bookmark, including agreed repairs and their evidence. The executor does not run that review. For other work, perform required review or ask about optional review if a specific concern merits it:
+Reuse a completed review of unchanged code; otherwise review the whole feature from its run base, including uncommitted fixes. For other work, perform required review or ask about optional review:
 
 ```
 Question: "Tests pass. Want code review before finishing?"
@@ -63,30 +63,17 @@ Subagent/delegation tool (code-reviewer):
     Do not infer scope from session history or auto-detect from ambient repository state.
 ```
 
-Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch; reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
+If a documentation path needs resolution before dispatch, read `../shared/docs-root.md`.
 
-**After review:**
-- Triage findings under `requesting-code-review`; reject factually false findings with evidence-backed rulings
-- Fix and re-review genuine Critical/Important issues before proceeding, unless the user explicitly accepts an exception
-- Note Minor issues
+Fix genuine issues, verify the changes and re-review until clean; explain mistaken findings directly and escalate blockers.
 
-**If user skips review:**
-- Continue to Step 3
-
-For final-review fixes after inline plan execution, keep ownership in this finishing step:
-
-1. Record an exact pending `fix:` subject in the existing scratch ledger before editing.
-2. Apply the authorised fix in undescribed `@`, verify it, and obtain re-review from the run base through `@`. Use `requesting-code-review` for finding disposition and its three-round escalation limit.
-3. Once verification and review pass, confirm the non-empty `@` has the feature bookmark as its sole parent, commit with the recorded subject, advance only that bookmark to `@-`, and record the full change and commit IDs as complete.
-4. Reuse the review when acceptance preserved its code and requirements. On interruption, reconcile the ledger and repository under `subagent-driven-development/recovery.md`, resuming finishing rather than the executor.
-
-A formally executed feature consists of accepted task commits plus any separately reviewed final-fix commits, and its feature bookmark identifies the accepted tip. Leave that curated local stack unchanged unless the user explicitly requests history reshaping or integration.
+After a clean final review of a formal plan, absorb fixes into its task commits with `jj absorb --from @ --into '<run-base>..<Feature Bookmark>'`. If changes remain, squash them into the relevant task commit or ask if ownership is unclear. Refresh completed commit IDs in the progress tracker; leave the run base and other features untouched. Reuse verification and review when the code is unchanged.
 
 ### Step 3: Present Completion Options
 
-Before delivery, the controller reads the resulting implementation across affected execution paths and validates it against approved requirements, with particular attention to correctness and unnecessary complexity. Inspect baseline evidence, failures and agreed repairs. Resolve failures or obtain an explicit user-accepted limitation; broader repairs require user agreement, not automatic expansion. Reviewer approval and task-only passing evidence do not replace this check.
+Deliver when required checks pass and review is complete, or state the limitations the user explicitly accepted.
 
-Report the outcome, checked scope and consequential decisions concisely. Keep approved designs/plans in the external docs repository. Review history, reports and logs stay in ignored scratch storage, outside commits; remove scratch after delivery, preserving unresolved work unless the user accepted its disposition. Carry out the requested next step; ask only for an unresolved decision. Do not append a standard menu.
+Report the outcome, checked scope and consequential decisions concisely.
 
 **Do not perform integration operations** (rebase shared work, move bookmarks, submit externally, create/update PRs, or advance the target bookmark) unless the user explicitly asks. The user controls final jj/git-colocated integration.
 

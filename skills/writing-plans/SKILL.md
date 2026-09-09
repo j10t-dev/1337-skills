@@ -9,22 +9,9 @@ description: Use when design is complete and you need detailed implementation ta
 
 Write code-complete implementation plans for an engineer with no session history. Supply actual production and test code, exact files, interfaces, cases and verification for each reviewable task. Choose the simplest implementation that satisfies the approved design. Resolve implementation structure during planning, not through implementer improvisation. DRY. YAGNI. TDD.
 
-**Determine filenames from project conventions:**
-- Use the user-provided feature slug, current jj bookmark/change description, or ask for a slug
-- Design and plan documents always live in an external docs repo, separate from the code repo
-- `$DOCS_ROOT` is the docs repo root. Resolve it from the `DOCS_ROOT` environment variable, or from the default defined in your instructions file. Expand it to an absolute path before using it in a file-tool path or a subagent prompt. If neither defines it, ask the user — never guess a path, and never fall back to writing docs in-repo
-- Designs: `$DOCS_ROOT/$projectName/designs/`
-- Plans: `$DOCS_ROOT/$projectName/plans/`
-- Determine `$projectName` from the repo directory name unless the user specifies a different docs project name
-- Determine the document slug:
-  - If the current jj bookmark or change description is a good semantic identifier, you may reuse its slug
-  - Otherwise ask the user for a feature/plan slug
-- File naming:
-  - Design file: `$DOCS_ROOT/$projectName/designs/<slug>.md`
-  - Plan file: `$DOCS_ROOT/$projectName/plans/<slug>.md`
+@../shared/docs-root.md
 
 **Before writing:**
-- Create the target directories if they don't exist
 - Read the design file to understand architecture and design decisions
 - Include architecture summary in the plan header
 
@@ -34,11 +21,7 @@ If the design covers multiple independent subsystems, it should have been broken
 
 ## Design Conformance
 
-Read the approved design's `Program Design` section before choosing files or tasks. Treat its file layout, unit boundaries and responsibilities, public interfaces and consequential internal seams, and representative scenario call paths as constraints.
-
-Validate those artefacts against the repository before planning. If the plan would move a responsibility, restructure approved files, introduce a public dependency, change a public signature or error contract, or replace an approved orchestration path, return `DesignRevisionRequired`, stop planning, and route the change through design revision and review. Name the approved artefact, proposed replacement, and exact conflict before stopping. Do not hide a material redesign in a task brief.
-
-Specify private helpers, algorithms and integration code in the plan. Implementers may make local syntax or naming adjustments that preserve the planned structure, behaviour and contracts. Binding an approved dependency as private state of the unit that owns an unchanged method is equivalent local mechanics when the design leaves binding unspecified; it does not permit ambient or global state or a new public contract.
+Follow the approved design; ask the user before changing its behaviour, structure, interfaces or dependencies.
 
 ## File Structure
 
@@ -276,9 +259,7 @@ Fix any issues inline before sharing the plan.
 
 **VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks.**
 
-Keep approved designs and plans after delivery. Review history, task reports and verification logs remain in ignored scratch storage, outside commits. Amend plans only for operative corrections or approved requirement changes. The executor runs and records the required-check baseline before source edits; planning-only work does not need a development test run.
-
-If the user requested planning only, report the saved plan and stop. If they already requested implementation and the plan preserves the approved design, continue with their chosen executor without another approval prompt. Otherwise use SDD when native subagents are available, or inline execution when they are not, provided this preserves required review guarantees. Ask about the options below only when that choice genuinely needs the user's decision:
+Follow any further instructions from the user; otherwise present these options:
 
 **"Plan complete and saved to `<plan-file>`. Two execution options:**
 
@@ -288,7 +269,7 @@ If the user requested planning only, report the saved plan and stop. If they alr
 
 **Which approach?"**
 
-If the current harness has no subagent support, skip the question and use Inline Execution.
+Offer only inline execution when subagents are unavailable.
 
 **If Subagent-Driven chosen:**
 - Load the `subagent-driven-development` skill via the current harness's skill-loading mechanism
