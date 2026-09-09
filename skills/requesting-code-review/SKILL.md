@@ -41,15 +41,16 @@ Reuse reviews of unchanged code and requirements. Use `verification-before-compl
 
 Use the current harness's subagent/delegation tool with the code-reviewer type if available, filling the template at `code-reviewer.md`
 
-Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch;
-reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
+Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch; reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
 
 **3. Act on feedback:**
 - Triage findings against requirements and repository evidence at any round.
-- Resolve a factually false finding with a durable ruling containing the original finding, evidence, rejection reason and cost if wrong. No fix or replacement passing verdict is needed solely to confirm rejection; it consumes no fix round.
+- Resolve a factually false finding with a scratch ruling containing the original finding, evidence, rejection reason and cost if wrong. No fix or replacement passing verdict is needed solely to confirm rejection; it consumes no fix round.
 - Fix genuine Critical/Important defects and re-review the smallest scope that proves resolution. After three fix rounds, escalate remaining genuine defects to the user; controller-only deferral cannot permit acceptance. Explicit user exceptions remain possible.
 - Record Minor issues for final triage. Keep original rejected findings, rulings and all repair work items available to final review for independent reassessment.
-- Combined repair review explicitly covers both original and repair requirements and their check evidence. Final delivery also requires resolution of separately managed failures unless the user explicitly changes that requirement.
+- Review agreed repairs against their requirements and baseline evidence. Broader repair scope requires user agreement, not merely a review finding. Resolve failures before delivery unless the user explicitly accepts a stated limitation.
+- Keep findings and review history in responses or ignored scratch storage. Update plans/designs for operative corrections or approved requirement changes, not review commentary.
+- The controller inspects actual changes before acceptance and the resulting implementation against approved requirements before delivery. Review verdicts do not replace this final correctness and complexity check.
 
 ## Example
 
@@ -64,17 +65,17 @@ reviewers do not inherit your environment. See `writing-plans` for docs-root rul
 [Subagent returns]:
   Strengths: Clean architecture, real tests
   Issues:
-    Important: Missing progress indicators
+    Important: Required cancellation leaves a write running
     Minor: Magic number (100) for reporting interval
   Assessment: Ready with fixes
 
-You: [Fix progress indicators]
+You: [Verify the defect and fix cancellation]
 
 [Dispatch code-reviewer again to verify fix]
-  DESCRIPTION: Verification of progress indicator fix
+  DESCRIPTION: Verification of cancellation fix
   PLAN_REFERENCE: Task 2 from `/abs/path/to/docs/<projectName>/plans/<slug>.md`
   FIX_REVIEW_SCOPE:
-    - Verify the progress indicator issue is fixed
+    - Verify cancellation stops the owned write
     - Review only:
       - src/index-verifier.ts
       - src/index-repairer.ts
@@ -82,7 +83,7 @@ You: [Fix progress indicators]
     - Confirm the relevant test command passes
 
 [Subagent returns]:
-  Strengths: Progress reporting now working correctly
+  Strengths: Cancellation now stops the owned write
   Issues: Minor: Magic number remains (acceptable)
   Assessment: Ready to proceed
 
@@ -117,6 +118,6 @@ You: [Fix progress indicators]
 **If reviewer wrong:**
 - Push back with technical reasoning
 - Show code/tests that prove it works
-- Record an evidence-backed rejection when factually disproved; ask for clarification when evidence remains insufficient
+- Record an evidence-backed rejection in scratch when factually disproved; ask for clarification when evidence remains insufficient
 
 See template at: requesting-code-review/code-reviewer.md

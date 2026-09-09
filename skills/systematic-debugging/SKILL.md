@@ -7,7 +7,7 @@ description: Use when encountering any bug, test failure, or unexpected behaviou
 
 Investigate root cause before proposing fixes, including under time pressure and for apparently simple bugs, performance, build or integration failures. Complete the four phases in order within the assigned scope and tool permissions.
 
-Investigation is not repair authority. For apparently unrelated failures, report the command, actual output, investigation and evidence of unrelatedness to the controller. Pause affected work and continue only independent authorised work. The controller records a repair brief and arranges verification/review; substantial repairs or consequential redesign need user approval. Standalone execution carries that controller responsibility.
+Investigation is not repair authority. Compare failures with the recorded baseline, changed code and environment. Report commands, actual output and attribution evidence to the controller; never dismiss a failure as pre-existing or call a passing rerun a diagnosis. Fix introduced regressions within scope. Repairs beyond approved scope need user agreement before dispatch. Continue only independent authorised work while blocked. Standalone execution carries controller responsibility.
 
 ## 1. Root-cause investigation
 
@@ -40,7 +40,7 @@ If you catch yourself guessing, stacking changes, skipping tests or proposing fi
 
 ## Environmental, timing-dependent or external causes
 
-Complete the investigation and document it. Implement appropriate handling only within authorised scope, or escalate evidence for a separately scoped repair. Add monitoring/logging for future investigation. Check that "no root cause" is not merely incomplete investigation.
+Record the investigation in scratch storage. Implement only the handling and regression coverage the demonstrated defect needs; agree broader repairs with the user. Diagnostic probes do not imply permanent monitoring or a new framework. Check that "no root cause" is not merely incomplete investigation.
 
 ## Supporting techniques
 

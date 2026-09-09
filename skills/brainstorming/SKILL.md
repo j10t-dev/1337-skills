@@ -7,20 +7,15 @@ description: Use when asked to create, add, or change any feature, component, or
 
 ## Overview
 
-Explore and clarify a requested change, then route it by capacity. Work that is
-one reviewable task, fits the current session, and has no unresolved
-consequential design choice takes the direct path. Everything else keeps the
-full design and planning path.
+Explore and clarify a requested change, then route it by capacity. Work that is one reviewable task, fits the current session, and has no unresolved consequential design choice takes the direct path. Everything else keeps the full design and planning path.
 
 <HARD-GATE>
-Full-path implementation needs design approval. The user's request authorises
-direct work within its scope; ask before adding scope or at a requested checkpoint.
+Full-path implementation needs design approval. The user's request authorises direct work within its scope; ask before adding scope or at a requested checkpoint.
 </HARD-GATE>
 
 ## Checklist
 
-Track these items in the current harness's task tracker and complete the
-applicable branch in order:
+Track these items in the current harness's task tracker and complete the applicable branch in order:
 
 1. **Explore project context** - check files, docs, recent changes, and representative existing execution paths
 2. **Clarify only what is needed** - establish purpose, constraints, success criteria, task boundaries, and consequential design choices
@@ -65,33 +60,19 @@ digraph brainstorming {
 
 ## Shared exploration and clarification
 
-Check the current project state first: files, docs, recent changes, and
-representative execution paths. Existing execution paths must come from
-repository evidence. Continue exploring or label an assumption for user
-approval; never invent a current call path.
+Check the current project state first: files, docs, recent changes, and representative execution paths. Existing execution paths must come from repository evidence. Continue exploring or label an assumption for user approval; never invent a current call path.
 
-Assess scope before detailed questions. If the request contains independent
-subsystems, identify the pieces, their relationship, and their delivery order
-before continuing. Ask one question at a time. Prefer open questions with two to
-four concrete examples when examples help. Clarify only enough to establish the
-purpose, constraints, success criteria, task boundaries, and consequential
-design choices. Look up facts yourself; questions block only dependent work.
+Assess scope before detailed questions. If the request contains independent subsystems, identify the pieces, their relationship, and their delivery order before continuing. Ask one decision per question. Do not bundle optional features into a clarification or treat a single answer as approval for several additions. Use concrete examples when they help. Clarify only enough to establish the purpose, constraints, success criteria, task boundaries, and consequential design choices. Look up facts yourself; questions block only dependent work.
 
 ## Internal scope assessment
 
-The direct path is the default. Use the full path when any of these conditions
-holds:
+The direct path is the default. Use the full path when any of these conditions holds:
 
-1. The work decomposes into more than one task that must land as separate
-   commits.
-2. More than one defensible approach remains, and the choice has consequences
-   beyond this change.
+1. The work decomposes into more than one task that must land as separate commits.
+2. More than one defensible approach remains, and the choice has consequences beyond this change.
 3. The user explicitly requested a design or implementation plan.
 
-Investigate unknown affected files and verification needs. Uncertainty calls for
-exploration, not a classification report or automatic full-path routing. Assess
-scope internally; a concise internal requirements record may preserve the user
-request and agreed clarifications without a compulsory user-facing format.
+Investigate unknown affected files and verification needs. Uncertainty calls for exploration, not a classification report or automatic full-path routing. Assess scope internally; a concise internal requirements record may preserve the user request and agreed clarifications without a compulsory user-facing format.
 
 ## Direct-path execution
 
@@ -109,10 +90,7 @@ Within the user request and agreed clarifications:
    Entry: Step 3
 ```
 
-The user request and agreed clarifications are the complete requirement boundary;
-no separate brief is required. Independent code review is unconditional. `REQUIREMENTS` replaces `PLAN_REFERENCE`; a direct path has no
-plan. Enter `finishing-development` at Step 3 because TDD plus the mandatory
-review already supplied verification and review.
+The user request and agreed clarifications are the complete requirement boundary; no separate brief is required. Independent code review is unconditional. `REQUIREMENTS` replaces `PLAN_REFERENCE`; a direct path has no plan. Enter `finishing-development` at Step 3 because TDD plus the mandatory review already supplied verification and review.
 
 Keep these four facts in the task record; report only those useful to the user:
 
@@ -125,72 +103,51 @@ Commit authority: explicit user instruction required
 
 ## Upgrade from direct to full
 
-If a full-path trigger emerges, preserve completed work, name the trigger and
-return to clarification. Pause dependent implementation; continue independent
-work. Do not revert edits without permission.
+If a full-path trigger emerges, preserve completed work, name the trigger and return to clarification. Pause dependent implementation; continue independent work. Do not revert edits without permission.
 
 ## Full path
 
 ### Compare approaches
 
-Propose two or three approaches with their trade-offs. Lead with the recommended
-option and explain why it best fits the clarified constraints. If the project is
-too large for one design, decompose it and take the first sub-project through
-this full path; each sub-project gets its own design, plan, and implementation
-cycle.
+Propose two or three approaches with their trade-offs. Lead with the recommended option and explain why it best fits the clarified constraints. If the project is too large for one design, decompose it and take the first sub-project through this full path; each sub-project gets its own design, plan, and implementation cycle.
 
 ### Present the design
 
-Read `design-document-template.md` from this skill directory and use it as the
-output contract. Scale sections to complexity. Approve the design together unless
-an earlier decision determines later sections. Clarify unresolved assumptions.
+Read `design-document-template.md` from this skill directory and enforce its headings, status box and body-content rules.
 
-Design units around one clear responsibility, explicit dependencies, and
-interfaces consumers can understand without reading internals. Follow the
-repository's existing patterns. Include targeted improvements only when an
-existing problem blocks or materially complicates this work; avoid unrelated
-refactoring.
+Choose the simplest implementation that satisfies the requested outcome, using existing code and patterns. 
+
+Before approval, check the proposed design against the user's request and agreed clarifications. Resolve any additions explicitly. The approved design then becomes the source of truth; reviewer suggestions cannot silently expand it.
 
 ### Write and review the design
 
-Design and plan documents live in the external docs repository, separate from
-the code repository. Resolve `$DOCS_ROOT` from the environment or the default in
-the active instructions, then expand it to an absolute path. If neither source
-defines it, ask the user. Never guess or write these documents in the code
-repository.
+Design and plan documents live in the external docs repository, separate from the code repository. Resolve `$DOCS_ROOT` from the environment or the default in the active instructions, then expand it to an absolute path. If neither source defines it, ask the user. Never guess or write these documents in the code repository.
 
 Use these paths:
 
 - Design: `$DOCS_ROOT/$projectName/designs/<slug>.md`
 - Plan: `$DOCS_ROOT/$projectName/plans/<slug>.md`
 
-Derive `$projectName` from the repository directory unless the user specifies a
-different docs project. Use a user-provided slug, a suitable current jj bookmark
-or change description, or ask for one. Create the design directory if needed.
-VCS operations in `$DOCS_ROOT` remain the user's responsibility.
+Derive `$projectName` from the repository directory unless the user specifies a different docs project. Use a user-provided slug, a suitable current jj bookmark or change description, or ask for one. Create the design directory if needed.
 
 Before sharing the written design, self-review it for:
 
-- completeness across purpose, constraints, success criteria, architecture,
-  components, data flow, errors, testing, and programme design;
-- internal consistency and focused scope;
+- completeness across purpose, constraints, success criteria, architecture, components, data flow, errors, testing, and programme design;
+- internal consistency, conformance to the user's request and agreed clarifications,
 - explicit assumptions and open questions;
+- scope as minimal and direct as necessary to meet the users request
 - absence of placeholders and undefined references;
-- conformance to `design-document-template.md`, including its programme-design
-  and change-control checks;
+- conformance to `design-document-template.md`, including its programme-design and change-control checks;
 - enough detail for a plan writer with no session history.
 
-Fix any issue found by self-review. Then load `requesting-document-review` and
-run it with `type=design` and no design reference. This review is mandatory.
-Present the written design. Existing approval covers unchanged decisions; ask
-for approval of material revisions. Apply corrections and repeat affected checks.
+Fix any issue found by self-review. Then load `requesting-document-review` and run it with `type=design` and no design reference. This review is mandatory. Present the written design. Existing approval covers unchanged decisions; ask for approval of material revisions. Apply corrections and repeat affected checks.
 
 Once approved, invoke `writing-plans`. This is the full path's terminal state.
 
 ## Key principles
 
 - **Capacity decides the path.** Perceived difficulty does not.
-- **One question at a time.** Clarify only what affects routing or design.
+- **One decision per question.** Clarify only what affects routing or design.
 - **Evidence before assumptions.** Establish current execution paths from the repository.
 - **YAGNI.** Exclude work that does not serve the accepted outcome.
 - **Full-path alternatives.** Compare two or three approaches when the full path fires.

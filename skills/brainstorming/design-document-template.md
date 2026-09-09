@@ -1,12 +1,11 @@
 # Design Document Template
 
-Use this structure when presenting and writing a design. Scale each section to
-the change: a few sentences for straightforward work, up to 200–300 words where
-trade-offs need explanation. Merge adjacent sections when that improves clarity,
-but retain the exact `## Program Design` heading.
+Use these headings in this order when presenting and writing a design. Keep them separate; add topic subheadings only within them. Scale the content to the change: a few sentences for straightforward work, up to 200–300 words where trade-offs need explanation.
 
 ```markdown
 # <Feature> Design
+
+> **Status:** Pending approval
 
 ## Purpose
 
@@ -35,21 +34,21 @@ but retain the exact `## Program Design` heading.
 ### Scenario call trees
 ```
 
-The first sections describe intended behaviour and system-level decisions. The
-`Program Design` section describes the proposed code shape compactly enough for
-a reviewer to assess boundaries, interfaces, and representative execution before
-planning.
+This design should only contain final feature descripions and not descrine the process used to arrive at them.
+
+`Approved` only after user approval. The body describes the problem, intended behaviour, decisions, constraints and technical rationale. State genuine technical limitations once, in the relevant section.
+
+Keep document-state narration, approval choreography, agent activity and workflow compliance out of the body. Source-investigation history, working-copy identities, checks run or not run, storage destinations and review history belong in the response or ignored scratch records. Retain technical facts needed to justify a decision, not the story of establishing them.
+
+The first sections describe intended behaviour and system-level decisions. The `Program Design` section describes the proposed code shape compactly enough for a reviewer to assess boundaries, interfaces, and representative execution before planning.
 
 ## Program Design
 
-Executable changes include all four artefacts below. Keep them scenario-scoped:
-exclude exhaustive static call graphs, incidental framework callbacks, and
-unchanged plumbing.
+Executable changes include all four artefacts below. Keep them scenario-scoped: exclude exhaustive static call graphs, incidental framework callbacks, and unchanged plumbing.
 
 ### File-tree diff
 
-Use `+`, `~`, and `-` for created, modified, and removed files, and state one
-responsibility for every affected file:
+Use `+`, `~`, and `-` for created, modified, and removed files, and state one responsibility for every affected file:
 
 ```diff
  src/resource/
@@ -57,8 +56,7 @@ responsibility for every affected file:
 ~└── resource-route.ts       # Wires create behaviour into the route
 ```
 
-Follow the repository's existing layout. Do not introduce unrelated
-restructuring.
+Follow the repository's existing layout. Do not introduce unrelated restructuring.
 
 ### Boundary map
 
@@ -71,14 +69,11 @@ For each affected unit, record:
 - side effects; and
 - failure behaviour.
 
-Justify boundaries through cohesion, information hiding, and change locality.
-Boundaries hide coherent design decisions rather than execution phases; the
-scenario tree only shows how independently justified units collaborate.
+Use existing boundaries where possible. A new boundary must serve a requested behaviour or demonstrated defect, not merely name an execution phase. The scenario tree shows how those units collaborate.
 
 ### Key interfaces in pseudocode
 
-Give exact names, parameter and return types, important errors, and behavioural
-constraints for public interfaces and consequential internal seams:
+Give exact names, parameter and return types, important errors, and behavioural constraints for public interfaces and consequential internal seams:
 
 ```ts
 interface ResourceClient {
@@ -86,26 +81,17 @@ interface ResourceClient {
 }
 ```
 
-Omit ordinary private helpers whose shape does not affect consumers or
-neighbouring tasks.
+Omit ordinary private helpers whose shape does not affect consumers or neighbouring tasks.
 
 ### Scenario call trees
 
-Show the shortest representative path from an entrypoint to an observable
-effect. For changed execution paths, show a contextual call-tree diff: retain
-enough unchanged calls to locate the change, mark removed calls with `-` and
-added calls with `+`, and show where control returns or produces an effect.
-Include:
+Show the shortest representative path from an entrypoint to an observable effect. For changed execution paths, show a contextual call-tree diff: retain enough unchanged calls to locate the change, mark removed calls with `-` and added calls with `+`, and show where control returns or produces an effect. Include:
 
 - the primary production path;
 - the corresponding test path when dependencies differ; and
 - materially distinct error, event, or asynchronous paths.
 
-Mark external I/O, durable side effects, and asynchronous boundaries. In
-call-tree notation, `→` is a synchronous call and `⇢ await` is an asynchronous
-boundary. When tests substitute a production dependency, name both
-implementations and verify that they satisfy the same interface and behavioural
-contract.
+Mark external I/O, durable side effects, and asynchronous boundaries. In call-tree notation, `→` is a synchronous call and `⇢ await` is an asynchronous boundary. When tests substitute a production dependency, name both implementations and verify that they satisfy the same interface and behavioural contract.
 
 ```diff
 Production:
@@ -128,24 +114,17 @@ Tests:
 
 ## Applicability and change control
 
-A change without executable flow still includes the `Program Design` section.
-Replace each inapplicable artefact with a specific explanation of why no runtime
-behaviour, callable interface, dependency substitution, or execution path
-changes. Do not invent runtime behaviour to satisfy the template.
+A change without executable flow still includes the `Program Design` section. Replace each inapplicable artefact with a specific explanation of why no runtime behaviour, callable interface, dependency substitution, or execution path changes. Do not invent runtime behaviour to satisfy the template.
 
-Establish existing execution paths from repository evidence. Continue exploring
-or label an assumption for user approval; never fabricate a current call path.
+Establish existing execution paths from repository evidence. Continue exploring or label an assumption for user approval; never fabricate a current call path.
 
-Material programme-design changes return to design revision and review. These
-include moving responsibilities, changing approved file layout or public
-signatures, adding a public dependency, or replacing an approved scenario call
-path. Private helper structure and equivalent local mechanics remain planning
-or implementation decisions when they preserve approved boundaries.
+Check the design against the user's request and agreed clarifications before approval. The approved design is then the source of truth. Material changes need user approval and affected review: moving responsibilities, changing approved file layout or public signatures, adding a dependency, or replacing a scenario call path. Planning supplies concrete implementation and test code within those boundaries. Update operative requirements, not review history.
 
 ## Author self-review
 
 Before sharing the document, verify:
 
+- headings and approval state follow the template, with no process narration in the body;
 - every executable design includes all four programme-design artefacts;
 - every proposed file has one responsibility;
 - boundaries hide coherent decisions rather than execution phases;

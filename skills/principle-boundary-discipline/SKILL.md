@@ -15,10 +15,7 @@ Place validation, type narrowing, and error handling at system boundaries. Trust
 - **Inside the system:** typed data, error propagation, no re-validation. Trust the types.
 - **Across the boundary.** Expose domain concepts, not the boundary's private representation. Keep general-purpose mechanism inside and special-purpose policy at the edge.
 
-A type guarantees its encoded properties, not mutable external facts. Guard live
-authorisation, resource state and destructive-operation destinations at the point
-of effect when they can change after parsing. Each independent external entry
-must construct the validated domain type.
+A type guarantees its encoded properties, not mutable external facts. Guard live authorisation, resource state and destructive-operation destinations at the point of effect when they can change after parsing. Each independent external entry must construct the validated domain type.
 
 **Applications:**
 
