@@ -51,7 +51,13 @@ You are the only reviewer this boundary gets. Reach your verdict from your own r
 {REQUIREMENTS}
 {PLAN_REFERENCE}
 
-Use the supplied brief or request when no plan exists.
+Use the supplied brief or request when no plan exists. The approved design is the
+source of truth. Check both requested behaviour and implementation complexity;
+identical outputs do not justify extra machinery. Proposed scope or architectural
+changes require user approval, not merely a reviewer recommendation.
+
+Return findings in your response or the controller's assigned ignored scratch file.
+Do not write review history into plans/designs or permanent review directories.
 
 For final review, the controller supplies original rejected findings, their
 rulings and evidence, and all repair work items with briefs, reports and recorded
@@ -84,8 +90,8 @@ scopes must be explicitly included in the supplied requirements.
 
 **Architecture:**
 - Sound design decisions?
-- Scalability considerations?
-- Performance implications?
+- Simplest implementation for the approved requirements?
+- Performance adequate for the specified workload?
 - Security concerns?
 
 **Testing:**
@@ -134,7 +140,7 @@ say so.
 [Bugs, security issues, data loss risks, broken functionality]
 
 #### Important (Should Fix)
-[Architecture problems, missing features, poor error handling, test gaps]
+[Concrete defects, missed approved requirements, or complexity that blocks safe maintenance]
 
 #### Minor (Nice to Have)
 [Code style, optimisation opportunities, documentation improvements]
@@ -146,7 +152,7 @@ say so.
 - How to fix (if not obvious)
 
 ### Recommendations
-[Improvements for code quality, architecture, or process]
+[Optional improvements within scope; not additional requirements]
 
 ### Assessment
 
@@ -181,10 +187,10 @@ say so.
 ### Issues
 
 #### Important
-1. **Missing help text in CLI wrapper**
+1. **Cancellation leaves a write running**
    - File: index-conversations:1-31
-   - Issue: No --help flag, users won't discover --concurrency
-   - Fix: Add --help case with usage examples
+   - Issue: The approved cancellation path returns before its owned write stops
+   - Fix: Join the existing write's cancellation before returning
 
 2. **Date validation missing**
    - File: search.ts:25-27
@@ -198,12 +204,11 @@ say so.
    - Impact: Users don't know how long to wait
 
 ### Recommendations
-- Add progress reporting for user experience
-- Consider config file for excluded projects (portability)
+- No additional features recommended.
 
 ### Assessment
 
 **Ready for user review: With fixes**
 
-**Reasoning:** Core implementation is solid with good architecture and tests. Important issues (help text, date validation) are easily fixed and don't affect core functionality.
+**Reasoning:** Cancellation and date validation need fixes before the implementation meets its approved requirements.
 ```

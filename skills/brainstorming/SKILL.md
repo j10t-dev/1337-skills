@@ -72,8 +72,9 @@ approval; never invent a current call path.
 
 Assess scope before detailed questions. If the request contains independent
 subsystems, identify the pieces, their relationship, and their delivery order
-before continuing. Ask one question at a time. Prefer open questions with two to
-four concrete examples when examples help. Clarify only enough to establish the
+before continuing. Ask one decision per question. Do not bundle optional features
+into a clarification or treat a single answer as approval for several additions.
+Use concrete examples when they help. Clarify only enough to establish the
 purpose, constraints, success criteria, task boundaries, and consequential
 design choices. Look up facts yourself; questions block only dependent work.
 
@@ -145,11 +146,14 @@ Read `design-document-template.md` from this skill directory and use it as the
 output contract. Scale sections to complexity. Approve the design together unless
 an earlier decision determines later sections. Clarify unresolved assumptions.
 
-Design units around one clear responsibility, explicit dependencies, and
-interfaces consumers can understand without reading internals. Follow the
-repository's existing patterns. Include targeted improvements only when an
-existing problem blocks or materially complicates this work; avoid unrelated
-refactoring.
+Choose the simplest implementation that satisfies the requested outcome, using
+existing code and patterns. Add a boundary, service or recovery path only when a
+requested behaviour or demonstrated defect needs it. Additional behaviour or
+architectural machinery requires user approval.
+
+Before approval, check the proposed design against the user's request and agreed
+clarifications. Resolve any additions explicitly. The approved design then becomes
+the source of truth; reviewer suggestions cannot silently expand it.
 
 ### Write and review the design
 
@@ -167,13 +171,16 @@ Use these paths:
 Derive `$projectName` from the repository directory unless the user specifies a
 different docs project. Use a user-provided slug, a suitable current jj bookmark
 or change description, or ask for one. Create the design directory if needed.
-VCS operations in `$DOCS_ROOT` remain the user's responsibility.
+VCS operations in `$DOCS_ROOT` remain the user's responsibility. Approved designs
+and plans remain there after delivery. Review output, execution logs and handoffs
+belong in ignored scratch storage, not permanent review or evidence directories.
 
 Before sharing the written design, self-review it for:
 
 - completeness across purpose, constraints, success criteria, architecture,
   components, data flow, errors, testing, and programme design;
-- internal consistency and focused scope;
+- internal consistency, conformance to the user's request and agreed clarifications,
+  and explicit approval for additional scope;
 - explicit assumptions and open questions;
 - absence of placeholders and undefined references;
 - conformance to `design-document-template.md`, including its programme-design
@@ -190,7 +197,7 @@ Once approved, invoke `writing-plans`. This is the full path's terminal state.
 ## Key principles
 
 - **Capacity decides the path.** Perceived difficulty does not.
-- **One question at a time.** Clarify only what affects routing or design.
+- **One decision per question.** Clarify only what affects routing or design.
 - **Evidence before assumptions.** Establish current execution paths from the repository.
 - **YAGNI.** Exclude work that does not serve the accepted outcome.
 - **Full-path alternatives.** Compare two or three approaches when the full path fires.

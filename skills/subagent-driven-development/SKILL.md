@@ -15,9 +15,9 @@ Execute a plan by dispatching a fresh implementer subagent per task, a task revi
 
 **Narration:** between tool calls, narrate at most one short line — the ledger and the tool results carry the record.
 
-**Continuous execution:** Do not pause to check in between tasks. Execute all tasks from the plan without stopping. "Should I continue?" prompts and progress summaries waste the partner's time — they asked you to execute the plan, so execute it.
+**Continuous execution:** Execute authorised tasks without routine continuation prompts. Pause affected work for missing requirements or authority; progress does not justify expanding scope.
 
-**Rulings, not stalls.** Resolve routine conflicts, ambiguities and plan defects against the approved design. Record material decisions as rulings and keep going. A ruling cannot override a consequential design decision or expand action authority. Follow `using-skills` for user precedence and pause diagnostics; a later user correction can stop or redirect this run.
+The approved design is the source of truth. Correct routine plan errors against it; ask the user before adding behaviour or architectural machinery. Keep execution rulings in scratch storage, not in the design or plan. Follow `using-skills` for user precedence and pause diagnostics.
 
 Pause affected work for these conditions; continue independent authorised work:
 
@@ -32,6 +32,8 @@ Pause affected work for these conditions; continue independent authorised work:
 Resolve routine matters with evidence-backed rulings. A ruling cannot defer a genuine Critical/Important defect into acceptance.
 
 Load [recovery.md](recovery.md) on resume, interruption or unexplained state. Load [review-handling.md](review-handling.md) for findings, unverifiable requirements or implementer escalation, including apparently unrelated failures. Ordinary execution needs neither reference immediately.
+
+**Controller validation:** Before task acceptance, inspect the actual diff for correctness, requested scope, unexpected paths and unnecessary complexity. Before delivery, read the resulting implementation across the affected execution paths and validate it against the approved design. Reviewer verdicts and passing tests support this judgement; they do not replace it.
 
 **Acceptance gate:** Obtain independent task review with both spec-compliance and quality verdicts. Accept only when applicable checks pass, every unverifiable requirement is resolved, and blocking findings are resolved by passing review after genuine fixes, evidence-backed rejection of factually false findings, or an explicit user exception. A false finding needs no replacement passing verdict and consumes no fix round. Genuine Critical/Important defects require fixes and re-review; after three fix rounds, escalate rather than accept by controller deferral. Record Minor findings for final triage. Combined repairs require checks and review covering both original and repair requirements. Final delivery also requires resolution of separately managed failures unless the user explicitly changes that requirement.
 
@@ -134,7 +136,7 @@ Exactly one implementation plan is active. The controller owns every VCS mutatio
 
 After the acceptance gate above, including both scopes for a combined repair and the applicable final review for a final fix:
 
-1. Confirm `@` is non-empty, undescribed, has one parent, and that parent is the feature bookmark. Reconcile the completed ledger entries as one exact-subject, exact-parent path from the run base. Stop on any mismatch.
+1. Complete controller validation. Confirm the exact changed paths belong to the approved task or repair and contain no scratch reports, review history or logs. Confirm `@` is non-empty, undescribed, has one parent, and that parent is the feature bookmark. Reconcile the completed ledger entries as one exact-subject, exact-parent path from the run base. Stop on any mismatch.
 2. Read the task subject from its `**Commit:**` field, or the final-fix subject from its pending ledger entry.
 3. Run `jj commit -m "<exact subject>"`. This leaves a new empty `@`; the accepted commit is `@-`.
 4. Run `jj bookmark set "<Feature Bookmark>" -r @-`.
@@ -151,8 +153,9 @@ Run this once before Task 1 or when resuming an interrupted run:
 3. Read `.agents/sdd/progress.md`. A matching ledger resumes through `Durable Progress`; a ledger for another plan stops. Only an absent ledger is a fresh run.
 4. On a fresh run, stop on unexplained non-empty `@`. Reuse empty `@` when its sole parent is the run base; otherwise run `jj new <Builds On>`.
 5. On a fresh run, stop if `Feature Bookmark` already exists.
-6. On a fresh run, write the ledger, then run `jj bookmark create <Feature Bookmark> -r <run-base-commit>`.
-7. Resolve the plan's `**Design:**` path and read it. The design is the authority every ruling resolves against. If the plan names no design, or the path does not resolve, record `Ruling: proceeding with no reachable design -- <what you looked for> -- rulings in this run are provisional` and continue.
+6. On a fresh run, initialise ignored scratch with `scripts/sdd-workspace`, write the ledger, then run `jj bookmark create <Feature Bookmark> -r <run-base-commit>`.
+7. Resolve the plan's `**Design:**` path and read the approved design. If it is missing or unreachable, stop and ask; do not make provisional design decisions.
+8. Establish the required-check baseline under `verification-before-completion` before source edits. Record the revision, commands, exit statuses and concise results in ignored scratch storage. On resume, reuse applicable baseline evidence and distinguish it from post-edit verification.
 
 A fresh ledger starts with exactly this shape:
 
@@ -170,14 +173,12 @@ These fixed-width IDs are synthetic format illustrations. Real entries come from
 Scan the plan once for conflicts before Task 1 dispatches, and write the result to the ledger as a table. The scan produces rows, not a verdict.
 
 - one row per pair of tasks sharing a file or an interface, naming the two tasks, what one produces against what the other consumes, and what you found
-- one row per task, recording whether its requirements agree with themselves: behaviour and boundary decisions against concrete test outcomes and side effects, binding interfaces/decisions against each other, and the files it creates against the files it later touches; omitted routine implementation/test bodies are not conflicts
+- one row per task, checking supplied production/test code against behaviour, interfaces, cases and side effects; missing bodies or integration decisions block dispatch
 - one row per plan instruction the reviewer rubric treats as a defect, such as a test that asserts nothing or verbatim duplication of a logic block
 
-Check producer/consumer signatures and outcomes, not absent implementation code.
-For example, expiry equality must have a decided result and write policy before
-dependent work; equivalent private helpers or illustrative syntax differences
-are not conflicts. Public contract, dependency, security or architectural changes
-remain consequential and require escalation beyond routine private mechanics.
+Check that code steps are complete and producer/consumer signatures agree. Allow
+local syntax or naming adjustments, not unspecified implementation structure.
+Additional behaviour, dependencies or architectural machinery require approval.
 
 "The scan is clean" without those rows is not a scan you ran.
 
@@ -201,7 +202,7 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
 - Do not ask a reviewer to re-run tests the implementer already ran on the same code — the implementer's report carries the test evidence.
 - Do not pre-judge findings for the reviewer — never instruct a reviewer to ignore or not flag a specific issue. If you believe a finding would be a false positive, let the reviewer raise it and adjudicate it in the review loop. If the prompt you are writing contains "do not flag," "don't treat X as a defect," "at most Minor," or "the plan chose" — stop: you are pre-judging, usually to spare yourself a review loop.
 - The global-constraints block you hand the reviewer is its attention lens. Copy the binding requirements verbatim from the plan's Global Constraints section or the spec: exact values, exact formats, and the stated relationships between components ("same layout as X", "matches Y"). The reviewer's template already carries the process rules (YAGNI, test hygiene, review method) — the constraints block is for what THIS project's spec demands.
-- Hand the reviewer its diff as a file: run this skill's `scripts/review-package @- @` and pass the reviewer the file path it prints. The output never enters your own context, and the reviewer sees the accepted parent plus the current task's undescribed working-copy change.
+- Generate `scripts/review-package @- @`, inspect its diff yourself, then pass the same file to the reviewer. It covers the accepted parent through the current task.
 - A dispatch prompt describes one task, not the session's history. Do not paste accumulated prior-task summaries ("state after Tasks 1-3") into later dispatches. A fresh subagent needs its task, the interfaces it touches, and the global constraints. Nothing else.
 - Record Minor findings in the task report and point the final whole-branch review at that list so it can triage which must be fixed before merge. A roll-up nobody reads is a silent discard.
 - A finding labelled plan-mandated — or any finding that conflicts with what the plan's text requires — is yours to rule on: weigh the finding against the plan text, decide with the design as the binding authority, and record the ruling before you act on it. Do not dismiss the finding because the plan mandates it, and do not dispatch a fix that contradicts the plan without a recorded ruling.
@@ -219,14 +220,19 @@ Per-task reviews are task-scoped gates. The broad review happens once, at the fi
 
   Track final-review fix rounds in the fix report without changing ledger forms; three rounds is also the cap for those findings. After its run-base-through-`@` package receives re-review and the acceptance gate is met, use root `SKILL.md`, `Accepting a Task or Final Fix`. Confirm acceptance preserved the reviewed tree and requirements; reuse that review rather than repeating it solely because commit metadata changed. Never amend a task commit.
 - Final review receives original rejected findings, their evidence-backed rulings, Minor findings and every repair work item. It may reassess them independently.
-- Scratch cleanup occurs only after the final acceptance gate is met, no unresolved repair or pending fix exists, and every ruling has been reported. Explicit user changes to delivery requirements must be recorded and reported before cleanup. Another plan may start only after cleanup.
+- Remove scratch after final validation and delivery, once consequential decisions and explicit user-accepted limitations have been reported. Preserve other unresolved work. Another plan may start only after cleanup.
 
 ## File Handoffs
 
-Everything you paste into a dispatch prompt — and everything a subagent prints back — stays resident in your context for the rest of the session and is re-read on every later turn. Hand artifacts over as files:
+Use ignored `.agents/sdd/` scratch files for task context and execution evidence.
+Initialise it through `scripts/sdd-workspace` before writing the ledger or reports.
+Keep approved designs and plans in the external docs repository after delivery;
+never append review commentary or archive execution material there.
 
 - **Task-scoped context boundary:** Every implementer, fixer, and task-reviewer dispatch must state that its supplied brief, context, and named artefacts are its complete boundary. The subagent must not locate the parent plan, neighbouring tasks, progress ledger, prior-task materials, or session history. Missing requirements are escalated to the controller rather than discovered by broadening scope. This restriction does not apply to the final whole-branch reviewer.
-- **Task brief:** before dispatching an implementer, run this skill's `scripts/task-brief PLAN_FILE N` — it extracts the task's full text to a file and prints the path. Compose the dispatch so the brief stays the single source of requirements. Your dispatch should contain: (1) one line on where this task fits; (2) the brief path, introduced as "read this first — it is your requirements, with the exact values to use verbatim"; (3) interfaces and decisions from earlier tasks that the brief cannot know; (4) your resolution of any ambiguity you noticed in the brief; (5) the report-file path and report contract. Exact values (numbers, magic strings, signatures, test cases) appear only in the brief. Retain binding interfaces/decisions, exclusions, concrete cases and verification verbatim. Complete contracts do not require routine production or test bodies: dispatch the implementer to construct them, parameterising the same behaviour's cases with independent expectations and choosing equivalent private mechanics. Preserve explicit illustrative/binding snippet labels; missing necessary decisions go to the controller, not a search of the full design or neighbouring tasks.
+- **Task brief:** run `scripts/task-brief PLAN_FILE N`. It includes the common plan preamble and the selected task, preserving global constraints, shared contracts, required context and complete production/test code. Read the generated brief and check that it contains every requirement the task needs before dispatch. Keep common requirements before the first task in the plan. Add only necessary earlier-task interface facts and resolved operative corrections; never accumulated review history.
+- **Assignment:** state scope, writable paths, necessary tools, exclusions and the report path. Further delegation requires controller permission. A design/plan reference in the preamble identifies controller authority, not permission for a task-scoped agent to read it.
+- **Baseline evidence:** every implementer, fixer and reviewer gets the applicable pre-edit revision, commands, exit statuses and concise results, as an excerpt or an explicitly named ignored scratch file. Do not require ledger access or substitute post-edit results.
 - **Report file:** name the implementer's report file after the brief (`…/task-N-brief.md` → `…/task-N-report.md`) and put it in the dispatch prompt. The implementer writes the full report there and returns only status, a one-line test summary, and concerns.
 - **Reviewer inputs:** the task reviewer gets the same brief file, report file and review package, plus binding global constraints. For a combined repair, also name the repair brief and report explicitly and require verdicts covering each scope.
 - Fix rounds append their report (with test results) to the same report file and return a short summary; re-reviews read the updated file.
@@ -268,11 +274,15 @@ On resume or unexplained state, load [recovery.md](recovery.md) and reconcile be
 
 ## Finish
 
-Before removing `.agents/sdd/`, collect every `Ruling:` line in the ledger into your final message under "Rulings I made", in the order you made them, each with what it costs if wrong. That means the conflict scan's rulings, the rejected findings and repair rulings, the ⚠️ resolutions, and the plan-mandated findings. The list is exhaustive. If the ledger holds a ruling, the list holds it.
+Complete the controller's final code validation before delivery. Report the
+result, verification and consequential rulings or user-accepted limitations
+concisely. Keep the full review history in scratch until that handoff; do not
+copy it into designs, plans or permanent evidence directories. Remove scratch
+only after the final gate and handoff, with no unresolved work except explicit
+user-accepted limitations.
 
-This list is the only place the decisions you took on the user's behalf reach them, and it is what they read to find what needs reworking. Delete the scratch directory first and those decisions are gone unreported.
-
-Then pass the existing verification and final-review evidence to finishing-development at Step 3.
+Pass existing verification and final-review evidence to finishing-development
+at Step 3. Approved designs and plans remain in the external docs repository.
 
 ## Prompt Templates
 
@@ -314,11 +324,11 @@ Task reviewer: Spec ✅. Task quality: Approved.
 
 [Run scripts/review-package RUN_BASE FEATURE_BOOKMARK; dispatch final reviewer]
 Final reviewer: Important findings.
-[Triage evidence; reject false findings with durable rulings; for genuine defects append "Final review fix 1 -> pending (subject `fix: address final review findings`)" before fixer dispatch]
+[Triage evidence; reject false findings with scratch rulings; agree broader repairs with the user. For authorised fixes append "Final review fix 1 -> pending (subject `fix: address final review findings`)" before fixer dispatch]
 [Dispatch ONE final-review fixer; run scripts/review-package RUN_BASE @]
 Final reviewer: Clean re-review.
 [Accept the reviewed final fix with its pending subject]
-[Confirm the accepted tree and requirements match the clean re-review; reuse it unless intervening changes invalidate it. With no pending fix or unresolved repair, report every ledger Ruling: line under "Rulings I made", then remove .agents/sdd/]
+[Inspect resulting code against the approved design; confirm applicable checks and review. Report results and consequential decisions, then remove scratch after delivery with no unresolved work except user-accepted limitations.]
 ```
 
 ## Advantages
@@ -335,7 +345,7 @@ Final reviewer: Clean re-review.
 - Review checkpoints automatic
 
 **Efficiency gains:**
-- Bulk artifacts move as files, not pasted text — the controller's context stays small
+- Scratch files support handoffs without replacing the controller's code inspection
 - Controller curates exactly what context each subagent needs
 - Subagent gets complete information upfront
 - Questions surfaced before work begins (not after)
@@ -373,7 +383,7 @@ Final reviewer: Clean re-review.
 - Re-dispatch a task the progress ledger already marks complete — reconcile the ledger and committed path after any compaction or resume
 - Let a subagent run jj or git commands — every VCS mutation belongs to the controller
 - Park the run on a routine question the approved design, plan or repository evidence answers. Rule, record it and continue; ask before a consequential redesign.
-- Remove `.agents/sdd/` with unresolved work or before every ruling in it has been reported to the user
+- Remove `.agents/sdd/` before delivery or with unresolved work lacking an explicit user-accepted limitation
 
 **If subagent asks questions:**
 - Answer clearly and completely

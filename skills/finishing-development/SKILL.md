@@ -81,14 +81,19 @@ A formally executed feature already consists of accepted task commits plus any s
 
 ### Step 3: Present Completion Options
 
-Before delivery, check all recorded failures and separate repair work items,
-including non-blocking unrelated failures. Resolve them with applicable checks
-and review, or obtain an explicit user change to the delivery requirement.
-Otherwise block delivery. Report all rulings before scratch cleanup; preserve
-unresolved work. Task-only passing evidence does not satisfy this gate.
+Before delivery, the controller reads the resulting implementation across affected
+execution paths and validates it against approved requirements, with particular
+attention to correctness and unnecessary complexity. Inspect baseline evidence,
+failures and agreed repairs. Resolve failures or obtain an explicit user-accepted
+limitation; broader repairs require user agreement, not automatic expansion.
+Reviewer approval and task-only passing evidence do not replace this check.
 
-Report the outcome and evidence. Carry out the requested next step; ask only for
-an unresolved decision. Do not append a standard menu.
+Report the outcome, checked scope and consequential decisions concisely. Keep
+approved designs/plans in the external docs repository. Review history, reports
+and logs stay in ignored scratch storage, outside commits; remove scratch after
+delivery, preserving unresolved work unless the user accepted its disposition.
+Carry out the requested next step; ask only for an unresolved decision. Do not
+append a standard menu.
 
 **Do not perform integration operations** (rebase shared work, move bookmarks, submit externally, create/update PRs, or advance the target bookmark) unless the user explicitly asks. The user controls final jj/git-colocated integration.
 

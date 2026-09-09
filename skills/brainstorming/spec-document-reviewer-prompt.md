@@ -13,6 +13,12 @@ Subagent/delegation tool (general-purpose):
     You are a design document reviewer. Verify this design is complete and ready for planning.
 
     **Design to review:** [DESIGN_FILE_PATH]
+    **User request and agreed clarifications:** [APPROVAL_CONTEXT]
+
+    Check proposed scope against this approval context. After approval, the design
+    is the source of truth. Flag proposed additions for a user decision rather
+    than converting reviewer preferences into requirements. Return your review
+    in the response; do not create review files or delegate further.
 
     ## What to Check
 

@@ -7,31 +7,26 @@ description: Use when partner provides a complete implementation plan to execute
 
 Execute inline when requested or subagents are unavailable.
 
-The plan and supplied context are your requirements. Ask the controller for
-missing context, or the user when executing standalone. Do not read the design.
+When executing standalone, read the approved design as the source of truth and
+validate the plan against it. When delegated, use only the supplied brief and
+context; ask the controller for gaps rather than locating the parent design.
 
-## Contract Discretion
+## Planned implementation
 
-Execute the binding behaviour, interfaces, decisions, exclusions, concrete cases
-and verification. Complete contracts may omit routine production and test bodies;
-construct them yourself under TDD. Private helper choice, local algorithms and
-fixture construction need no permission. Explicitly illustrative snippets are not
-syntax requirements; binding snippets remain constraints.
+Execute the supplied production and test code, interfaces, exclusions and cases
+under TDD. Local syntax or naming adjustments may fit repository conventions;
+equivalent outputs do not justify a different implementation structure. Missing
+code or integration decisions need clarification before dependent work. Additional
+behaviour or architectural machinery requires user approval.
 
-Preserve exact cases and outcomes. Parameterise inputs exercising the same
-behaviour with independently derived expectations; keep distinct operations in
-separate behaviour tests (see test-driven-development's writing-good-tests.md).
-An undocumented boundary such as expiry equality needs clarification before
-dependent work; an omitted routine body does not. Escalate changes to public
-results or interfaces, dependencies, security properties or architectural
-boundaries to the controller (or user standalone) for resolution and any required
-approval. Use TDD's prose/configuration exception where no useful executable test
-exists, retaining required checks and the execution gates below.
+Preserve exact cases and independently derived expectations. Parameterise one
+behaviour's inputs; keep distinct operations separate. Use TDD's prose/configuration
+exception where no useful executable test exists, retaining required checks.
 
 ## Start or Resume
 
 1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task. Stop on missing, duplicate or ambiguous metadata.
-2. Use `.agents/sdd/progress.md` as the active-plan ledger. On a fresh run, resolve and record the full `Builds On` identities, require the feature bookmark to be absent, reject unexplained edits, position empty `@` on the run base, write the ledger, then create the feature bookmark there.
+2. Initialise ignored scratch with `../subagent-driven-development/scripts/sdd-workspace` and use its `progress.md` as the ledger. On a fresh run, resolve and record the full `Builds On` identities, require the feature bookmark to be absent, reject unexplained edits, position empty `@` on the run base, write the ledger, then create the feature bookmark there. Establish the required-check baseline under `verification-before-completion` before source edits; on resume retain applicable baseline evidence.
 3. On resume, load `../subagent-driven-development/recovery.md`. Require the same plan metadata and run-base identities. Verify completed commits form one exact-subject, exact-parent path and the feature bookmark identifies the accepted tip. Combined repairs use the amended prospective plan subject; reconcile recorded scope/subject intent before continuing and stop on incomplete or inconsistent intent.
 4. Resume only the recorded task or final fix. If its exact accepted commit exists while the bookmark or ledger lags, advance the bookmark if needed, then record the full IDs. Stop on any other mismatch or divergence.
 
@@ -45,6 +40,8 @@ For each task in order:
 2. Keep `@` undescribed with the feature bookmark at `@-`.
 3. Follow the plan's skills and TDD steps. Use `verification-before-completion` for required checks.
 4. Only after verification passes for all authorised scopes, including a combined repair, accept the task. Resolve any findings under Controller triage below before acceptance:
+   - inspect the actual diff for correctness, approved scope and unnecessary complexity;
+   - confirm changed paths contain only approved work, with no scratch material;
    - confirm non-empty undescribed `@` has the feature bookmark as its sole parent;
    - run `jj commit -m "<exact planned subject>"`;
    - run `jj bookmark set "<Feature Bookmark>" -r @-`;
@@ -56,9 +53,10 @@ Inline execution has no task-review subagent and must not invent one. Verificati
 ## Controller triage and repairs
 
 When executing standalone, you carry controller responsibility for failures and
-findings. When delegated, report the command, actual output and evidence for
-apparent unrelatedness to the controller. Continue only independent authorised
-work; do not silently enlarge scope.
+findings. Investigate failures against the baseline, changed code and environment.
+When delegated, report the command, actual output and evidence to the controller.
+Continue only independent authorised work; do not dismiss failures as pre-existing
+or silently enlarge scope.
 
 For findings or unrelated failures, load
 `../subagent-driven-development/review-handling.md`. Apply its evidence-backed
@@ -67,7 +65,8 @@ at round 0 without a replacement passing verdict; genuine Critical/Important
 fixes require re-review and remaining genuine defects at round 3 require user
 escalation, not controller deferral.
 
-For a bounded blocking repair, record a separate brief and scope ruling, then
+For a repair beyond approved scope, obtain user agreement first. For an agreed
+bounded blocking repair, record a separate scratch brief and scope ruling, then
 record original/replacement prospective subjects and reason and amend only the
 still-unaccepted task's plan subject. Perform the repair serially, inline on this
 execution path, preserving the original edits. Verify both scopes before one
@@ -76,10 +75,10 @@ the existing final review, or any applicable repair re-review. This adds no
 mandatory per-task subagent. Substantial repairs or consequential redesign need
 user approval; no history or bookmark permissions expand.
 
-Record non-blocking repairs separately using the existing unblocking/final-fix
-pending subject forms. Resolve them serially at a safe boundary with requirements,
-verification and review before final delivery, unless the user explicitly changes
-that requirement. Acceptance uses this skill's Task Loop, with the recorded
+Report unrelated findings with evidence and agree their disposition with the user;
+do not automatically create a repair programme. Record agreed separate repairs
+using the existing unblocking/final-fix pending subject forms. Resolve failures
+before delivery unless the user explicitly accepts a stated limitation. Acceptance uses this skill's Task Loop, with the recorded
 pending subject for separately reviewed fixes.
 
 ## Final Review and Fixes
@@ -93,11 +92,12 @@ reassessment. Triage findings first. For genuine defects requiring fixes:
 3. After re-review and resolution of findings under Controller triage, repeat the acceptance sequence using the pending subject. Track fix rounds in the fix report without changing ledger forms; at three, escalate genuine unresolved Critical/Important defects instead of dispatching another wave.
 4. Reuse that review if the accepted content and requirements are unchanged.
 
-After the final review gate is met, resolve all recorded failures and pending
-repairs or record an explicit user change to delivery requirements. Report every
-ruling with its cost if wrong before removing `.agents/sdd/`; cleanup must not
-erase unresolved work or unreported rulings. Enter `finishing-development` at
-Step 3 with the existing evidence.
+Before delivery, read the resulting implementation across affected execution paths
+and validate it against the approved design. Resolve failures and agreed repairs,
+or record explicit user-accepted limitations. Report results and consequential
+rulings concisely, then remove scratch after delivery. Keep approved designs/plans,
+not review history or execution logs. Enter `finishing-development` at Step 3 with
+the existing evidence.
 
 ## Stop and Ask
 

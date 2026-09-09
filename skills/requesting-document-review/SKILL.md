@@ -24,15 +24,18 @@ Dispatch mechanics — role, model, and result inspection — follow the
    for the document type:
 
    - `design`: the `brainstorming` skill's `spec-document-reviewer-prompt.md`.
-     Resolve `[DESIGN_FILE_PATH]` to the document under review.
+     Resolve `[DESIGN_FILE_PATH]` to the document under review. Supply the user's
+     request and agreed clarifications as `[APPROVAL_CONTEXT]` so review can catch
+     added scope before approval. The approved design remains the source of truth.
    - `plan`: the `writing-plans` skill's `plan-document-reviewer-prompt.md`.
      Resolve `[PLAN_FILE_PATH]` to the document under review and
      `[DESIGN_FILE_PATH]` to the design the plan must align with. A plan
      review always checks the plan against its design, so that reference is
      required.
 
-   Instruct the reviewer to emit only the Status block — Status, Issues,
-   Recommendations — as its entire response.
+   Instruct the reviewer to return only Status, Issues and Recommendations,
+   read-only and without further delegation. Keep review material in the response
+   or ignored scratch storage; do not create permanent review documents.
 
    If the dispatch fails, or the response contains no Status block, that is a
    failed invocation to diagnose and retry — it is not a review round and
@@ -41,9 +44,10 @@ Dispatch mechanics — role, model, and result inspection — follow the
    indefinitely.
 
 2. **Load `receiving-code-review` and triage.** Check every finding against
-   the actual document. Fix legitimate ones. Reject misreads with a one-line
-   reason. Treat the prompt's "Recommendations (advisory)" as non-blocking —
-   never a reason to keep looping.
+   the actual document. Correct operative instructions for legitimate defects.
+   Added behaviour or architectural changes require user approval. Reject misreads
+   with a one-line reason. Advisory recommendations do not block approval.
+   Keep findings and review history out of the design and plan.
 
 3. **Dispatch a fresh reviewer** on the revised document.
 

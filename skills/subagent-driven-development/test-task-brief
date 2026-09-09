@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+printf '%s\n' \
+  '# Example plan' \
+  '**Required Files:** source.ts' \
+  '## Global constraints' \
+  'No new dependencies.' \
+  '## Shared contracts' \
+  '```ts' \
+  '## Task 99: This is fenced example text' \
+  '```' \
+  '````markdown' \
+  '```text' \
+  '## Task 98: Nested fence content is not a task' \
+  '```' \
+  '## Task 97: Still inside the outer fence' \
+  '````' \
+  '~~~text' \
+  '## Task 96: Tilde-fenced content is not a task' \
+  '~~~' > "$tmp/common"
+printf '%s\n' \
+  '## Task 1: First behaviour' \
+  'First task requirements.' > "$tmp/first"
+printf '%s\n' \
+  '## Task 2: Second behaviour' \
+  'Second task requirements.' \
+  '```text' \
+  '## Task 3: Still part of the example' \
+  '```' > "$tmp/second"
+printf '%s\n' '## Task 3: Third behaviour' 'Third task requirements.' > "$tmp/third"
+
+# Build complete input and expected briefs independently of the extractor.
+for part in common first second third; do
+  while IFS= read -r line; do printf '%s\n' "$line"; done < "$tmp/$part"
+done > "$tmp/plan.md"
+for task in 1 2 3; do
+  case "$task" in 1) part=first ;; 2) part=second ;; 3) part=third ;; esac
+  for input in common "$part"; do
+    while IFS= read -r line; do printf '%s\n' "$line"; done < "$tmp/$input"
+  done > "$tmp/expected"
+  "$script_dir/scripts/task-brief" "$tmp/plan.md" "$task" "$tmp/actual" > /dev/null
+  diff -u "$tmp/expected" "$tmp/actual"
+done
+
+if "$script_dir/scripts/task-brief" "$tmp/plan.md" 4 "$tmp/missing" > /dev/null 2> "$tmp/error"; then
+  printf 'FAIL: missing task was accepted\n' >&2
+  exit 1
+fi
+[ ! -s "$tmp/missing" ]
+[ -s "$tmp/error" ]
+printf 'PASS: briefs contain common requirements and only the requested task\n'

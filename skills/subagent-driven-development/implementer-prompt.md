@@ -20,6 +20,9 @@ Subagent/delegation tool (general-purpose):
     [Scene-setting: where this fits, dependencies, architectural context,
     and any cross-task interfaces (exact signatures) the brief cannot know]
 
+    Applicable baseline: [pre-edit revision, commands, exit statuses and concise
+    results, supplied here or in an explicitly named ignored scratch file]
+
     ## Context Boundary
 
     Treat the task brief, this prompt's Context section, and any artefacts they
@@ -42,24 +45,23 @@ Subagent/delegation tool (general-purpose):
     - Anything unclear in the task description
 
     Ask the controller about missing requirements or consequential choices.
-    Resolve routine private mechanics from the brief and repository patterns;
-    continue independent specified work while a question remains open.
+    Follow the supplied implementation and repository patterns. Ask for missing
+    code or integration decisions; continue only independent specified work.
 
-    ## Contract-Based Implementation
+    ## Planned implementation
 
-    The brief supplies binding behaviour, interfaces, decisions, exclusions,
-    concrete cases and verification, not necessarily production or test bodies.
-    Construct those bodies yourself. Private helper choice, local algorithms and
-    local fixture construction need no permission when requirements are preserved.
-    Explicitly illustrative snippets show an approach, not required syntax;
-    binding snippets remain constraints.
+    The brief supplies complete production and test code, interfaces, exclusions,
+    cases and verification. Follow its structure. Local syntax or naming changes
+    may fit repository conventions; equivalent outputs do not justify a different
+    private architecture. Missing code or integration decisions require controller
+    clarification, not invention.
 
     Preserve exact case values and expected outcomes. Parameterise cases that
     exercise the same behaviour with different inputs; keep independently different
     operations in separate behaviour tests. Derive expectations independently of
     production code and its helpers, following test-driven-development's
-    writing-good-tests.md. An omitted routine body is not missing context; an
-    undocumented behaviour boundary (such as expiry equality) is. Ask the
+    writing-good-tests.md. Missing bodies or undocumented behaviour boundaries,
+    such as expiry equality, are missing requirements. Ask the
     controller to clarify it before dependent implementation.
 
     Changes to public results or interfaces, dependencies, security properties or
@@ -87,14 +89,14 @@ Subagent/delegation tool (general-purpose):
     A `**Commit:**` line belongs to the controller. It does not authorise you to run
     VCS commands; ignore it while editing and verifying the task.
 
-    **While you work:** Investigate unexpected behaviour within scope. Ask the
-    controller when missing requirements or a consequential choice block the
-    task; routine recoverable failures within scope do not require a permission
-    round-trip. For apparently unrelated failures, report the command, actual
-    output and evidence for why they appear unrelated. The controller decides
-    disposition and supplies a separate repair brief if needed. Do not silently
-    expand scope; continue only independent authorised work. A serial repair
-    assignment must preserve the original task edits and verify its own scope.
+    **While you work:** Investigate failures against supplied baseline evidence,
+    changed code and environment. Report the command, actual output and evidence
+    to the controller; do not dismiss a failure as pre-existing or call a rerun a
+    diagnosis. Fix introduced regressions within scope. Broader repairs require
+    controller escalation and user agreement. Continue only independent authorised
+    work while blocked. Write only assigned paths; further delegation requires
+    controller permission. Keep reports/logs in assigned ignored scratch paths,
+    never in plans, designs or permanent review directories.
 
     While iterating, run focused covering tests and the project's required
     checks. Use verification-before-completion for evidence reuse. Broaden or
@@ -134,8 +136,8 @@ Subagent/delegation tool (general-purpose):
     already arranged. A reviewer you commission yourself repeats that work at
     full cost and its verdict counts for nothing here. If you catch yourself
     thinking an independent check would strengthen your report, report instead.
-    Delegate the legwork the task needs. The verdict on your own work belongs to
-    the controller.
+    Further delegation requires controller permission. The verdict on your own
+    work belongs to the controller.
 
     Review your work with fresh eyes:
 
@@ -149,7 +151,8 @@ Subagent/delegation tool (general-purpose):
     requested? Follow existing patterns? Reuse existing fixtures and methods?
 
     **Testing:** Do tests verify behaviour (not mocks)? Did I follow TDD if
-    required? Are tests comprehensive? Is test output pristine (no stray noise)?
+    required? Do tests cover the requested behaviour? Are failures and new warnings
+    investigated against the baseline, with expected diagnostics distinguished?
 
     If you find issues during self-review, fix them now before reporting.
 
@@ -174,7 +177,7 @@ Subagent/delegation tool (general-purpose):
 
     Then report back with ONLY (under 15 lines — detail lives in the report file):
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    - One-line test summary (e.g. "14/14 passing, output pristine")
+    - One-line test summary, including any unexplained output
     - Your concerns, if any
     - The report file path
 

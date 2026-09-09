@@ -34,11 +34,13 @@ Subagent/delegation tool (general-purpose):
     ## What the Implementer Claims They Built
 
     Read the implementer's report: [REPORT_FILE]
+    Applicable baseline: [pre-edit revision, commands, exit statuses and concise
+    results, supplied here or in an explicitly named ignored scratch file]
 
     ## Context Boundary
 
-    The supplied task brief, global constraints, implementer report, and diff
-    package, plus any explicitly supplied repair brief/report, are your
+    The supplied task brief, global constraints, baseline evidence, implementer
+    report and diff package, plus any explicitly supplied repair brief/report, are your
     complete review boundary.
 
     Do not locate or read the parent implementation plan, neighbouring tasks,
@@ -105,8 +107,9 @@ Subagent/delegation tool (general-purpose):
     running it. If you cannot run commands in this environment, name the
     test you would run.
 
-    Warnings or other noise in the implementer's reported test output are
-    findings — test output should be pristine.
+    Compare failures and warnings with supplied baseline evidence. Report concrete
+    defects and unexplained changes; expected diagnostics are not automatically a
+    mandate for cleanup or new diagnostic machinery.
 
     Failing to read the evidence does not mean the evidence is missing. If the
     report or its test output looks truncated, or you cannot find the results it
@@ -116,20 +119,12 @@ Subagent/delegation tool (general-purpose):
 
     ## Part 1: Spec Compliance
 
-    Compare the diff against What Was Requested. Review binding behaviour,
-    interfaces, decisions, exclusions, concrete case outcomes and verification,
-    not a transcription of illustrative syntax. Public contracts, security
-    properties, dependencies, architectural boundaries and explicitly binding
-    snippets remain constraints. Changed public results or added dependencies
-    require controller escalation and any required user approval.
-
-    A complete brief can omit routine production and test bodies: the implementer
-    owns their construction. Accept different private helpers, local algorithms
-    and local fixtures when contracts and outcomes are identical. Equivalent
-    correct code differing from an explicitly illustrative snippet is not a
-    conformance defect solely because its syntax differs. Missing necessary
-    decisions, such as an undocumented expiry equality boundary, require controller
-    clarification rather than reviewer or implementer invention.
+    Compare the diff against What Was Requested, including the planned production
+    and test code, structure, interfaces, exclusions and exact cases. Accept harmless
+    syntax or naming adjustments; identical public results do not justify a more
+    complex private implementation. Missing code or integration decisions require
+    controller clarification. Added behaviour or architectural machinery requires
+    user approval; reviewer suggestions are not authority to expand scope.
 
     For instruction changes, trace each case through every affected writer,
     executor and reviewer in the supplied diff, not only the authoring skill.
@@ -158,10 +153,8 @@ Subagent/delegation tool (general-purpose):
     - Are the task's exact cases, edge boundaries and side effects covered with
       expectations derived independently of production code and its helpers?
     - Are inputs for the same behaviour parameterised, with distinct behaviours
-      kept in separate tests? For the example expiry contract, `expiresAt < now`,
-      `expiresAt == now` and `expiresAt > now` belong in one table: first two
-      return expired with no writes; third follows successful acceptance.
-      Invitation revocation is a separate operation, not another expiry row.
+      kept in separate tests? Check that assertions establish the specified result
+      and side effects rather than merely reproducing implementation decisions.
     - For prose/configuration under TDD's exception, does the report provide
       applicable inspection/validation and required project-check evidence?
 
@@ -242,7 +235,7 @@ Subagent/delegation tool (general-purpose):
   report to
 - `[DIFF_FILE]` — REQUIRED: the path the controller wrote the review
   package to (`scripts/review-package @- @` prints the unique path it
-  wrote; the package never enters the controller's context)
+  wrote and inspected before review)
 
 **Reviewer returns:** Spec Compliance verdict (✅/❌/⚠️), Strengths, Issues
 (Critical/Important/Minor), Task quality verdict

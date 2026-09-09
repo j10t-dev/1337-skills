@@ -7,7 +7,7 @@ description: Use when design is complete and you need detailed implementation ta
 
 ## Overview
 
-Write implementation plans as behaviour contracts for a skilled engineer with no session history. Supply the decisions, interfaces, concrete cases, files and verification needed for each reviewable task. The implementer writes routine production and test bodies, choosing private mechanics within those contracts. DRY. YAGNI. TDD.
+Write code-complete implementation plans for an engineer with no session history. Supply actual production and test code, exact files, interfaces, cases and verification for each reviewable task. Choose the simplest implementation that satisfies the approved design. Resolve implementation structure during planning, not through implementer improvisation. DRY. YAGNI. TDD.
 
 **Determine filenames from project conventions:**
 - Use the user-provided feature slug, current jj bookmark/change description, or ask for a slug
@@ -47,9 +47,9 @@ change through design revision and review. Name the approved artefact, proposed
 replacement, and exact conflict before stopping. Do not hide a material redesign
 in a task brief.
 
-Private helpers, local algorithms, and equivalent implementation mechanics may
-be left to the implementer when they preserve approved behaviour, boundaries, and
-contracts. Binding an approved dependency as private state of the unit that owns
+Specify private helpers, algorithms and integration code in the plan. Implementers
+may make local syntax or naming adjustments that preserve the planned structure,
+behaviour and contracts. Binding an approved dependency as private state of the unit that owns
 an unchanged method is equivalent local mechanics when the design leaves binding
 unspecified; it does not permit ambient or global state or a new public contract.
 
@@ -57,13 +57,12 @@ unspecified; it does not permit ambient or global state or a new public contract
 
 Before defining tasks, map every approved programme-design file to its created,
 modified, or removed plan path and responsibility. Preserve the approved
-boundaries; planning supplies necessary contract decisions but leaves routine
-private details to implementation.
+boundaries and supply the concrete implementation within them.
 
 - Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
 - You reason best about code you can hold in context at once, and your edits are more reliable when files are focused. Prefer smaller, focused files over large ones that do too much.
 - Files that change together should live together. Split by responsibility, not by technical layer.
-- In existing codebases, follow established patterns. If the codebase uses large files, don't unilaterally restructure — but if a file you're modifying has grown unwieldy, including a split in the plan is reasonable.
+- Follow existing patterns. File size alone does not justify a split; additional architectural machinery requires user approval.
 
 This structure informs the task decomposition. Each task should produce self-contained changes that make sense independently.
 
@@ -97,7 +96,7 @@ in this order:
 **Dependencies:** Earlier tasks required before this task
 **Files:** Every cross-layer file created, modified, or removed
 **Interfaces:** Exact contracts consumed and produced
-**Implementation decisions:** Binding choices and implementer discretion
+**Implementation:** Complete production and test code, in execution order
 **Exclusions:** Explicit non-goals
 **Concrete cases:** Inputs, preconditions and independently derived expected outcomes
 **Verification:** Exact commands, expected results and integrated outcome check
@@ -144,12 +143,15 @@ to increase apparent parallelism.
 
 ## Plan Document Header
 
+Keep global constraints, shared contracts and required repository context before
+the first task heading so `scripts/task-brief` includes them in every handoff.
+
 **Every plan MUST start with this header:**
 
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **Implementation handoff:** Use the `subagent-driven-development` skill (recommended where the harness supports subagent dispatch) or the `executing-plans` skill to implement this plan task-by-task.
+> **Controller handoff:** Use `subagent-driven-development` or `executing-plans` to execute this plan. Task-scoped agents follow only their assigned brief and must not start a plan executor.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -183,10 +185,14 @@ naming and copy rules, platform requirements — one line each, with exact
 values copied verbatim from the spec. Every task's requirements implicitly
 include this section.]
 
+## Shared contracts
+
+[Exact interfaces and cross-task decisions every task needs, or "None".]
+
 ---
 ```
 
-## Task Contract
+## Task implementation
 
 Retain `## Task N:` headings and all plan metadata. Every task requires exactly
 one `**Commit:**` conventional-commit subject describing delivered behaviour,
@@ -207,11 +213,11 @@ and produced names, parameters, return/error contracts and necessary boundary
 decisions. State exclusions. Escalate consequential redesign for controller
 resolution and any required user approval.
 
-**Private mechanics:** Leave routine function and test bodies, private helpers,
-local algorithms and fixture construction to the implementer. Equivalent
-mechanics need no permission when binding requirements stay unchanged. Mark
-optional snippets explicitly **Illustrative**; equivalent correct code need not
-match their syntax. A snippet marked **Binding** remains a constraint.
+**Code:** Include complete changed function bodies, new helpers, test bodies and
+fixture construction. Name the existing code to reuse and show integration edits.
+The plan fixes implementation structure as well as behaviour. An equivalent public
+result does not justify a different private architecture. Local syntax or naming
+adjustments are acceptable; missing implementation decisions go to the controller.
 
 **Cases and verification:** Specify actual inputs, preconditions, expected
 results and side effects. Require one parameterised case table when inputs
@@ -222,57 +228,74 @@ implementation, focused GREEN and integrated outcome verification, with exact
 commands and expected results. Apply TDD's prose/configuration exception when no
 useful executable test exists; required project checks still apply.
 
-### Representative Task (Illustrative)
+### Representative task
 
-This example describes a hypothetical Python invitation service, not this skill
-repository. Its paths and check command are illustrative, not commands to run
-here. Within such a task, the interfaces, decisions and case outcomes are
-binding; routine production and test bodies are intentionally absent.
+This hypothetical Python invitation service illustrates the required code detail.
+Its paths and commands are examples, not checks to run in this skill repository.
 
-```markdown
-## Task 1: Reject expired invitation acceptance without writes
+````markdown
+## Task 1: Reject expired invitation acceptance
 
-**Commit:** `feat: reject expired invitation acceptance`
+**Commit:** `fix: reject expired invitation acceptance`
 
-**Behaviour:** Acceptance rejects expired invitations without changing stored state.
-**Scenario:** Existing acceptance entrypoint -> expiry decision -> existing successful acceptance path when unexpired.
-**Observable outcome:** Expired acceptance returns expired with no writes; unexpired acceptance returns accepted and stores the acceptance.
+**Behaviour:** Acceptance rejects invitations expiring at or before now.
+**Scenario:** Existing acceptance function -> expiry check -> accepted-state update.
+**Observable outcome:** Expired invitations remain unaccepted; a future invitation becomes accepted.
 **Dependencies:** None.
+**Files:** Modify `src/invitations/acceptance.py`; create `tests/invitations/test_acceptance.py`.
+**Interfaces:** Preserve `accept_invitation(invitation: Invitation, now: datetime) -> Literal["expired", "accepted"]`. Existing `Invitation` is a dataclass with `expires_at: datetime` and `accepted: bool = False`, in the same module. Both timestamps are UTC-aware.
 
-**Files:**
-- Modify: `src/invitations/acceptance.py`
-- Create: `tests/invitations/test_acceptance.py` (test)
+**Implementation:** Write this test first in `tests/invitations/test_acceptance.py`:
 
-**Interfaces:**
-- Preserve `accept_invitation(invitation_id: str, now: datetime) -> Literal["expired", "accepted"]`.
-- Existing invitation records expose `expiresAt: datetime`; both timestamps are UTC-aware.
-- Preserve existing repository reads and successful acceptance writes.
+```python
+from datetime import datetime
 
-**Implementation decisions:** `expiresAt <= now` is expired. Check expiry before any write. Private helper choice and local fixtures belong to the implementer. Public results, dependencies and architectural responsibilities stay unchanged.
-**Exclusions:** Invitation revocation, new dependencies and changes to other acceptance preconditions.
+import pytest
 
-**Concrete cases:** One parameterised acceptance test table. In every row the invitation exists, is pending, and meets all other acceptance preconditions; `now` is `2030-01-01T12:00:00Z`.
+from invitations.acceptance import Invitation, accept_invitation
 
-| Case | expiresAt | Expected result | Expected effects |
-| --- | --- | --- | --- |
-| `expiresAt < now` | `2030-01-01T11:59:59Z` | `expired` | No writes; stored state unchanged |
-| `expiresAt == now` | `2030-01-01T12:00:00Z` | `expired` | No writes; stored state unchanged |
-| `expiresAt > now` | `2030-01-01T12:00:01Z` | `accepted` | Existing successful acceptance writes; acceptance stored |
 
-**Verification:**
-1. Construct the parameterised test against the acceptance entrypoint with controlled storage and independently derived expectations. Run `pytest tests/invitations/test_acceptance.py::test_acceptance_expiry -v`; verify RED for the missing expiry behaviour, not fixture or syntax errors.
-2. Implement the expiry decision; run the same command for GREEN: three cases pass.
-3. That entrypoint test must verify returned results and persisted state/write effects together, demonstrating the integrated outcome. Run the project's required checks as well.
+@pytest.mark.parametrize(
+    "expiry, expected_result, expected_accepted",
+    [
+        ("2030-01-01T11:59:59+00:00", "expired", False),
+        ("2030-01-01T12:00:00+00:00", "expired", False),
+        ("2030-01-01T12:00:01+00:00", "accepted", True),
+    ],
+)
+def test_acceptance_expiry(expiry, expected_result, expected_accepted):
+    invitation = Invitation(expires_at=datetime.fromisoformat(expiry))
+    now = datetime.fromisoformat("2030-01-01T12:00:00+00:00")
+
+    assert accept_invitation(invitation, now) == expected_result
+    assert invitation.accepted is expected_accepted
 ```
 
-## Completeness, Not Full Bodies
+After observing RED, replace the existing function in `src/invitations/acceptance.py` with this complete body. Retain the existing dataclass and imports of `datetime` and `Literal`:
 
-An omitted routine production or test body is not a placeholder. A plan with
-complete contracts and cases is ready for implementer-written code and tests.
-These remain blocking gaps:
+```python
+def accept_invitation(
+    invitation: Invitation, now: datetime
+) -> Literal["expired", "accepted"]:
+    if invitation.expires_at <= now:
+        return "expired"
+    invitation.accepted = True
+    return "accepted"
+```
+
+**Exclusions:** Persistence, invitation revocation, new dependencies and additional validation.
+**Concrete cases:** The test supplies exact timestamps, return values and resulting accepted state for before/equal/after expiry. No additional layer participates in this example.
+**Verification:** Run `uv run pytest tests/invitations/test_acceptance.py -v` before implementation and observe the two expired rows fail. After implementation, the same command passes all three rows and checks the returned result and state together. Run the project's required checks.
+````
+
+## No placeholders
+
+Code steps require actual code. These are blocking gaps:
 
 - Necessary behaviour or decisions left as "TBD", "TODO", "add validation" or
   "handle edge cases" without actual rules and outcomes.
+- Production or test bodies left to the implementer, including generic instructions
+  to add validation, helpers, fixtures or integration without showing the code.
 - Tests requested without concrete cases and independently derived expectations.
 - An undecided boundary, such as whether `expiresAt == now` is expired; clarify
   before dependent implementation.
@@ -282,7 +305,7 @@ These remain blocking gaps:
 
 ## Remember
 - Exact file paths always
-- Complete behaviour contracts and concrete cases, not routine bodies
+- Complete production/test code and concrete cases
 - Exact commands with expected results; label illustrative commands
 - Reference relevant skills with @ syntax
 - DRY, YAGNI, TDD
@@ -300,8 +323,8 @@ Review the plan yourself before sharing it.
 - **Dependency order:** Sequential dependencies are ordered; independent tasks are marked as safe to parallelise only if they do not edit the same files.
 - **TDD shape:** Behaviour changes specify concrete cases and RED before implementation, then GREEN; apply TDD's prose/configuration exception where appropriate.
 - **Verification:** Every task has exact commands and expected results, with illustrative commands clearly labelled.
-- **Contract completeness:** Every task contains all required fields, necessary decisions and independently derived case expectations; routine bodies may be absent. Parameterise the same behaviour's inputs; keep distinct behaviours separate.
-- **Binding versus illustrative:** Optional snippets are explicitly illustrative; public contracts, security, dependencies, architectural boundaries and required decisions remain binding.
+- **Code completeness:** Every code step supplies its actual implementation or test body, with existing context and integration edits. Preserve independently derived expectations; parameterise the same behaviour's inputs.
+- **Scope and complexity:** Every new mechanism serves the approved design. Equivalent outputs alone do not justify additional machinery.
 - **Type consistency:** Types, method signatures, and property names used in later tasks match what earlier tasks defined. A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 - **Context sufficiency:** A competent task-scoped executor can complete the task from its extracted brief, supplied context and named artefacts alone, with exact values preserved and no need to locate the full design or neighbouring tasks.
 - **Linear position:** `Builds On` resolves to exactly one existing local bookmark target and `Feature Bookmark` is a distinct semantic output bookmark absent at fresh-run start; dependent plans form one explicit stack.
@@ -330,6 +353,12 @@ Fix any issues inline before sharing the plan.
 ## Execution Handoff
 
 **VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks.**
+
+Keep approved designs and plans after delivery. Review history, task reports and
+verification logs remain in ignored scratch storage, outside commits. Amend plans
+only for operative corrections or approved requirement changes. The executor runs
+and records the required-check baseline before source edits; planning-only work
+does not need a development test run.
 
 If the user requested planning only, report the saved plan and stop. If they
 already requested implementation and the plan preserves the approved design,

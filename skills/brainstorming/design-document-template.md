@@ -71,9 +71,9 @@ For each affected unit, record:
 - side effects; and
 - failure behaviour.
 
-Justify boundaries through cohesion, information hiding, and change locality.
-Boundaries hide coherent design decisions rather than execution phases; the
-scenario tree only shows how independently justified units collaborate.
+Use existing boundaries where possible. A new boundary must serve a requested
+behaviour or demonstrated defect, not merely name an execution phase. The
+scenario tree shows how those units collaborate.
 
 ### Key interfaces in pseudocode
 
@@ -136,11 +136,12 @@ changes. Do not invent runtime behaviour to satisfy the template.
 Establish existing execution paths from repository evidence. Continue exploring
 or label an assumption for user approval; never fabricate a current call path.
 
-Material programme-design changes return to design revision and review. These
-include moving responsibilities, changing approved file layout or public
-signatures, adding a public dependency, or replacing an approved scenario call
-path. Private helper structure and equivalent local mechanics remain planning
-or implementation decisions when they preserve approved boundaries.
+Check the design against the user's request and agreed clarifications before
+approval. The approved design is then the source of truth. Material changes need
+user approval and affected review: moving responsibilities, changing approved
+file layout or public signatures, adding a dependency, or replacing a scenario
+call path. Planning supplies concrete implementation and test code within those
+boundaries. Update operative requirements, not review history.
 
 ## Author self-review
 

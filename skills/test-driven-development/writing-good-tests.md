@@ -42,9 +42,9 @@ expect(buildSearchQuery({ tag: 'urgent' })).toBe('tag:"urgent"');
 
 When cases exercise the same behaviour with different inputs, use one
 parameterised case table with explicit, independently derived expected values
-and side effects. Plans specify the actual cases and outcomes; implementers
-construct test bodies and local fixtures. Fixture helpers may arrange inputs,
-but production code or its helpers must not compute expectations.
+and side effects. Plans supply the actual cases, test bodies and local fixtures.
+Implementers follow them under TDD. Fixture helpers may arrange inputs, but
+production code or its helpers must not compute expectations.
 
 Example contract: one acceptance operation rejects expiry at or before `now`.
 Parameterise these supplied cases:
