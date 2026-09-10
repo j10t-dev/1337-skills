@@ -9,6 +9,8 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 Guide completion of development work by presenting clear options and handling chosen workflow.
 
+For formal plans, read `.agents/sdd/progress.md` on entry and update it as finishing progresses.
+
 **Core principle:** Verify tests → Present options → Execute choice → Clean up.
 
 ## The Process
@@ -67,7 +69,7 @@ If a documentation path needs resolution before dispatch, read `../shared/docs-r
 
 Fix genuine issues, verify the changes and re-review until clean; explain mistaken findings directly and escalate blockers.
 
-After a clean final review of a formal plan, absorb fixes into its task commits with `jj absorb --from @ --into '<run-base>..<Feature Bookmark>'`. If changes remain, squash them into the relevant task commit or ask if ownership is unclear. Refresh completed commit IDs in the progress tracker; leave the run base and other features untouched. Reuse verification and review when the code is unchanged.
+After a clean final review of a formal plan, absorb fixes into its task commits with `jj absorb --from @ --into '<run-base>..<Feature Bookmark>'`. If changes remain, squash them into the relevant task commit or ask if ownership is unclear. Refresh completed commit IDs in the progress file; leave the run base and other features untouched. Reuse verification and review when the code is unchanged.
 
 ### Step 3: Present Completion Options
 

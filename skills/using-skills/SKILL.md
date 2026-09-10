@@ -9,7 +9,7 @@ If dispatched as a task-scoped subagent, stop here and execute the assignment wi
 
 Before responding or acting, invoke skills requested by the user, matching the current action, or required by the active workflow. This includes conversational prose guidance such as `unslop`. Reuse current guidance already loaded. Reading a skill as review material does not activate its workflow; set aside a skill that proves inapplicable.
 
-Use process skills before implementation skills. Invoke `brainstorming` before entering plan mode if brainstorming has not already occurred. Follow skills without announcing invocation. Track applicable checklists in the harness, or briefly in chat if no tracker exists.
+Use process skills before implementation skills. Invoke `brainstorming` before entering plan mode if brainstorming has not already occurred. Follow skills without announcing invocation. Track applicable checklists in the harness, or briefly in chat if no tracker exists, unless the active skill specifies a durable progress file.
 
 If temporary files are useful, use `/tmp`.
 
