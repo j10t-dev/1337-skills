@@ -167,10 +167,10 @@ If you find significant deviations from the plan, flag them specifically so the 
 ### Issues
 
 #### Important
-1. **Missing help text in CLI wrapper**
+1. **Cancellation leaves a write running**
    - File: index-conversations:1-31
-   - Issue: No --help flag, users won't discover --concurrency
-   - Fix: Add --help case with usage examples
+   - Issue: The approved cancellation path returns before its owned write stops
+   - Fix: Join the existing write's cancellation before returning
 
 2. **Date validation missing**
    - File: search.ts:25-27
@@ -184,12 +184,11 @@ If you find significant deviations from the plan, flag them specifically so the 
    - Impact: Users don't know how long to wait
 
 ### Recommendations
-- Add progress reporting for user experience
-- Consider config file for excluded projects (portability)
+- No additional features recommended.
 
 ### Assessment
 
 **Ready for user review: With fixes**
 
-**Reasoning:** Core implementation is solid with good architecture and tests. Important issues (help text, date validation) are easily fixed and don't affect core functionality.
+**Reasoning:** Cancellation and date validation need fixes before the implementation meets its approved requirements.
 ```

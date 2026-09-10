@@ -30,13 +30,13 @@ Supply this context directly or by reference when a file is useful. `scripts/tas
 
 1. Read the plan, its required context and skills, `Builds On`, `Feature Bookmark`, and each task's `Commit` subject. Ask about missing or conflicting requirements.
 2. Resolve `Builds On` to one local bookmark target and retain its full change and commit IDs as the run base.
-3. Check the progress tracker. On resume, follow [recovery.md](recovery.md); do not restart completed tasks.
+3. Read `.agents/sdd/progress.md` if it exists. On resume, follow [recovery.md](recovery.md); do not restart completed tasks.
 4. On a fresh run, require the feature bookmark to be absent and stop on unexplained edits. Position empty `@` on the run base with `jj new <Builds On>` if needed, then create the declared feature bookmark there.
 5. Establish the baseline under `verification-before-completion` before source edits.
 
-## Progress tracker
+## Progress
 
-Use the harness's task tracker, or a concise checklist in chat if none exists, with these fields and task states:
+Keep the repository's current progress in `.agents/sdd/progress.md`, ignored by VCS. This is the single record of completed work, work underway and where to resume after compaction.
 
 ```text
 plan: /absolute/path/to/plan.md
@@ -44,13 +44,13 @@ builds on: feature-a
 feature bookmark: feature-b
 run base: change <full change ID>, commit <full commit ID>
 
-Task 1 -> pending
+Task 1 -> change <full change ID>, commit <full commit ID> (complete)
 Task 2 -> in progress
-Task 3 -> change <full change ID>, commit <full commit ID> (complete)
+Task 3 -> pending
 Final review -> pending | in progress | complete
 ```
 
-Update each task as it starts and completes; the numbered lines illustrate the available states, not a valid execution order.
+Create the file when starting a plan and update it as work progresses.
 
 ## Task loop
 
@@ -81,7 +81,7 @@ Each fix assignment names the defect and tests that exercise the changed behavio
 
 ## Finish
 
-After all tasks are complete, pass the run base, feature bookmark, progress tracker and test results to `finishing-development` at Step 2 for final review and delivery.
+After all tasks are complete, pass the run base, feature bookmark, progress file and test results to `finishing-development` at Step 2 for final review and delivery.
 
 ## Context boundaries
 

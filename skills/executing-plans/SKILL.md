@@ -18,7 +18,7 @@ Preserve exact cases and independently derived expectations. Parameterise one be
 ## Start or Resume
 
 1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task. Stop on missing, duplicate or ambiguous metadata.
-2. Track the plan path, bookmarks, run-base IDs and each task's state in the harness or chat checklist. On a fresh run, require the feature bookmark to be absent, stop on unexplained edits, position empty `@` on the run base and create the declared bookmark there.
+2. Keep the plan path, bookmarks, run-base IDs and task progress in `.agents/sdd/progress.md`, ignored by VCS. Read it on resume and update it as work progresses. On a fresh run, require the feature bookmark to be absent, stop on unexplained edits, position empty `@` on the run base and create the declared bookmark there.
 3. On resume, follow `../subagent-driven-development/recovery.md`; resume the unfinished execution task, not completed work or final review.
 4. Establish the baseline under `verification-before-completion` before source edits; reuse applicable results on resume.
 
@@ -26,7 +26,7 @@ Preserve exact cases and independently derived expectations. Parameterise one be
 
 For each task in order:
 
-1. Confirm the progress tracker and feature bookmark identify the accepted tip, then mark the task `in progress`.
+1. Confirm the progress file and feature bookmark identify the accepted tip, then mark the task `in progress`.
 2. Keep `@` undescribed with the feature bookmark at `@-`.
 3. Follow the plan's skills and TDD steps. Use `verification-before-completion` for required checks.
 4. Only after verification passes for the task and any agreed blocking repair, accept the task:
@@ -34,7 +34,7 @@ For each task in order:
    - run `jj commit -m "<exact planned subject>"`;
    - run `jj bookmark set "<Feature Bookmark>" -r @-`;
    - record `@-`'s full change and commit IDs as complete.
-5. Mark the task complete in the tracker and continue in the new empty `@`.
+5. Mark the task complete in `progress.md` and continue in the new empty `@`.
 
 Verification is the execution gate. Do not commission plan, task, repair or final reviews here. Never amend accepted work or move another bookmark.
 
@@ -46,7 +46,7 @@ Preserve the task's edits when fixing an agreed blocker, verify both scopes, and
 
 ## Completion
 
-Report completed tasks, check results and unresolved blockers to the caller; when standalone, pass these and the progress tracker to `finishing-development` from Step 1.
+Report completed tasks, check results and unresolved blockers to the caller; when standalone, pass these and the progress file to `finishing-development` from Step 1.
 
 ## Stop and Ask
 
