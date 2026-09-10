@@ -77,9 +77,7 @@ Make the authorised fix. Reuse applicable verification evidence; request a decis
 
 ### 5. Reply to Thread
 
-Confirm that replying is authorised by the user's request or standing instructions.
-Local fixing alone does not grant authority to publish replies or resolve threads.
-Prepare the concrete local result before requesting any missing approval.
+Confirm that replying is authorised by the user's request or standing instructions. Local fixing alone does not grant authority to publish replies or resolve threads. Prepare the concrete local result before requesting any missing approval.
 
 Reply in the inline review thread. Do not post a top-level PR comment for inline review feedback.
 

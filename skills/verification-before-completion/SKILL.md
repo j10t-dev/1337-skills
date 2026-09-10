@@ -3,121 +3,36 @@ name: verification-before-completion
 description: Use when about to claim work is complete, fixed, or passing, before integration, submission, or task completion
 ---
 
-# Verification Before Completion
+# Verification before completion
 
-## Overview
+Make completion claims only with applicable verification evidence. This applies before accepting work, moving to the next task, describing or saving completed local changes, requesting bookmark advancement, integrating or submitting externally. Different wording does not bypass the gate.
 
-Claiming work is complete without verification is dishonesty, not efficiency.
+## Baseline before implementation
 
-**Core principle:** Evidence before claims, always.
+Before source edits, run required project checks and report the starting revision, commands, exit statuses, elapsed times and results. Resolve a failed or unavailable baseline with the user before proceeding. Reuse applicable baseline results on resume; planning-only work needs no development test run.
 
-**Violating the letter of this rule is violating the spirit of this rule.**
+Investigate later failures against this evidence, changed code and environment. A pre-existing claim needs evidence; a green rerun alone does not explain an intermittent failure. Fix introduced regressions within scope and agree broader repairs with the user. Resolve failures before delivery unless the user explicitly accepts a stated limitation.
 
-## The Iron Law
+## Evidence gate
 
-```
-NO COMPLETION CLAIMS WITHOUT APPLICABLE VERIFICATION EVIDENCE
-```
+1. Identify what proves each claim.
+2. Read existing results. Evidence survives handoffs and formatting differences; fix the report, not the test run.
+3. Run missing or invalidated checks. Rerun for relevant code, configuration or environment changes, failures or a specific doubt. Complete required project checks without broadening the suite by default.
+4. Confirm reported output supports the claim, including exit status, failures, elapsed time and checked scope; use the required reviewers' verdicts for code review.
+5. Flag unexplained changes in test runtime as potential defects, accounting for changes in checked scope and environment.
+6. Resolve failures or obtain explicit user-accepted limitations before delivery.
+7. Report results and remaining gaps concisely. Task-only checks do not prove the whole feature passed.
 
-Read existing results first. Evidence survives handoffs and formatting differences:
-fix the report, not the test run. Rerun only for missing evidence, relevant code,
-configuration or environment changes, failures, or a specific doubt. Complete
-required checks; do not broaden the suite by default.
+## Match evidence to claims
 
-## The Gate Function
+| Claim | Required evidence |
+|-------|-------------------|
+| Tests pass | Applicable command output with zero failures and scope |
+| Linter clean | Applicable linter output with zero errors |
+| Build succeeds | Build command exits zero, not merely a passing linter |
+| Bug fixed | Original symptom's test passes |
+| Regression test works | Observed red-green cycle, not a single pass |
+| Agent completed | Reported check results and required review verdicts |
+| Requirements met | Check each binding requirement, not just test results |
 
-```
-BEFORE claiming completion:
-
-1. IDENTIFY: What proves the claim?
-2. READ: Inspect existing results.
-3. RUN: Perform missing or invalidated checks.
-4. VERIFY: Do the results support the claim?
-5. REPORT: State the checked scope, result and remaining gaps.
-```
-
-## Common Failures
-
-| Claim | Requires | Not Sufficient |
-|-------|----------|----------------|
-| Tests pass | Applicable command output: 0 failures, with scope | A stale result or "should pass" |
-| Linter clean | Linter output: 0 errors | Partial check, extrapolation |
-| Build succeeds | Build command: exit 0 | Linter passing, logs look good |
-| Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
-| Regression test works | Red-green cycle verified | Test passes once |
-| Agent completed | VCS diff shows changes | Agent reports "success" |
-| Requirements met | Line-by-line checklist | Tests passing |
-
-## Red Flags - STOP
-
-- Using "should", "probably", "seems to"
-- Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
-- About to describe/save local changes, ask the user to advance the target bookmark, submit externally, create a PR, or mark a task complete without verification
-- Trusting agent success reports
-- Claiming a broader result than the verification covers
-- Thinking "just this once"
-- Tired and wanting work over
-- **ANY wording implying success without applicable verification evidence**
-
-## Rationalisation Prevention
-
-| Excuse | Reality |
-|--------|---------|
-| "Should work now" | RUN the verification |
-| "I'm confident" | Confidence ≠ evidence |
-| "Just this once" | No exceptions |
-| "Linter passed" | Linter ≠ compiler |
-| "Agent said success" | Read the code and recorded results |
-| "I'm tired" | Exhaustion ≠ excuse |
-| "Partial check is enough" | Claim only the checked scope and complete required checks |
-| "Different words so rule doesn't apply" | Spirit over letter |
-
-## Key Patterns
-
-**Tests:**
-```
-✅ [Run test command] [See: 34/34 pass] "All tests pass"
-❌ "Should pass now" / "Looks correct"
-```
-
-**Regression tests (TDD Red-Green):**
-```
-✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
-❌ "I've written a regression test" (without red-green verification)
-```
-
-**Build:**
-```
-✅ [Run build] [See: exit 0] "Build passes"
-❌ "Linter passed" (linter doesn't check compilation)
-```
-
-**Requirements:**
-```
-✅ Re-read plan → Create checklist → Verify each → Report gaps or completion
-❌ "Tests pass, phase complete"
-```
-
-**Agent delegation:**
-```
-✅ Agent report → Inspect diff and results → Run missing checks → Report state
-❌ Trust agent report
-```
-
-## Why This Matters
-
-- Your human partner can only accept evidenced claims of completion. 
-- Unverified work is inherently valueless
-
-## When To Apply
-
-Before claiming completion, accepting work, moving to the next task or submitting
-externally. Changing the wording of a claim does not change its evidence needs.
-
-## The Bottom Line
-
-**No shortcuts for verification.**
-
-Read the evidence. Fill gaps. Report the result.
-
-This is non-negotiable.
+For an existing regression test, a permitted temporary removal of the fix can establish failure before restoration and a passing run. Preserve tool and edit permissions. Confidence, fatigue, partial checks and agent assurances are not substitutes for evidence. Claim only what the checks establish.

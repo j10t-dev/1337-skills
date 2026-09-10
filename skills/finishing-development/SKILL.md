@@ -9,14 +9,15 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 Guide completion of development work by presenting clear options and handling chosen workflow.
 
+For formal plans, read `.agents/sdd/progress.md` on entry and update it as finishing progresses.
+
 **Core principle:** Verify tests → Present options → Execute choice → Clean up.
 
 ## The Process
 
 ### Step 1: Verify Tests
 
-Use `verification-before-completion` to reuse existing results and fill gaps.
-If verification and review are complete, enter Step 3.
+Use `verification-before-completion` to reuse existing results and fill gaps. If verification and review are complete, enter Step 3, retaining its outstanding-work gate.
 
 ```bash
 # Run project's test suite
@@ -29,17 +30,16 @@ Tests failing (<N> failures). Must fix before completing:
 
 [Show failures]
 
-Cannot proceed until tests pass.
+Cannot deliver until tests pass or the user explicitly changes the delivery requirement.
 ```
 
-Stop. Don't proceed to Step 2.
+Stop affected delivery unless the user explicitly accepts the stated limitation.
 
 **If tests pass:** Continue to Step 2.
 
-### Step 2: Optional Code Review
+### Step 2: Code Review
 
-Reuse completed review. Otherwise perform required review, or ask about optional
-review if a specific concern merits it:
+Reuse a completed review of unchanged code; otherwise review the whole feature from its run base, including uncommitted fixes. For other work, perform required review or ask about optional review:
 
 ```
 Question: "Tests pass. Want code review before finishing?"
@@ -48,7 +48,7 @@ Options:
   - "No, skip review" → Proceed to Step 3
 ```
 
-**If user wants review:**
+**When review is required or requested:**
 
 Dispatch code-reviewer with an explicit jj boundary:
 ```
@@ -65,23 +65,17 @@ Subagent/delegation tool (code-reviewer):
     Do not infer scope from session history or auto-detect from ambient repository state.
 ```
 
-Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch;
-reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
+If a documentation path needs resolution before dispatch, read `../shared/docs-root.md`.
 
-**After review:**
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
-- Note Minor issues
+Fix genuine issues, verify the changes and re-review until clean; explain mistaken findings directly and escalate blockers.
 
-**If user skips review:**
-- Continue to Step 3
-
-A formally executed feature already consists of accepted task commits plus any separately reviewed final-fix commits, and its feature bookmark identifies the accepted tip. Leave that curated local stack unchanged unless the user explicitly requests history reshaping or integration.
+After a clean final review of a formal plan, absorb fixes into its task commits with `jj absorb --from @ --into '<run-base>..<Feature Bookmark>'`. If changes remain, squash them into the relevant task commit or ask if ownership is unclear. Refresh completed commit IDs in the progress file; leave the run base and other features untouched. Reuse verification and review when the code is unchanged.
 
 ### Step 3: Present Completion Options
 
-Report the outcome and evidence. Carry out the requested next step; ask only for
-an unresolved decision. Do not append a standard menu.
+Deliver when required checks pass and review is complete, or state the limitations the user explicitly accepted.
+
+Report the outcome, checked scope and consequential decisions concisely.
 
 **Do not perform integration operations** (rebase shared work, move bookmarks, submit externally, create/update PRs, or advance the target bookmark) unless the user explicitly asks. The user controls final jj/git-colocated integration.
 
@@ -98,7 +92,7 @@ an unresolved decision. Do not append a standard menu.
 ## Red Flags
 
 **Never:**
-- Proceed with failing tests
+- Deliver with unresolved failures without an explicit user change to the delivery requirement
 - Delete work without confirmation
 - Push, submit, move bookmarks, or rewrite shared history without explicit request
 

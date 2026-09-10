@@ -2,12 +2,9 @@
 
 ## Overview
 
-When invalid data has multiple independent entry paths, each entry must validate
-it. Use `principle-boundary-discipline` as the authority for placement: construct
-validated domain types at external boundaries and trust their guarantees inside.
+When invalid data has multiple independent entry paths, each entry must validate it. Use `principle-boundary-discipline` as the authority for placement: construct validated domain types at external boundaries and trust their guarantees inside.
 
-**Core principle:** Protect distinct entry paths and live operation hazards, not
-repeat the same immutable-property check in every internal helper.
+**Core principle:** Protect distinct entry paths and live operation hazards, not repeat the same immutable-property check in every internal helper.
 
 ## Why Multiple Layers
 
@@ -47,16 +44,12 @@ function initializeWorkspace(projectDir: ValidatedDirectory, sessionId: SessionI
 }
 ```
 
-A separate external importer must construct these same validated types before
-calling this function; an internal helper is not another trust boundary.
+A separate external importer must construct these same validated types before calling this function; an internal helper is not another trust boundary.
 
 ### Layer 3: Environment Guards
 **Purpose:** Prevent dangerous operations in specific contexts
 
-Check live facts where the operation needs them. A parsed type cannot guarantee
-that filesystem state or permissions have not changed. Use appropriate atomic
-or handle-based operations when a separate pre-check would leave a race. The
-prefix check below illustrates a test guard, not a complete security boundary.
+Check live facts where the operation needs them. A parsed type cannot guarantee that filesystem state or permissions have not changed. Use appropriate atomic or handle-based operations when a separate pre-check would leave a race. The prefix check below illustrates a test guard, not a complete security boundary.
 
 ```typescript
 async function gitInit(directory: string) {
@@ -132,9 +125,6 @@ Bug: Empty `projectDir` caused `git init` in source code
 
 ## Key Insight
 
-Independent entry paths can bypass one adapter, and mutable state can invalidate
-an earlier precondition. Protect those cases explicitly. Mocks should preserve
-the real boundary contract; debug logging helps locate a violation.
+Independent entry paths can bypass one adapter, and mutable state can invalidate an earlier precondition. Protect those cases explicitly. Mocks should preserve the real boundary contract; debug logging helps locate a violation.
 
-**Validate at trust boundaries and guard live hazards.** More internal checks do
-not by themselves establish a stronger guarantee.
+**Validate at trust boundaries and guard live hazards.** More internal checks do not by themselves establish a stronger guarantee.

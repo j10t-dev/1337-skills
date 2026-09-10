@@ -41,15 +41,13 @@ Reuse reviews of unchanged code and requirements. Use `verification-before-compl
 
 Use the current harness's subagent/delegation tool with the code-reviewer type if available, filling the template at `code-reviewer.md`
 
-Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch;
-reviewers do not inherit your environment. See `writing-plans` for docs-root rules.
+Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch; reviewers do not inherit your environment. See `../shared/docs-root.md` for docs-root rules.
 
 **3. Act on feedback:**
-- Fix Critical/Important issues
-- **Re-review Critical/Important fixes** using the smallest scope that proves the issue was resolved: specific files, affected tests, or a narrower jj boundary if appropriate
-- Final completion requires Critical/Important findings resolved or explicitly accepted by the user. SDD's task-level exceptions do not waive final review.
-- Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
+- Communicate disagreements directly, using implementer or reviewer evidence as needed.
+- Fix genuine code defects and re-review the smallest scope that proves resolution until clean. Escalate actual blockers, not arbitrary round limits.
+- Broader repair scope requires user agreement, not merely a review finding.
+- Return reviews in responses, not forced files.
 
 ## Example
 
@@ -68,13 +66,13 @@ reviewers do not inherit your environment. See `writing-plans` for docs-root rul
     Minor: Magic number (100) for reporting interval
   Assessment: Ready with fixes
 
-You: [Fix progress indicators]
+You: [Have the implementer add progress indicators]
 
 [Dispatch code-reviewer again to verify fix]
-  DESCRIPTION: Verification of progress indicator fix
+  DESCRIPTION: Verification of progress indicators
   PLAN_REFERENCE: Task 2 from `/abs/path/to/docs/<projectName>/plans/<slug>.md`
   FIX_REVIEW_SCOPE:
-    - Verify the progress indicator issue is fixed
+    - Verify progress indicators report completed and total work
     - Review only:
       - src/index-verifier.ts
       - src/index-repairer.ts
@@ -82,7 +80,7 @@ You: [Fix progress indicators]
     - Confirm the relevant test command passes
 
 [Subagent returns]:
-  Strengths: Progress reporting now working correctly
+  Strengths: Progress indicators now show completed and total work
   Issues: Minor: Magic number remains (acceptable)
   Assessment: Ready to proceed
 
@@ -96,8 +94,8 @@ You: [Fix progress indicators]
 - Catch issues before they compound
 - Follow SDD's task-acceptance rules
 
-**Executing Plans:**
-- Review after all tasks complete
+**Finishing a Development Branch:**
+- Owns final review after inline execution completes
 - Final check before asking the user to advance the target bookmark or submit externally
 
 **Ad-Hoc Development:**
@@ -117,6 +115,6 @@ You: [Fix progress indicators]
 **If reviewer wrong:**
 - Push back with technical reasoning
 - Show code/tests that prove it works
-- Request clarification
+- Explain the disagreement directly; ask for clarification when evidence remains insufficient
 
 See template at: requesting-code-review/code-reviewer.md

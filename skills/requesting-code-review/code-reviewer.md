@@ -51,7 +51,9 @@ You are the only reviewer this boundary gets. Reach your verdict from your own r
 {REQUIREMENTS}
 {PLAN_REFERENCE}
 
-Use the supplied brief or request when no plan exists.
+Use the supplied brief or request when no plan exists. Review code against approved requirements; scope or architectural changes require user approval. Combined repair reviews must explicitly include both scopes.
+
+Return findings in your response, not review files.
 
 **Diff File (preferred):**
 {DIFF_FILE}
@@ -81,10 +83,7 @@ Use the supplied brief or request when no plan exists.
 - Security concerns?
 
 **Testing:**
-Reuse inspected test evidence for the current code/configuration under
-`verification-before-completion`. Run a focused check only for missing or
-invalidated evidence or a concrete unresolved doubt; do not repeat a suite
-merely because another agent or workflow phase supplied the result.
+Reuse inspected test evidence for the current code/configuration under `verification-before-completion`. Run a focused check only for missing or invalidated evidence or a concrete unresolved doubt; do not repeat a suite merely because another agent or workflow phase supplied the result.
 
 - Tests actually test logic (not mocks)?
 - Edge cases covered?
@@ -106,14 +105,9 @@ merely because another agent or workflow phase supplied the result.
 
 ## Calibration
 
-Categorise issues by actual severity. Not everything is Critical.
-Acknowledge what was done well before listing issues — accurate praise
-helps the implementer trust the rest of the feedback.
+Categorise issues by actual severity. Not everything is Critical. Acknowledge what was done well before listing issues — accurate praise helps the implementer trust the rest of the feedback.
 
-If you find significant deviations from the plan, flag them specifically
-so the implementer can confirm whether the deviation was intentional.
-If you find issues with the plan itself rather than the implementation,
-say so.
+If you find significant deviations from the plan, flag them specifically so the implementer can confirm whether the deviation was intentional. If you find issues with the plan itself rather than the implementation, say so.
 
 ## Output Format
 
@@ -173,10 +167,10 @@ say so.
 ### Issues
 
 #### Important
-1. **Missing help text in CLI wrapper**
+1. **Cancellation leaves a write running**
    - File: index-conversations:1-31
-   - Issue: No --help flag, users won't discover --concurrency
-   - Fix: Add --help case with usage examples
+   - Issue: The approved cancellation path returns before its owned write stops
+   - Fix: Join the existing write's cancellation before returning
 
 2. **Date validation missing**
    - File: search.ts:25-27
@@ -190,12 +184,11 @@ say so.
    - Impact: Users don't know how long to wait
 
 ### Recommendations
-- Add progress reporting for user experience
-- Consider config file for excluded projects (portability)
+- No additional features recommended.
 
 ### Assessment
 
 **Ready for user review: With fixes**
 
-**Reasoning:** Core implementation is solid with good architecture and tests. Important issues (help text, date validation) are easily fixed and don't affect core functionality.
+**Reasoning:** Cancellation and date validation need fixes before the implementation meets its approved requirements.
 ```

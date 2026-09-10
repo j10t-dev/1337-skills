@@ -9,15 +9,11 @@ description: Use when the user explicitly asks for a cross-harness pi review of 
 
 Request a document or code review from the `pi` harness and its configured models. 
 
-This skill runs **only** when the user explicitly asks for a cross-harness
-check. `brainstorming` and `writing-plans` never route here; their mandatory
-independent review goes to `requesting-document-review`.
+This skill runs **only** when the user explicitly asks for a cross-harness check. `brainstorming` and `writing-plans` never route here; their mandatory independent review goes to `requesting-document-review`.
 
 ## Usage
 
-Load `requesting-document-review` and follow its loop unchanged — triage under
-`receiving-code-review`, the 3-round bound, convergence, and reporting all
-apply exactly as written. Substitute the wrapper for the reviewer dispatch:
+Load `requesting-document-review` and follow its loop unchanged — triage under `receiving-code-review`, the 3-round bound, convergence, and reporting all apply exactly as written. Substitute the wrapper for the reviewer dispatch:
 
 The wrapper is not on `PATH`. Invoke it by its canonical absolute path:
 
@@ -26,21 +22,13 @@ The wrapper is not on `PATH`. Invoke it by its canonical absolute path:
 ~/.claude/skills/requesting-pi-review/pi-review plan <doc> <design-ref>
 ```
 
-`design-ref` (the design doc the plan must align with) is **required** for
-`plan` reviews and rejected for `design` reviews.
+`design-ref` (the design doc the plan must align with) is **required** for `plan` reviews and rejected for `design` reviews.
 
-Defaults: pi's configured model, effort `high`. Override with `--model` /
-`--effort`, or `PI_REVIEW_MODEL` / `PI_REVIEW_EFFORT`.
+Defaults: pi's configured model, effort `high`. Override with `--model` / `--effort`, or `PI_REVIEW_MODEL` / `PI_REVIEW_EFFORT`.
 
-The reviewer runs with `--no-session --no-context-files --no-extensions
---no-skills`: no saved session, and no project AGENTS.md/CLAUDE.md,
-extensions, or skills loaded — only the prompt template and the document(s)
-passed in shape its judgement.
+The reviewer runs with `--no-session --no-context-files --no-extensions --no-skills`: no saved session, and no project AGENTS.md/CLAUDE.md, extensions, or skills loaded — only the prompt template and the document(s) passed in shape its judgement.
 
-If the wrapper exits non-zero, or its output contains no Status block, that is
-a failed invocation to diagnose and retry — it is not a review round and
-consumes nothing from the 3-round bound. Stop after 2 consecutive failed
-invocations and report the failure plainly.
+If the wrapper exits non-zero, or its output contains no Status block, that is a failed invocation to diagnose and retry — it is not a review round and consumes nothing from the 3-round bound. Stop after 2 consecutive failed invocations and report the failure plainly.
 
 ## Common Mistakes
 

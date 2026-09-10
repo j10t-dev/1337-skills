@@ -7,56 +7,56 @@ description: Use when partner provides a complete implementation plan to execute
 
 Execute inline when requested or subagents are unavailable.
 
-The plan and supplied context are your requirements. Ask the controller for
-missing context, or the user when executing standalone. Do not read the design.
+Execute the approved plan and supplied context; do not reopen design or plan approval. Ask the controller about missing requirements, or the user when working standalone.
+
+## Planned implementation
+
+Implement the supplied production and test code, interfaces, exclusions and cases following TDD. Local syntax or naming adjustments must fit repository conventions; equivalent outputs do not justify a different implementation structure. Missing code or integration decisions need clarification before dependent work. Additional behaviour or architectural machinery requires user approval.
+
+Preserve exact cases and independently derived expectations. Parameterise one behaviour's inputs; keep distinct operations separate. Use TDD's prose/configuration exception where no useful executable test exists, retaining required checks.
 
 ## Start or Resume
 
 1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task. Stop on missing, duplicate or ambiguous metadata.
-2. Use `.agents/sdd/progress.md` as the active-plan ledger. On a fresh run, resolve and record the full `Builds On` identities, require the feature bookmark to be absent, reject unexplained edits, position empty `@` on the run base, write the ledger, then create the feature bookmark there.
-3. On resume, require the same plan metadata and run-base identities. Verify completed commits form one exact-subject, exact-parent path and the feature bookmark identifies the accepted tip.
-4. Resume only the recorded task or final fix. If its exact accepted commit exists while the bookmark or ledger lags, advance the bookmark if needed, then record the full IDs. Stop on any other mismatch or divergence.
-
-Ledger: plan path, bookmark names, run-base IDs and task/fix states: `in progress`, `pending (subject ...)`, or `change <full-id>, commit <full-id> (complete)`.
+2. Keep the plan path, bookmarks, run-base IDs and task progress in `.agents/sdd/progress.md`, ignored by VCS. Read it on resume and update it as work progresses. On a fresh run, require the feature bookmark to be absent, stop on unexplained edits, position empty `@` on the run base and create the declared bookmark there.
+3. On resume, follow `../subagent-driven-development/recovery.md`; resume the unfinished execution task, not completed work or final review.
+4. Establish the baseline under `verification-before-completion` before source edits; reuse applicable results on resume.
 
 ## Task Loop
 
 For each task in order:
 
-1. Confirm the ledger and feature bookmark identify the accepted tip. Write `Task N -> in progress` before new work; preserve that entry when resuming.
+1. Confirm the progress file and feature bookmark identify the accepted tip, then mark the task `in progress`.
 2. Keep `@` undescribed with the feature bookmark at `@-`.
 3. Follow the plan's skills and TDD steps. Use `verification-before-completion` for required checks.
-4. Only after verification passes, accept the task:
+4. Only after verification passes for the task and any agreed blocking repair, accept the task:
    - confirm non-empty undescribed `@` has the feature bookmark as its sole parent;
    - run `jj commit -m "<exact planned subject>"`;
    - run `jj bookmark set "<Feature Bookmark>" -r @-`;
    - record `@-`'s full change and commit IDs as complete.
-5. Mark the task complete in the tracker and continue in the new empty `@`.
+5. Mark the task complete in `progress.md` and continue in the new empty `@`.
 
-Inline execution has no task-review subagent and must not invent one. Verification is its acceptance gate. Never amend accepted work or move another bookmark.
+Verification is the execution gate. Do not commission plan, task, repair or final reviews here. Never amend accepted work or move another bookmark.
 
-## Final Review and Fixes
+## Failures and blockers
 
-Review from the recorded run base through the feature bookmark. For findings:
+Investigate verification failures against the baseline, changed code and environment. Fix introduced regressions within scope. Report commands, actual output and attribution evidence; do not dismiss failures as pre-existing or treat a passing rerun as a diagnosis. Escalate repairs beyond approved scope to the controller, or the user when standalone. Continue only independent authorised work while blocked.
 
-1. Record an exact pending `fix:` subject before changing work.
-2. Apply and verify the fix in undescribed `@`, then review from run base through `@`.
-3. After clean re-review, repeat the acceptance sequence using the pending subject.
-4. Reuse that review if the accepted content and requirements are unchanged.
+Preserve the task's edits when fixing an agreed blocker, verify both scopes, and update the unaccepted plan entry if the repair changes its instructions or commit subject.
 
-After final review passes with no pending fix, remove `.agents/sdd/` and enter `finishing-development` at Step 3 with the existing evidence.
+## Completion
+
+Report completed tasks, check results and unresolved blockers to the caller; when standalone, pass these and the progress file to `finishing-development` from Step 1.
 
 ## Stop and Ask
 
-Escalate missing requirements, scope changes or permissions to the controller.
-Continue independent work; repair failures before acceptance.
+Escalate missing requirements, scope changes or permissions while continuing independent authorised work.
 
-Stop on unexplained edits, malformed state, identity mismatch, divergence or
-undocumented recovery. Do not improvise history changes, integration or bookmark movement.
+Stop on unexplained edits, malformed state, identity mismatch, divergence or undocumented recovery. Do not improvise history changes, integration or bookmark movement.
 
 ## Integration
 
 **Required workflow skills:**
 - `test-driven-development` for task implementation
 - `verification-before-completion` before reporting success
-- `finishing-development` after final review
+- `finishing-development` after standalone execution

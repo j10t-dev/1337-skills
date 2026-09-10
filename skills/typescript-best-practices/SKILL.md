@@ -1,6 +1,6 @@
 ---
 name: typescript-best-practices
-description: TypeScript best practices. Use when reading or editing any .ts or .tsx file.
+description: Use when implementing or changing TypeScript code, designing TypeScript types or APIs, or reviewing TypeScript code changes. Read-only investigation alone does not trigger this skill.
 ---
 
 # TypeScript best practices
