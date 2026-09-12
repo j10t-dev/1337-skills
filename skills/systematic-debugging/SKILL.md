@@ -7,21 +7,21 @@ description: Use when encountering any bug, test failure, or unexpected behaviou
 
 Investigate root cause before proposing fixes, including under time pressure and for apparently simple bugs, performance, build or integration failures. Complete the four phases in order within the assigned scope and tool permissions.
 
-Investigation is not repair authority. Compare failures with the recorded baseline, changed code and environment. Report commands, actual output and attribution evidence to the controller; never dismiss a failure as pre-existing or call a passing rerun a diagnosis. Fix introduced regressions within scope. Repairs beyond approved scope need user agreement before dispatch. Continue only independent authorised work while blocked. Standalone execution carries controller responsibility.
+Investigation is not repair authority. Follow [the shared verification policy](../shared/verification.md) for baselines, failure attribution, independent work and repair authority. Scoped agents report evidence to the controller; standalone execution carries controller responsibility.
 
 ## 1. Root-cause investigation
 
 - Read errors, warnings and complete stack traces. Note paths, line numbers and error codes.
 - Establish exact reproduction steps and frequency. If reproduction is unreliable, gather data rather than guess.
 - Inspect relevant changes, dependencies, configuration and environment differences using supplied evidence within the task boundary. Use VCS/history only when permitted.
-- For multi-component systems, instrument each boundary before proposing fixes. Record inputs, outputs, environment/configuration propagation and state at each layer. Run to locate the failing component, then investigate it.
+- For multi-component systems, use existing evidence first. Instrument only the boundaries needed to locate the fault, recording relevant inputs, outputs, configuration or state. Stop adding diagnostics once the evidence explains the failure.
 - Trace bad values backwards through callers to their source, not just the symptom. For deep call stacks, read `root-cause-tracing.md`.
 
 Proceed when evidence explains what fails and why.
 
 ## 2. Pattern analysis
 
-Find comparable working code. Read reference implementations completely before applying their patterns. List every difference between working and broken paths, however small, and identify dependencies, settings and assumptions. Proceed with the differences understood.
+Find comparable working code when it helps explain the failure. Read the relevant implementation and its dependencies before applying a pattern. Compare relevant differences between working and broken paths until the evidence explains the failure; do not inventory unrelated differences.
 
 ## 3. Hypothesis and testing
 

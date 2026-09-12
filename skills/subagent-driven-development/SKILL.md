@@ -28,11 +28,11 @@ Supply this context directly or by reference when a file is useful. `scripts/tas
 
 ## Start or resume
 
-1. Read the plan, its required context and skills, `Builds On`, `Feature Bookmark`, and each task's `Commit` subject. Ask about missing or conflicting requirements.
+1. Read the plan, its required context and skills, `Builds On`, `Feature Bookmark`, and each task's `Commit` subject. Derive a missing subject from the approved task and record it before execution. Ask about other missing or conflicting requirements; do not infer run bases or feature identity.
 2. Resolve `Builds On` to one local bookmark target and retain its full change and commit IDs as the run base.
 3. Read `.agents/sdd/progress.md` if it exists. On resume, follow [recovery.md](recovery.md); do not restart completed tasks.
 4. On a fresh run, require the feature bookmark to be absent and stop on unexplained edits. Position empty `@` on the run base with `jj new <Builds On>` if needed, then create the declared feature bookmark there.
-5. Establish the baseline under `verification-before-completion` before source edits.
+5. Inspect the design/plan baseline under [the shared verification policy](../shared/verification.md). Reuse applicable results; fill missing or invalidated checks before dependent implementation and surface any consequence for the approved design.
 
 ## Progress
 
@@ -99,7 +99,7 @@ Never:
 
 - `writing-plans` supplies the approved implementation plan.
 - `test-driven-development` governs implementation.
-- `verification-before-completion` governs checks.
+- `shared/verification.md` governs baselines, evidence reuse and failure handling; `verification-before-completion` checks acceptance and delivery claims.
 - `requesting-code-review` supplies the final reviewer template.
 - `finishing-development` handles final review, fixes and delivery.
 - `executing-plans` is the inline alternative without task subagents.

@@ -17,7 +17,7 @@ Full-path implementation needs design approval. The user's request authorises di
 
 Track these items in the current harness's task tracker and complete the applicable branch in order:
 
-1. **Explore project context** - check files, docs, recent changes, and representative existing execution paths
+1. **Explore project context** - check relevant files, docs, recent changes and representative existing execution paths; establish the verification baseline before design approval
 2. **Clarify only what is needed** - establish purpose, constraints, success criteria, task boundaries, and consequential design choices
 3. **Assess scope internally** - evaluate full-path triggers and investigate unknown files
 4. **Direct path** - proceed within the request and agreed clarifications; no compulsory classification or brief output
@@ -60,7 +60,9 @@ digraph brainstorming {
 
 ## Shared exploration and clarification
 
-Check the current project state first: files, docs, recent changes, and representative execution paths. Existing execution paths must come from repository evidence. Continue exploring or label an assumption for user approval; never invent a current call path.
+Check the current project state first: relevant files, docs, recent changes, and representative execution paths. Existing execution paths must come from repository evidence. Continue exploring or label an assumption for user approval; never invent a current call path.
+
+During this exploration, follow [the shared verification policy](../shared/verification.md) to establish the required-check baseline before design approval. Use failures and unavailable checks to inform testing constraints and the plan. Direct work establishes its baseline before implementation. Reuse applicable results; read-only advice and prose-only changes need relevant inspection rather than unrelated executable checks.
 
 Assess scope before detailed questions. If the request contains independent subsystems, identify the pieces, their relationship, and their delivery order before continuing. Ask one decision per question. Do not bundle optional features into a clarification or treat a single answer as approval for several additions. Use concrete examples when they help. Clarify only enough to establish the purpose, constraints, success criteria, task boundaries, and consequential design choices. Look up facts yourself; questions block only dependent work.
 
@@ -117,7 +119,7 @@ Read `design-document-template.md` from this skill directory and enforce its hea
 
 Choose the simplest implementation that satisfies the requested outcome, using existing code and patterns. 
 
-Before approval, check the proposed design against the user's request and agreed clarifications. Resolve any additions explicitly. The approved design then becomes the source of truth; reviewer suggestions cannot silently expand it.
+Before approval, check the proposed design against the user's request and agreed clarifications, including the baseline's testing constraints and unresolved verification limitations. Resolve any additions explicitly. The approved design then becomes the source of truth; reviewer suggestions cannot silently expand it.
 
 ### Write and review the design
 

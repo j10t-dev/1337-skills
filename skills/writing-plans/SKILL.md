@@ -14,6 +14,7 @@ Write code-complete implementation plans for an engineer with no session history
 **Before writing:**
 - Read the design file to understand architecture and design decisions
 - Include architecture summary in the plan header
+- Reuse the design-exploration baseline under [the shared verification policy](../shared/verification.md). Carry its evidence and unresolved constraints into the plan and specify required checks. Fill missing or invalidated evidence before dependent planning; do not repeat applicable checks merely to begin planning.
 
 ## Scope Check
 
@@ -107,6 +108,8 @@ Keep global constraints, shared contracts and required repository context before
 
 `Design` is the absolute path to the approved design in `$DOCS_ROOT/$projectName/designs/`. Expand it. A literal `$DOCS_ROOT`, `$projectName`, or `~` reaches the executor as text it cannot resolve. The controller and document reviewer use the design. Task-scoped implementers use only their brief, supplied context and explicitly named artefacts; they ask the controller for missing requirements rather than locating the design, parent plan or neighbouring task materials.
 
+**Baseline:** [Design-stage revision, commands, results and checked scope, or an absolute path to that evidence; state unresolved limitations and applicability.]
+
 **Tech Stack:** [Key technologies/libraries]
 
 **Skills to Use:**
@@ -132,7 +135,7 @@ Keep global constraints, shared contracts and required repository context before
 
 ## Task implementation
 
-Retain `## Task N:` headings and all plan metadata. Every task requires exactly one `**Commit:**` conventional-commit subject describing delivered behaviour, with no task number, plan slug, run ID or metadata. This is the exact subject supplied to the controller helper. A missing subject blocks execution until the user supplies it.
+Retain `## Task N:` headings and all plan metadata. Every task requires exactly one `**Commit:**` conventional-commit subject describing delivered behaviour, with no task number, plan slug, run ID or metadata. This is the exact subject supplied to the controller helper. The plan writer or controller derives a missing subject from the approved task and records it before execution; routine wording does not require user input or grant additional commit authority.
 
 Use the fields above to make each extracted brief self-sufficient. Copy exact values, signatures, cases and constraints verbatim; supply producer/consumer contracts without requiring access to neighbouring tasks. The controller keeps the full design and plan; task-scoped agents receive only their brief, supplied context and explicitly named artefacts.
 
@@ -245,7 +248,7 @@ Review the plan yourself before sharing it.
 - **Task/commit coherence:** Each task is one coherent reviewable unit normally suitable for one commit.
 - **Parallel safety:** Tasks marked parallel share no files, interfaces, migrations, or state transitions.
 
-A plan missing any of the three required field classes is incomplete and must not execute until the user supplies it.
+A plan missing required execution metadata is incomplete. Derive missing commit subjects from the approved tasks; missing or ambiguous run bases and feature identity still require user resolution before execution.
 
 Fix any issues inline before sharing the plan.
 
@@ -253,29 +256,19 @@ Fix any issues inline before sharing the plan.
 
 - Load the `requesting-document-review` skill and run it on the plan document you just wrote (`type=plan`, `design-ref` = the design document this plan implements).
 - This handoff always runs — there is no trivial-skip path for "the plan looks fine."
-- Once that skill's loop terminates, proceed to Execution Handoff with the resulting plan.
+- Proceed to Execution Handoff only after reviewer approval or explicit user acceptance of the stated unresolved review issues or unavailable review. A retry cap or convergence ends the review loop, not the approval gate. Otherwise report the blocker without starting execution.
 
 ## Execution Handoff
 
 **VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks.**
 
-Follow any further instructions from the user; otherwise present these options:
+If only planning was requested, deliver the reviewed plan without starting execution. If implementation is already authorised, use the requested execution method or inline execution by default; do not ask for a routine execution-method choice. Preserve design approval, review gates, scope and VCS authority.
 
-**"Plan complete and saved to `<plan-file>`. Two execution options:**
-
-**1. Subagent-Driven (recommended where the harness supports subagents)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
-
-**2. Inline Execution** - Execute and verify tasks in this session using executing-plans, then hand off to finishing-development
-
-**Which approach?"**
-
-Offer only inline execution when subagents are unavailable.
-
-**If Subagent-Driven chosen:**
+**For subagent-driven execution:**
 - Load the `subagent-driven-development` skill via the current harness's skill-loading mechanism
 - Stay in this session
 - Fresh subagent per task + code review
 
-**If Inline Execution chosen:**
+**For inline execution:**
 - Load the `executing-plans` skill via the current harness's skill-loading mechanism
 - Execute and verify, then hand off to finishing-development for final review and delivery; pause execution for consequential decisions or missing authority

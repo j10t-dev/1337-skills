@@ -41,6 +41,10 @@ This design should only contain final feature descripions and not descrine the p
 This document only contains final production design requirements and does not describe the process that lead up to its final form. 
 The first sections describe intended behaviour and system-level decisions. The `Program Design` section describes the proposed code shape compactly enough for a reviewer to assess boundaries, interfaces, and representative execution before planning.
 
+## Testing
+
+Include the baseline established during exploration, directly or by a named evidence reference: revision, commands, outcomes, checked scope and any unresolved limitations that constrain the design. State the checks the planned change requires. For new projects or non-executable changes, record the applicable verification instead of inventing a test run. Follow [the shared verification policy](../shared/verification.md).
+
 ## Program Design
 
 Executable changes include all four artefacts below. Keep them scenario-scoped: exclude exhaustive static call graphs, incidental framework callbacks, and unchanged plumbing.
