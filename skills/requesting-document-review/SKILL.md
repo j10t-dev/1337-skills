@@ -36,6 +36,8 @@ Dispatch mechanics — role, model, and result inspection — follow the `workin
 
 5. **Report:** rounds run, fixes applied (with a diff summary), findings rejected and why, final reviewer status. If issues remain at the cap, say so plainly — no false "done".
 
+Loop termination is not approval. Proceed past the review gate only after reviewer approval or explicit user acceptance of stated unresolved review issues or unavailable review. At the cap, failed-invocation limit or convergence without approval, report the blocker and continue only independent authorised work.
+
 ## Substituting an External Reviewer
 
 When the user explicitly asks for a cross-harness check and this harness provides an external-reviewer adapter skill, load that skill and use it as the reviewer for every round. The dispatch mechanism is the only thing that changes: triage, bounds, convergence, and reporting are exactly as above.

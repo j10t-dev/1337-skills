@@ -35,11 +35,17 @@ echo "Found $TOTAL test files"
 echo ""
 
 COUNT=0
-for TEST_FILE in $TEST_FILES; do
+EXECUTED=0
+FAILED=0
+SKIPPED=0
+RESULT=0
+while IFS= read -r TEST_FILE; do
+  [ -n "$TEST_FILE" ] || continue
   COUNT=$((COUNT + 1))
 
   # Skip if pollution already exists
-  if [ -e "$POLLUTION_CHECK" ]; then
+  if [ -e "$POLLUTION_CHECK" ] || [ -L "$POLLUTION_CHECK" ]; then
+    SKIPPED=$((SKIPPED + 1))
     echo "⚠️  Pollution already exists before test $COUNT/$TOTAL"
     echo "   Skipping: $TEST_FILE"
     continue
@@ -47,26 +53,42 @@ for TEST_FILE in $TEST_FILES; do
 
   echo "[$COUNT/$TOTAL] Testing: $TEST_FILE"
 
-  # Run the test
-  npm test "$TEST_FILE" > /dev/null 2>&1 || true
+  # Keep command output visible and retain the first failing status.
+  EXECUTED=$((EXECUTED + 1))
+  if npm test "$TEST_FILE"; then
+    echo "   Passed: $TEST_FILE"
+  else
+    STATUS=$?
+    FAILED=$((FAILED + 1))
+    if [ "$RESULT" -eq 0 ]; then RESULT=$STATUS; fi
+    echo "   Failed (status $STATUS): $TEST_FILE"
+  fi
 
-  # Check if pollution appeared
-  if [ -e "$POLLUTION_CHECK" ]; then
+  # Check even after failure: a failing test can still be the polluter.
+  if [ -e "$POLLUTION_CHECK" ] || [ -L "$POLLUTION_CHECK" ]; then
     echo ""
     echo "🎯 FOUND POLLUTER!"
     echo "   Test: $TEST_FILE"
     echo "   Created: $POLLUTION_CHECK"
     echo ""
     echo "Pollution details:"
-    ls -la "$POLLUTION_CHECK"
+    ls -la -- "$POLLUTION_CHECK" || :
     echo ""
     echo "To investigate:"
     echo "  npm test $TEST_FILE    # Run just this test"
     echo "  cat $TEST_FILE         # Review test code"
+    echo "Executed: $EXECUTED; Failed: $FAILED; Skipped: $SKIPPED; Not run: $((TOTAL - COUNT))"
+    if [ "$RESULT" -ne 0 ]; then exit "$RESULT"; fi
     exit 1
   fi
-done
+done <<< "$TEST_FILES"
 
 echo ""
-echo "✅ No polluter found - all tests clean!"
+echo "Executed: $EXECUTED; Failed: $FAILED; Skipped: $SKIPPED"
+if [ "$TOTAL" -eq 0 ] || [ "$FAILED" -ne 0 ] || [ "$SKIPPED" -ne 0 ]; then
+  echo "⚠️  Inconclusive: no matches, failed tests, or skipped tests; cleanliness not established."
+  if [ "$RESULT" -ne 0 ]; then exit "$RESULT"; fi
+  exit 1
+fi
+echo "No pollution observed. Selected test files run: $EXECUTED."
 exit 0

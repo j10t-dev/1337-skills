@@ -28,7 +28,7 @@ Subagent/delegation tool (general-purpose):
 
     The supplied task, global constraints, baseline, implementer response and diff are your complete review boundary.
 
-    Do not locate or read the parent implementation plan, neighbouring tasks, progress ledger, prior reviews, or session history. Read additional repository code only for a concrete risk permitted under Diff Under Review. If a requirement cannot be verified within this boundary, report it as `⚠️ Cannot verify from diff`; do not broaden the review independently.
+    Do not locate or read the parent implementation plan, neighbouring tasks, progress ledger, prior reviews, or session history. Read additional repository code only for a concrete risk permitted under Diff Under Review. If a requirement cannot be verified within this boundary, report it as `Cannot verify from diff`; do not broaden the review independently.
 
     ## Diff Under Review
 
@@ -59,7 +59,7 @@ Subagent/delegation tool (general-purpose):
 
     The implementer already ran the tests and reported results with TDD evidence for exactly this code. Do not re-run the suite to confirm their report. Run a test only when reading the code raises a specific doubt that no existing run answers — and then a focused test, never a package-wide suite, race detector run, or repeated/high-count loop. If heavy validation seems warranted, recommend it in your report instead of running it. If you cannot run commands in this environment, name the test you would run.
 
-    Compare failures, warnings and elapsed test times with the supplied baseline. Report concrete defects and unexplained changes; expected diagnostics are not automatically a mandate for cleanup or new diagnostic machinery.
+    Compare failures, warnings and elapsed test times with the supplied baseline. Follow the shared verification policy in `../shared/verification.md`: investigate material, repeatable timing changes or timeouts, not ordinary variation. Expected diagnostics are not automatically a mandate for cleanup or new diagnostic machinery.
 
     Ask for missing or truncated results rather than rerunning checks to replace an unread response.
 
@@ -73,7 +73,7 @@ Subagent/delegation tool (general-purpose):
     - **Extra:** features that weren't requested, over-engineering, unneeded "nice to haves"
     - **Misunderstood:** right feature built the wrong way, wrong problem solved
 
-    If a requirement cannot be verified from this diff alone (it lives in unchanged code or spans tasks), report it as a ⚠️ item instead of broadening your search.
+    If a requirement cannot be verified from this diff alone (it lives in unchanged code or spans tasks), report it as a Cannot verify from diff item instead of broadening your search.
 
     ## Part 2: Code Quality
 
@@ -86,6 +86,7 @@ Subagent/delegation tool (general-purpose):
     **Tests:**
     - Do the new and changed tests verify real behaviour, not mocks?
     - Are the task's exact cases, edge boundaries and side effects covered with expectations derived independently of production code and its helpers?
+    - If implementation preceded tests, do the recovery tests trace to the original request and approved plan, rather than expectations altered to match the code? Verify detection evidence for missing or incorrect requested behaviour; do not accept retrospective test-first claims.
     - Are inputs for the same behaviour parameterised, with distinct behaviours kept in separate tests? Check that assertions establish the specified result and side effects rather than merely reproducing implementation decisions.
     - For prose/configuration under TDD's exception, does the report provide applicable inspection/validation and required project-check evidence?
 
@@ -107,8 +108,8 @@ Subagent/delegation tool (general-purpose):
 
     ### Spec Compliance
 
-    - ✅ Spec compliant | ❌ Issues found: [what's missing/extra/misunderstood, with file:line references]
-    - ⚠️ Cannot verify from diff: [requirements you could not verify from the diff alone, and what the controller should check — report alongside the ✅/❌ verdict for everything you could verify]
+    - Spec compliant | Issues found: [what's missing/extra/misunderstood, with file:line references]
+    - Cannot verify from diff: [requirements you could not verify from the diff alone, and what the controller should check — report alongside the verdict for everything you could verify]
 
     ### Strengths
     [What's well done? Be specific.]
@@ -135,6 +136,6 @@ Subagent/delegation tool (general-purpose):
 - `[IMPLEMENTER_RESULT]` — the implementer's response, including check results
 - `[DIFF]` — the task diff; `scripts/review-package @- @` can produce a file when useful
 
-**Reviewer returns:** Spec Compliance verdict (✅/❌/⚠️), Strengths, Issues (Critical/Important/Minor), Task quality verdict
+**Reviewer returns:** Spec Compliance verdict (Spec compliant / Issues found / Cannot verify from diff), Strengths, Issues (Critical/Important/Minor), Task quality verdict
 
 A fix dispatch can address spec gaps and quality findings together; re-review after fixes covers both verdicts.

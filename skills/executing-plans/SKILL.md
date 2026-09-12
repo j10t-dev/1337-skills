@@ -5,7 +5,7 @@ description: Use when partner provides a complete implementation plan to execute
 
 # Executing Plans
 
-Execute inline when requested or subagents are unavailable.
+Execute inline when requested, when an authorised execution handoff selects the inline default, or when subagents are unavailable. A planning-only request does not authorise execution.
 
 Execute the approved plan and supplied context; do not reopen design or plan approval. Ask the controller about missing requirements, or the user when working standalone.
 
@@ -17,10 +17,10 @@ Preserve exact cases and independently derived expectations. Parameterise one be
 
 ## Start or Resume
 
-1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task. Stop on missing, duplicate or ambiguous metadata.
+1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task. Derive a missing subject from the approved task and record it before execution. Stop on other missing, duplicate or ambiguous metadata; do not infer run bases or feature identity.
 2. Keep the plan path, bookmarks, run-base IDs and task progress in `.agents/sdd/progress.md`, ignored by VCS. Read it on resume and update it as work progresses. On a fresh run, require the feature bookmark to be absent, stop on unexplained edits, position empty `@` on the run base and create the declared bookmark there.
 3. On resume, follow `../subagent-driven-development/recovery.md`; resume the unfinished execution task, not completed work or final review.
-4. Establish the baseline under `verification-before-completion` before source edits; reuse applicable results on resume.
+4. Inspect the design/plan baseline under [the shared verification policy](../shared/verification.md). Reuse applicable results; fill missing or invalidated checks before dependent implementation and surface any consequence for the approved design.
 
 ## Task Loop
 
@@ -28,7 +28,7 @@ For each task in order:
 
 1. Confirm the progress file and feature bookmark identify the accepted tip, then mark the task `in progress`.
 2. Keep `@` undescribed with the feature bookmark at `@-`.
-3. Follow the plan's skills and TDD steps. Use `verification-before-completion` for required checks.
+3. Follow the plan's skills and TDD steps. Run missing or invalidated required checks under the shared verification policy; use `verification-before-completion` when accepting the task.
 4. Only after verification passes for the task and any agreed blocking repair, accept the task:
    - confirm non-empty undescribed `@` has the feature bookmark as its sole parent;
    - run `jj commit -m "<exact planned subject>"`;

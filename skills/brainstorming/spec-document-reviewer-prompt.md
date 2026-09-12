@@ -26,6 +26,7 @@ Subagent/delegation tool (general-purpose):
     | Clarity | Requirements ambiguous enough to cause someone to build the wrong thing |
     | Scope | Focused enough for a single plan — not covering multiple independent subsystems |
     | YAGNI | Unrequested features, over-engineering |
+    | Baseline | Testing records or references baseline evidence from design exploration and its constraints. New projects and non-executable changes state applicable verification. Reuse supplied evidence; missing or unavailable checks are explicit, not silently deferred to implementation. |
     | Program Design | Every design has a `Program Design` section. Executable changes have a responsibility-labelled file-tree diff, justified boundary map, exact key interfaces, and representative production/test/material failure or asynchronous scenario call trees. A non-executable change gives a specific credible exemption for each inapplicable artefact. |
 
     Missing, contradictory, or implementation-blocking programme-design artefacts are issues. Check that every proposed file has one responsibility, boundaries hide coherent decisions rather than execution phases, interface names and types agree with call trees, external I/O and async boundaries are visible, and test substitutions satisfy the same interface and behavioural contract as production dependencies. Changed call paths use a contextual call-tree diff rather than only describing the final path. A vague exemption is an issue when runtime or callable behaviour actually changes.

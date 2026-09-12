@@ -3,26 +3,18 @@ name: grilling
 description: Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases.
 ---
 
-Interview the user relentlessly until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.
+Interview the user until consequential decisions are settled. Map the work as a **design tree**: each decision identifies the decisions that depend on it.
 
-Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
+The **frontier** contains decisions whose prerequisites are settled. Ask one unsettled decision per clarification, with your recommended answer. Wait for the answer, update the tree, then select the next decision. Do not ask questions that depend on an unanswered decision or bundle several decisions into one question.
 
-Format a round like so:
+Format each clarification like this:
 
 ```
-**Q1 - <question title>**: <question body, which may include multiple paragraphs or choices>
+**Q1 - <question title>**: <one decision>
 
-Recommendation: <your recommended answer>
-
----
-
-**Q2 - <question title>**: <question body, which may include multiple paragraphs or choices>
-
-Recommendation: <your recommended answer>
+Recommendation: <your recommended answer and reason>
 ```
 
-Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
+Finding facts is your job. Look up facts directly; delegate only when permitted and worthwhile, following `working-with-subagents`. A running investigation blocks only decisions that depend on its results. Continue with another independent decision rather than asking the user for facts you can discover.
 
-Finding _facts_ is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, etc.), follow the `working-with-subagents` skill and dispatch a subagent to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of the frontier now. The _decisions_ are the user's: put each to them and wait.
-
-The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not act on it until the user confirms you have reached a shared understanding.
+Finish when consequential decisions are settled and no required branch remains silently assumed. Continue only work already authorised; ask before new scope or actions, not for a second confirmation of decisions already settled. An interview-only request does not authorise implementation.

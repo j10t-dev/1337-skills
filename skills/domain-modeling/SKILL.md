@@ -1,11 +1,11 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain language. Use when discussing codebase terminology or writing or editing a CONTEXT.md.
+description: Use when developing a project's domain model or editing its CONTEXT.md glossary, not merely explaining existing terminology.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain language as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary down the moment terminology crystallises. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Actively build and sharpen the project's domain language as you design. Challenge terms and use edge-case scenarios to resolve ambiguity. Persist terms only when glossary edits are authorised; otherwise propose wording without changing files. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
 ## File structure
 
@@ -29,7 +29,7 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
         └── CONTEXT.md
 ```
 
-Create files lazily: only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved.
+Create files lazily: when glossary edits are authorised and the first term is resolved. If edits are not authorised, propose the entry without creating `CONTEXT.md`.
 
 ## During the session
 
@@ -51,6 +51,6 @@ When the user states how something works, check whether the code agrees. If you 
 
 ### Update CONTEXT.md inline
 
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up: capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+When a term is resolved and glossary edits are authorised, update `CONTEXT.md` then rather than batching accepted terms. Otherwise propose the entry in the response. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
