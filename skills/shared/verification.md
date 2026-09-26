@@ -14,6 +14,8 @@ Carry the baseline evidence into planning and task handoffs. Planning specifies 
 
 Run missing or invalidated checks for relevant code, configuration or environment changes, failures or a concrete unresolved doubt. Evidence survives handoffs, resumes and formatting differences; fix an incomplete report rather than rerunning a check whose result is already available. Complete required project checks without broadening the suite by default.
 
+Focused task checks do not replace required project checks. Reuse applicable results for unchanged code rather than repeating the full suite at each review gate.
+
 Investigate material, repeatable test-runtime changes or timeout failures, accounting for checked scope and environment. Ordinary timing variation alone does not require a diagnostic investigation.
 
 ## Failures and unavailable checks

@@ -7,12 +7,13 @@ description: Use when design is complete and you need detailed implementation ta
 
 ## Overview
 
-Write code-complete implementation plans for an engineer with no session history. Supply actual production and test code, exact files, interfaces, cases and verification for each reviewable task. Choose the simplest implementation that satisfies the approved design. Resolve implementation structure during planning, not through implementer improvisation. DRY. YAGNI. TDD.
+Write implementation plans for an engineer with no session history. Specify the simplest implementation that satisfies the approved design using whichever form is clearest and most compact: code, precise instructions or references to inspected existing code. Settle implementation choices during planning. Supply exact files, interfaces, concrete tests and verification for each reviewable task. DRY. YAGNI. TDD.
 
 @../shared/docs-root.md
 
 **Before writing:**
 - Read the design file to understand architecture and design decisions
+- Inspect affected code and relevant helpers; identify suitable existing implementations to reuse before specifying new code
 - Include architecture summary in the plan header
 
 ## Scope Check
@@ -47,8 +48,8 @@ This structure informs the task decomposition. Each task should produce self-con
 **Subtask = Logical phase within a task**
 - Failing test, minimal implementation, focused verification, refactor, and integrated outcome verification.
 
-**Step = Meaningful implementation or verification action**
-- State the requirement or exact check and expected result; size steps by the meaningful work.
+**Step = One action with a checkable result**
+- State what changes or what is checked, and the observable result that establishes completion.
 
 A normal task is one reviewable vertical behaviour increment. Write every task, including a decomposition-only or outline response, with each bold field below in this order:
 
@@ -59,7 +60,7 @@ A normal task is one reviewable vertical behaviour increment. Write every task, 
 **Dependencies:** Earlier tasks required before this task
 **Files:** Every cross-layer file created, modified, or removed
 **Interfaces:** Exact contracts consumed and produced
-**Implementation:** Complete production and test code, in execution order
+**Implementation:** Chosen implementation and integration edits, using code, precise instructions or named existing code, plus concrete tests, in execution order
 **Exclusions:** Explicit non-goals
 **Concrete cases:** Inputs, preconditions and independently derived expected outcomes
 **Verification:** Exact commands, expected results and integrated outcome check
@@ -127,6 +128,10 @@ Keep global constraints, shared contracts and required repository context before
 
 [Exact interfaces and cross-task decisions every task needs, or "None".]
 
+## Review focus
+
+[Input classes or failure modes implied by the approved behaviour that the initial task tests missed. Name each expected outcome and the owning task, then add its test there. Write "None" when the check finds no gaps. New features require scope agreement.]
+
 ---
 ```
 
@@ -138,13 +143,15 @@ Use the fields above to make each extracted brief self-sufficient. Copy exact va
 
 **Binding:** Behaviour, scenario, observable outcome, dependencies, files, public contracts, security properties, architectural boundaries and explicitly required decisions or snippets constrain implementation. Include exact consumed and produced names, parameters, return/error contracts and necessary boundary decisions. State exclusions. Escalate consequential redesign for controller resolution and any required user approval.
 
-**Code:** Include complete changed function bodies, new helpers, test bodies and fixture construction. Name the existing code to reuse and show integration edits. The plan fixes implementation structure as well as behaviour. An equivalent public result does not justify a different private architecture. Local syntax or naming adjustments are acceptable; missing implementation decisions go to the controller.
+**Implementation choices:** Specify the approach, components to reuse, integration edits and consequential algorithm, dependency or ordering decisions. Use code when it states these most clearly and compactly; use exact edit instructions or named existing implementations when copying bodies would add repetition. Keep short, useful snippets. Supply concrete test bodies and fixtures with independent expectations. Avoid prose that merely repeats the code. Missing production bodies are acceptable when the remaining specification settles the implementation choices.
+
+**Implementation discretion:** Small local extractions may remove demonstrated duplication. Implementers who discover suitable existing code the planner missed should inspect its contract, prefer reuse and report the substitution. These adjustments must preserve approved behaviour, responsibilities, interfaces and dependency constraints. Consequential changes or unresolved conflicts go to the controller.
 
 **Cases and verification:** Specify actual inputs, preconditions, expected results and side effects. Require one parameterised case table when inputs exercise the same behaviour; keep independently different behaviours in separate tests. Derive expectations independently of implementation (see @../test-driven-development/writing-good-tests.md). Require TDD's RED before implementation, focused GREEN and integrated outcome verification, with exact commands and expected results. Apply TDD's prose/configuration exception when no useful executable test exists; required project checks still apply.
 
 ### Representative task
 
-This hypothetical Python invitation service illustrates the required code detail. Its paths and commands are examples, not checks to run in this skill repository.
+This hypothetical Python invitation service keeps the short production body because code states the decision more compactly than prose. Its paths and commands are examples, not checks to run in this skill repository.
 
 ````markdown
 ## Task 1: Reject expired invitation acceptance
@@ -203,10 +210,10 @@ def accept_invitation(
 
 ## No placeholders
 
-Code steps require actual code. These are blocking gaps:
+Every task must settle the decisions its implementation needs. These are blocking gaps:
 
 - Necessary behaviour or decisions left as "TBD", "TODO", "add validation" or "handle edge cases" without actual rules and outcomes.
-- Production or test bodies left to the implementer, including generic instructions to add validation, helpers, fixtures or integration without showing the code.
+- Unresolved implementation or integration choices hidden behind generic instructions to add validation, helpers or error handling.
 - Tests requested without concrete cases and independently derived expectations.
 - An undecided boundary, such as whether `expiresAt == now` is expired; clarify before dependent implementation.
 - "Similar to Task N" instead of the requirements the extracted brief needs.
@@ -214,7 +221,7 @@ Code steps require actual code. These are blocking gaps:
 
 ## Remember
 - Exact file paths always
-- Complete production/test code and concrete cases
+- Clear implementation decisions, concrete test code and cases
 - Exact commands with expected results; label illustrative commands
 - Reference relevant skills with @ syntax
 - DRY, YAGNI, TDD
@@ -232,7 +239,8 @@ Review the plan yourself before sharing it.
 - **Dependency order:** Sequential dependencies are ordered; independent tasks are marked as safe to parallelise only if they do not edit the same files.
 - **TDD shape:** Behaviour changes specify concrete cases and RED before implementation, then GREEN; apply TDD's prose/configuration exception where appropriate.
 - **Verification:** Every task has exact commands and expected results, with illustrative commands clearly labelled.
-- **Code completeness:** Every code step supplies its actual implementation or test body, with existing context and integration edits. Preserve independently derived expectations; parameterise the same behaviour's inputs.
+- **Implementation completeness:** Code, precise instructions and named references settle the implementation and integration choices. Existing reuse candidates have been considered. Test bodies retain independent expectations and parameterised cases for one behaviour.
+- **Review focus:** Check for input classes and failure modes implied by the approved behaviour but missing from the initial tests. Add their cases to the owning tasks and summarise them in Review focus; keep new features outside this check.
 - **Scope and complexity:** Every new mechanism serves the approved design. Equivalent outputs alone do not justify additional machinery.
 - **Type consistency:** Types, method signatures, and property names used in later tasks match what earlier tasks defined. A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 - **Context sufficiency:** A competent task-scoped executor can complete the task from its extracted brief, supplied context and named artefacts alone, with exact values preserved and no need to locate the full design or neighbouring tasks.
@@ -259,13 +267,13 @@ Fix any issues inline before sharing the plan.
 
 **VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks.**
 
-Follow any further instructions from the user; otherwise present these options:
+Preserve the user's existing execution choice. Otherwise recommend an approach based on task coupling, risk and the benefit of independent task reviews, then present these options:
 
 **"Plan complete and saved to `<plan-file>`. Two execution options:**
 
-**1. Subagent-Driven (recommended where the harness supports subagents)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
+**1. Subagent-Driven** - Fresh implementer per task and independent task review; useful when those reviews justify the context transfer
 
-**2. Inline Execution** - Execute and verify tasks in this session using executing-plans, then hand off to finishing-development
+**2. Inline Execution** - Execute and verify in this session with less coordination overhead, then hand off to finishing-development for independent final review
 
 **Which approach?"**
 

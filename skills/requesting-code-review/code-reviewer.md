@@ -22,7 +22,7 @@ If `{DIFF_FILE}` is provided:
 If `{FIX_REVIEW_SCOPE}` is provided:
 - Treat this as a focused re-review of previously reported Critical/Important issues.
 - Review only the listed files, affected tests, commands, or narrower jj boundary.
-- Verify the named issue is resolved.
+- Mark each original finding resolved or open with file:line evidence. Report any defects introduced by the fix separately, with severity.
 - Do not re-review unrelated parts of the original change unless needed to confirm the fix.
 
 If `{JJ_BOUNDARY}` is provided:
@@ -88,12 +88,14 @@ Reuse inspected test evidence for the current code/configuration under `verifica
 - Tests actually test logic (not mocks)?
 - If implementation preceded tests, do recovery assertions follow the original request and approved plan rather than merely matching the code? Check evidence that they detect missing or incorrect requested behaviour; do not accept retrospective test-first claims.
 - Edge cases covered?
+- Does each plan Review focus case have its expected outcome checked in the owning task's tests?
 - Integration tests where needed?
 - All tests passing?
 
 **Requirements:**
 - All plan requirements met?
 - Implementation matches spec?
+- Small local extractions remove demonstrated duplication, and substitutions reuse suitable existing code after checking its contract? Accept these when approved behaviour, responsibilities, interfaces and dependency constraints remain intact.
 - Are deviations justified improvements, or problematic departures?
 - No scope creep?
 - Breaking changes documented?

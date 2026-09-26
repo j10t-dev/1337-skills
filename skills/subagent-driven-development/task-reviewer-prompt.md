@@ -65,7 +65,7 @@ Subagent/delegation tool (general-purpose):
 
     ## Part 1: Spec Compliance
 
-    Compare the diff against What Was Requested, including the planned production and test code, structure, interfaces, exclusions and exact cases. Accept harmless syntax or naming adjustments; identical public results do not justify a more complex private implementation. Missing code or integration decisions require controller clarification. Added behaviour or architectural machinery requires user approval; reviewer suggestions are not authority to expand scope.
+    Compare the diff against What Was Requested, including the chosen implementation approach, behaviour, responsibilities, interfaces, exclusions and exact cases. Accept small local extractions that remove demonstrated duplication and reuse of suitable existing code whose contract has been checked, even if the planner missed it. These adjustments must preserve approved boundaries and dependency constraints. An omitted production body is not itself a defect; unresolved implementation decisions require controller clarification. Passing tests alone do not justify added behaviour or architectural machinery; reviewer suggestions are not authority to expand scope.
 
     For instruction changes, trace each case through every affected writer, executor and reviewer in the supplied diff, not only the authoring skill.
 

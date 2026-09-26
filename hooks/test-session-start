@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+scratch=$(mktemp -d)
+trap 'rm -rf "$scratch"' EXIT
+ln -s "$root" "$scratch/plugin with spaces"
+plugin="$scratch/plugin with spaces"
+command=$(jq -er '.hooks.SessionStart[0].hooks[0].command' "$root/hooks/hooks.json")
+
+# Exercise the configured launcher, including its interpreter selection.
+for shell in /bin/bash /bin/sh; do
+  for hook_path in "$PATH" '' /nonexistent; do
+    output=$(env -u BASH PATH="$hook_path" CLAUDE_PLUGIN_ROOT="$plugin" \
+      "$shell" -c "$command")
+    jq -e --rawfile skill "$root/skills/using-skills/SKILL.md" '
+      keys == ["hookSpecificOutput"] and
+      .hookSpecificOutput.hookEventName == "SessionStart" and
+      (.hookSpecificOutput.additionalContext | contains($skill | rtrimstr("\n")))
+    ' <<< "$output" >/dev/null
+  done
+done
+
+# Direct invocation without Claude keeps the alternative output contract.
+output=$(env -u CLAUDE_PLUGIN_ROOT PATH=/nonexistent /bin/bash "$root/hooks/session-start")
+jq -e --rawfile skill "$root/skills/using-skills/SKILL.md" '
+  keys == ["additional_context"] and
+  (.additional_context | contains($skill | rtrimstr("\n")))
+' <<< "$output" >/dev/null
+
+printf 'PASS: launcher works with normal, empty and unusable PATH; spaces and both output formats preserved\n'

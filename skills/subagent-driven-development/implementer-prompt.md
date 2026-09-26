@@ -36,13 +36,15 @@ Subagent/delegation tool (general-purpose):
     - Dependencies or assumptions
     - Anything unclear in the task description
 
-    Ask the controller about missing requirements or consequential choices. Follow the supplied implementation and repository patterns. Ask for missing code or integration decisions; continue only independent specified work.
+    Ask the controller about missing requirements, unresolved integration decisions or consequential choices. Follow the supplied implementation decisions and repository patterns; continue independent specified work while awaiting clarification.
 
     ## Planned implementation
 
-    The brief supplies complete production and test code, interfaces, exclusions, cases and verification. Follow its structure. Local syntax or naming changes may fit repository conventions; equivalent outputs do not justify a different private architecture. Missing code or integration decisions require controller clarification, not invention.
+    The brief specifies implementation decisions using code, precise instructions or references to existing code, plus concrete tests, interfaces, exclusions, cases and verification. Preserve its behaviour, responsibilities and architectural boundaries. Missing production bodies alone do not block execution; unresolved implementation choices require controller clarification.
 
-    Preserve exact case values and expected outcomes. Parameterise cases that exercise the same behaviour with different inputs; keep independently different operations in separate behaviour tests. Derive expectations independently of production code and its helpers, following test-driven-development's writing-good-tests.md. Missing bodies or undocumented behaviour boundaries, such as expiry equality, are missing requirements. Ask the controller to clarify it before dependent implementation.
+    Extract small local helpers to remove demonstrated duplication. If you find suitable existing code the planner missed, inspect its contract, prefer reuse and report the substitution. Preserve approved behaviour, responsibilities, interfaces and dependency constraints; escalate consequential changes or unresolved conflicts to the controller.
+
+    Preserve exact case values and expected outcomes. Parameterise cases that exercise the same behaviour with different inputs; keep independently different operations in separate behaviour tests. Derive expectations independently of production code and its helpers, following test-driven-development's writing-good-tests.md. Missing test bodies or undocumented behaviour boundaries, such as expiry equality, are missing requirements. Ask the controller to clarify them before dependent implementation.
 
     Changes to public results or interfaces, dependencies, security properties or architectural boundaries are consequential, not private mechanics. Escalate to the controller for resolution and any required user approval.
 
@@ -83,7 +85,7 @@ Subagent/delegation tool (general-purpose):
     - The task requires architectural decisions with multiple valid approaches
     - You need to understand code beyond what was provided and can't find clarity
     - A concrete correctness concern remains after focused investigation
-    - The task involves restructuring existing code the plan didn't anticipate
+    - The task requires consequential restructuring beyond the local extractions and verified reuse permitted above
 
     ## Before Reporting Back: Self-Review
 

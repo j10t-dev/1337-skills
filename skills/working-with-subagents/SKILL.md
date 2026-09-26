@@ -15,3 +15,4 @@ Delegate independent work when it saves time or adds useful coverage. Keep share
 3. Allow only required tools; enforce writable paths where supported.
 4. Assign scope, writable paths, exclusions, required context and checks. Further delegation requires controller permission.
 5. Use the child's results and the required review verdicts before accepting the task.
+6. Use bounded, event-driven waits supported by the harness and continue independent work while a child runs. If a result is missing or truncated, request the report. Check live child state when completion is unclear; reconcile it with the report before redispatching work or accepting completion.

@@ -11,7 +11,9 @@ Execute the approved plan and supplied context; do not reopen design or plan app
 
 ## Planned implementation
 
-Implement the supplied production and test code, interfaces, exclusions and cases following TDD. Local syntax or naming adjustments must fit repository conventions; equivalent outputs do not justify a different implementation structure. Missing code or integration decisions need clarification before dependent work. Additional behaviour or architectural machinery requires user approval.
+Implement the plan's decisions, whether supplied as code, precise instructions or references to existing code, following TDD. Preserve approved behaviour, responsibilities, interfaces, exclusions and exact cases. Missing production bodies alone do not block execution; unresolved implementation or integration decisions need clarification before dependent work. Additional behaviour or architectural machinery requires user approval.
+
+Extract small local helpers to remove demonstrated duplication. If you find suitable existing code the planner missed, inspect its contract, prefer reuse and report the substitution. These adjustments must preserve the planned behaviour, architectural boundaries and dependency constraints. Escalate consequential changes or unresolved conflicts to the controller, or the user when standalone; continue independent specified work.
 
 Preserve exact cases and independently derived expectations. Parameterise one behaviour's inputs; keep distinct operations separate. Use TDD's prose/configuration exception where no useful executable test exists, retaining required checks.
 

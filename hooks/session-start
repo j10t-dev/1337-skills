@@ -4,11 +4,13 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+script_parent=${0%/*}
+if [ "$script_parent" = "$0" ]; then script_parent=.; fi
+SCRIPT_DIR="$(cd "$script_parent" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Read using-skills content
-using_skills_content=$(cat "${PLUGIN_ROOT}/skills/using-skills/SKILL.md" 2>&1 || echo "Error reading using-skills skill")
+using_skills_content=$(<"${PLUGIN_ROOT}/skills/using-skills/SKILL.md") || using_skills_content="Error reading using-skills skill"
 
 # Escape string for JSON embedding
 escape_for_json() {
