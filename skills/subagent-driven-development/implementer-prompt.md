@@ -19,6 +19,8 @@ Subagent/delegation tool (general-purpose):
 
     Applicable baseline: [pre-edit revision, commands, exit statuses, elapsed times and results, supplied here or by reference]
 
+    Applicable code principles: [absolute skill paths and the decisions they bear on, or None]
+
     ## Context Boundary
 
     Treat the task brief, this prompt's Context section, and any artefacts they explicitly name as your complete requirements boundary.

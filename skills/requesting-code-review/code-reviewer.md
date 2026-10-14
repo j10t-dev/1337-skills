@@ -55,6 +55,9 @@ Use the supplied brief or request when no plan exists. Review code against appro
 
 Return findings in your response, not review files.
 
+**Applicable Code Principles:**
+{CODE_PRINCIPLES}
+
 **Diff File (preferred):**
 {DIFF_FILE}
 

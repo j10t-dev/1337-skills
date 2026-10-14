@@ -39,7 +39,7 @@ Reuse reviews of unchanged code and requirements. Use `verification-before-compl
 
 **2. Dispatch code-reviewer subagent:**
 
-Use the current harness's subagent/delegation tool with the code-reviewer type if available, filling the template at `code-reviewer.md`
+Use the current harness's subagent/delegation tool with the code-reviewer type if available, filling the template at `code-reviewer.md`. Supply `CODE_PRINCIPLES` as absolute skill paths and the decisions they bear on, or None.
 
 Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch; reviewers do not inherit your environment. See `../shared/docs-root.md` for docs-root rules.
 

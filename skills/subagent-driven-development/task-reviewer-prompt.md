@@ -24,6 +24,8 @@ Subagent/delegation tool (general-purpose):
     Implementer's response: [IMPLEMENTER_RESULT]
     Applicable baseline: [pre-edit revision, commands, exit statuses, elapsed times and results]
 
+    Applicable code principles: [absolute skill paths and the decisions they bear on, or None]
+
     ## Context Boundary
 
     The supplied task, global constraints, baseline, implementer response and diff are your complete review boundary.
