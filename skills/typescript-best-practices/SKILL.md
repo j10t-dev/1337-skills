@@ -7,6 +7,8 @@ description: Use when implementing or changing TypeScript code, designing TypeSc
 
 When changing or reviewing domain models, type contracts or type-related correctness, invoke `principle-type-system-discipline`. Routine TypeScript edits use the conventions here without loading unrelated skills.
 
+When writing, changing or reviewing TypeScript, invoke `principle-reader-first-code`.
+
 | Rule | Summary |
 |------|---------|
 | Discriminated unions | Model variants with a `kind` literal discriminant so impossible states can't be represented. No optional-field bags. |
@@ -24,5 +26,16 @@ When changing or reviewing domain models, type contracts or type-related correct
 | Object args | Pass objects, not positional, so argument order is self-documenting. Skip on hot paths (per-frame render, tokenisers, parsers). |
 | Real tests | Don't mock what you can run. Prefer the framework's real test primitives with leak/disposable checks, and verify UI in a running build. Mock only what you can't run locally. |
 | Structured telemetry | Prefer structured logger diagnostics with enough context to debug from an id. No `console.log` in shipped code. |
+| Result library | In a codebase that has adopted an established Result library, expected failures are values from it: `Result.gen` with `yield*` for fail-fast sequences, combinators for short transforms, `Result.try` at throwing APIs, one bridge from another library's result shape such as Zod `safeParse`. Prefer an API option that doesn't throw over catching (`lstatSync(path, { throwIfNoEntry: false })`). Visible branches only for policy (record and continue, accumulate, recover, roll back). Inside a database transaction, a failure that must roll back is thrown, since only a throw rolls back, and becomes a Result outside the transaction. |
+| Return annotations | Every function and callback declares its return type, so the reader sees what it produces. |
+| Yes/no predicates | `shouldX(): boolean` in place of a two-literal union compared with `===`. The rule and its exceptions live in `principle-reader-first-code`. |
+| Closed sets | An `as const` array or object with a derived type, in place of `enum`. Values from JSON, SQL and argv are used as they arrive. |
+| Collections | Array methods (`filter`, `map`, `find`, `some`, `reduce`) build, filter, project, search and aggregate: `filter` then `map`, and `flatMap` only when one input yields several outputs; no lazy `values().filter().map().toArray()` chains. Explicit loops for awaited I/O, transactions, early-exit parsing, pagination, stateful grouping and linked traversal. Eager passes are fine at ordinary sizes. When `find` replaces a loop, the first match still decides. |
+| Branch choice | `switch` for multi-state unions, and slightly preferred for other two-state unions; `if` for null checks and ok/err guards. |
+| Guard runs | In a `Result.gen`, a run of "condition, else fail" guards is `yield* require(condition, failure)` lines over named predicates. Real decisions stay `if`. |
+| Single-method ports | A port with one method and one implementation is a function type, not an interface wrapping that method. Multi-method ports stay interfaces. |
+| Generic cost | Generic machinery earns its cost: avoid four or more nested generic layers, drop a type parameter every implementer erases with overloads, and spell a union out in place of a distributive conditional type; replace per-variant overloads with one generic signature over a variant-keyed record of parsers, so per-variant code becomes a loop. Generic pass-through wrappers wait for a second caller; branded types and `[Symbol.dispose]` are fine. |
+| One meaning per value | A `null` carries one meaning. A constant field is typed as its literal (`version: 1`). |
+| `async` | Prefer marking every Promise-returning function `async`. |
 
 Examples: `references/patterns.md`.

@@ -7,11 +7,15 @@ Code examples for each rule in `SKILL.md`. The underlying principles are languag
 Brand primitives so they can't be mixed up. Validate once at creation; downstream code trusts the type.
 
 ```ts
+import { Result } from "better-result";
+
 type AgentId = string & { readonly __brand: "AgentId" };
 
-function parseAgentId(input: string): AgentId {
-  if (!isUUID(input)) throw new Error(`Invalid agent id: ${input}`);
-  return input as AgentId;
+function parseAgentId(input: string): Result<AgentId, string> {
+  if (!isUUID(input)) {
+    return Result.err(`Invalid agent id: ${input}`);
+  }
+  return Result.ok(input as AgentId);
 }
 
 function focusAgent(id: AgentId): void {
@@ -88,7 +92,7 @@ Keep `durationMs` a plain number. Brand it (per Branded types) only if a raw num
 Don't strengthen everything. Keep `T[]` when every operation on it is total:
 
 ```ts
-const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0); // [] is 0, fine
+const sum = (xs: number[]): number => xs.reduce((a, b): number => a + b, 0); // [] is 0, fine
 ```
 
 Strengthen when the loose type forces a lie at a use site. The tells are `!`, `arr[0] as T`, and a "should never happen" throw:
@@ -113,12 +117,12 @@ Weakening the result to `Session | undefined` is the other total signature. Eith
 
 ```ts
 // Don't
-function handle(input: any) {
-  return input.foo.bar;
+function handle(input: any): void {
+  consume(input.foo.bar);
 }
 
 // Do
-function handle(input: unknown) {
+function handle(input: unknown): void {
   if (typeof input === "object" && input !== null && "foo" in input) {
     // narrowed; compiler verifies access
   }
@@ -136,15 +140,15 @@ Every `as` is a potential runtime crash. Cast only after the type system has ver
 const user = data as User;
 
 // Do. Earn the cast at the boundary.
-function parseUser(data: unknown): User {
+function parseUser(data: unknown): Result<User, string> {
   if (typeof data !== "object" || data === null) {
-    throw new Error("expected object");
+    return Result.err("expected object");
   }
   if (!("id" in data) || typeof (data as Record<string, unknown>).id !== "string") {
-    throw new Error("expected id");
+    return Result.err("expected id");
   }
   // ... validate all fields
-  return data as User; // OK, earned cast after full validation
+  return Result.ok(data as User); // OK, earned cast after full validation
 }
 ```
 
@@ -167,7 +171,9 @@ From best to last-resort:
 
 ```ts
 function area(s: Shape): number {
-  if ("radius" in s) return Math.PI * s.radius ** 2; // narrowed to circle
+  if ("radius" in s) {
+    return Math.PI * s.radius ** 2; // narrowed to circle
+  }
   return s.width * s.height; // narrowed to rect
 }
 ```
@@ -240,7 +246,7 @@ const config = { theme: "dark", cols: 3 } satisfies Config;
 Validate once where data crosses in; trust types inside. Invoke the `principle-boundary-discipline` skill.
 
 - **Wire formats** (proto, JSON-RPC): parse with `ignoreUnknownFields` so forward-compatible changes don't break old clients.
-- **Persisted JSON:** versioned blob with a try/catch around the parse.
+- **Persisted data** (database rows, cache files) is a boundary: parse it where it is read and return corrupt data as a local failure.
 - **Don't re-validate** deep in call chains.
 
 ## Schema-derived types
@@ -253,13 +259,13 @@ type CheckSummary = {
   totalCount: number;
   checks: { name: string; status: string }[];
 };
-function renderChecks(s: CheckSummary) {
+function renderChecks(s: CheckSummary): void {
   /* ... */
 }
 
 // Do. Derive from the generated schema type.
 import type { ChecksMessage } from "<generated module>";
-function renderChecks(s: Pick<ChecksMessage, "totalCount" | "checks">) {
+function renderChecks(s: Pick<ChecksMessage, "totalCount" | "checks">): void {
   /* ... */
 }
 ```
@@ -290,3 +296,180 @@ openFile({
 ```
 
 Skip on hot paths: per-frame render, tokenisers, parsers, anything in a tight loop where the allocation cost matters.
+
+## Result library
+
+`Result.try` wraps each throwing call on its own, and `parse` is the one bridge from Zod. Only a throw rolls a database transaction back, so a failure that must undo the writes is thrown inside the transaction and becomes a Result outside it.
+
+```ts
+import { Result, type Err } from "better-result";
+
+type ResultGenerator<T, E> = Generator<Err<never, E>, Result<T, E>, unknown>;
+
+// Don't. The catch-all turns every defect and every failure into the same null.
+function loadSettings(file: string): Settings | null {
+  try {
+    return settingsSchema.parse(JSON.parse(readFileSync(file, "utf8")));
+  } catch {
+    return null;
+  }
+}
+
+// Do. Failures are values, and each throwing call is wrapped on its own.
+function loadSettings(file: string): Result<Settings, string> {
+  return Result.gen(function* (): ResultGenerator<Settings, string> {
+    const text = yield* Result.try({
+      try: (): string => readFileSync(file, "utf8"),
+      catch: (cause): string => `Cannot read ${file}: ${String(cause)}`,
+    });
+    const json = yield* Result.try({
+      try: (): unknown => JSON.parse(text),
+      catch: (): string => `${file} is not JSON`,
+    });
+    return parse(settingsSchema, json);
+  });
+}
+
+// The one bridge from Zod's success/failure shape.
+function parse<T>(schema: z.ZodType<T>, input: unknown): Result<T, string> {
+  const parsed = schema.safeParse(input);
+  return parsed.success ? Result.ok(parsed.data) : Result.err(parsed.error.message);
+}
+
+// Don't. Catching to detect a missing file.
+function isMissing(path: string): boolean {
+  try {
+    lstatSync(path);
+    return false;
+  } catch {
+    return true;
+  }
+}
+
+// Do. The option returns undefined in place of throwing.
+function isMissing(path: string): boolean {
+  return lstatSync(path, { throwIfNoEntry: false }) === undefined;
+}
+
+// Do. The throw rolls the transaction back; Result.try turns that one failure into a value and lets defects through.
+class StaleNoteError extends Error {}
+
+function saveNotes(db: Database, notes: Note[]): Result<void, string> {
+  return Result.try({
+    try: (): void => {
+      db.transaction((): void => {
+        for (const note of notes) {
+          if (!updateIfUnchanged(db, note)) {
+            throw new StaleNoteError(`Note ${note.id} changed since it was read`);
+          }
+        }
+      })();
+    },
+    catch: (error): string => {
+      if (error instanceof StaleNoteError) {
+        return error.message;
+      }
+      throw error;
+    },
+  });
+}
+```
+
+## Yes/no predicates
+
+A yes/no answer is a boolean function. The rule and its exceptions live in `principle-reader-first-code`.
+
+```ts
+// Don't. The caller compares a two-literal union.
+function draftDecision(draft: Draft): "keep" | "discard" {
+  return draft.body.trim() === "" ? "discard" : "keep";
+}
+if (draftDecision(draft) === "discard") {
+  deleteDraft(draft);
+}
+
+// Do.
+function shouldDiscardDraft(draft: Draft): boolean {
+  return draft.body.trim() === "";
+}
+if (shouldDiscardDraft(draft)) {
+  deleteDraft(draft);
+}
+```
+
+## Closed sets
+
+An `as const` array or object holds the values, a derived type names them, and a schema reads the same constant. Literals from JSON, SQL and argv already are the domain value, so nothing converts them.
+
+```ts
+// Don't. The enum generates runtime code, and strings from outside need converting.
+enum LogLevel {
+  Debug = "debug",
+  Info = "info",
+  Warn = "warn",
+}
+
+// Do. The array iterates, the type derives from it, and the schema reads it.
+const LOG_LEVELS = ["debug", "info", "warn"] as const;
+type LogLevel = (typeof LOG_LEVELS)[number];
+const logLevelSchema = z.enum(LOG_LEVELS);
+
+// An object when each value needs a name.
+const EXIT = { success: 0, usage: 2 } as const;
+type ExitCode = (typeof EXIT)[keyof typeof EXIT];
+```
+
+## Collections
+
+`filter` then `map` reads as "keep these", then "convert them".
+
+```ts
+// Don't. flatMap hides the filter inside the conversion.
+const emails = users.flatMap((user): string[] => (user.active ? [user.email] : []));
+
+// Don't. The lazy chain adds iterator helpers for no gain.
+const emails = users.values().filter((user): boolean => user.active).map((user): string => user.email).toArray();
+
+// Do.
+const emails = users.filter((user): boolean => user.active).map((user): string => user.email);
+
+// flatMap fits when one input yields several outputs.
+const lines = orders.flatMap((order): Line[] => order.lines);
+
+// When find replaces a loop, the first match still decides.
+const owner = members.find((member): boolean => member.role === "owner");
+```
+
+## Guard runs
+
+`require` turns a condition and its failure into a Result, so each guard is one `yield*` line over a named predicate. `ResultGenerator` is the alias from the Result library example.
+
+```ts
+type TransferFailure = { kind: "closed" } | { kind: "insufficient_funds" };
+
+function require<const E>(condition: boolean, failure: E): Result<void, E> {
+  return condition ? Result.ok() : Result.err(failure);
+}
+
+// Don't. Each guard repeats the return-an-error shape.
+function transfer(account: Account, amount: number): Result<Transfer, TransferFailure> {
+  return Result.gen(function* (): ResultGenerator<Transfer, TransferFailure> {
+    if (!isOpen(account)) {
+      return Result.err({ kind: "closed" });
+    }
+    if (!hasFunds(account, amount)) {
+      return Result.err({ kind: "insufficient_funds" });
+    }
+    return Result.ok(debit(account, amount));
+  });
+}
+
+// Do. The reader sees the preconditions as one run.
+function transfer(account: Account, amount: number): Result<Transfer, TransferFailure> {
+  return Result.gen(function* (): ResultGenerator<Transfer, TransferFailure> {
+    yield* require(isOpen(account), { kind: "closed" });
+    yield* require(hasFunds(account, amount), { kind: "insufficient_funds" });
+    return Result.ok(debit(account, amount));
+  });
+}
+```

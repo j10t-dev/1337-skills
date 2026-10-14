@@ -12,7 +12,7 @@ Place validation, type narrowing, and error handling at system boundaries. Trust
 
 **The pattern:**
 - **At boundaries** (CLI args, config files, external APIs, network protocols): validate, return errors, handle defensively.
-- **Inside the system:** typed data, error propagation, no re-validation. Trust the types.
+- **Inside the system:** typed data, error propagation, no re-validation. Trust the types. Trust covers one-line "just in case" guards too: when the port type guarantees a fact, core branches on it.
 - **Across the boundary.** Expose domain concepts, not the boundary's private representation. Keep general-purpose mechanism inside and special-purpose policy at the edge.
 
 A type guarantees its encoded properties, not mutable external facts. Guard live authorisation, resource state and destructive-operation destinations at the point of effect when they can change after parsing. Each independent external entry must construct the validated domain type.
@@ -21,9 +21,13 @@ A type guarantees its encoded properties, not mutable external facts. Guard live
 
 Validation and error handling:
 - Validate config at parse time (the boundary), not inside business logic
+- Merge configuration sources (file, environment) first, then parse each capability's subset once, through a schema that carries its defaults
 - Parse raw data into domain types at the boundary
+- Parse one structure in one pass by composing its nested schemas
+- A safeguard that only gates a capability runs inside the opener that returns the capability (`openWriter(identity)`); core never reads the binding state behind it
 - Do not re-export transport, storage, framework, or wire types through the public surface
 - No redundant nil checks deep in call chains if the boundary already validated
+- Stored local data is a boundary: parse it where it is read, and report corrupt data there as a local failure
 
 Code organisation:
 - Business logic in pure functions with no framework dependencies
