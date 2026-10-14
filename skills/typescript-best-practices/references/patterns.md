@@ -192,41 +192,34 @@ Prefer discriminant narrowing when possible. The guard adds a layer the reader h
 
 ## Exhaustiveness
 
-In default arms, assign the discriminant to a `never`-typed local. The compiler errors if a new variant is added without handling.
+Write a `case` per variant and no `default`. The `switch-exhaustiveness-check` lint rule enforces it; `tooling-baseline.md` configures it.
 
 ```ts
-// Value-returning switch
-function area(s: Shape): number {
-  switch (s.kind) {
+function area(shape: Shape): number {
+  switch (shape.kind) {
     case "circle":
-      return Math.PI * s.radius ** 2;
+      return Math.PI * shape.radius ** 2;
     case "rect":
-      return s.width * s.height;
-    default: {
-      const _exhaustive: never = s;
-      return _exhaustive;
-    }
+      return shape.width * shape.height;
   }
 }
 
-// Void switch
-function handle(s: Shape): void {
-  switch (s.kind) {
+function draw(shape: Shape): void {
+  switch (shape.kind) {
     case "circle":
-      drawCircle(s);
-      break;
+      drawCircle(shape);
+      return;
     case "rect":
-      drawRect(s);
-      break;
-    default: {
-      const _exhaustive: never = s;
-      void _exhaustive;
-    }
+      drawRect(shape);
+      return;
   }
+  assertNever(shape); // only where no exhaustiveness lint rule is configured
+}
+
+function assertNever(value: never): never {
+  throw new Error(`Unhandled variant: ${JSON.stringify(value)}`);
 }
 ```
-
-Return-style in value-returning switches; void-style in statement switches.
 
 ## `satisfies` over `as`
 

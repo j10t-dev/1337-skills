@@ -19,7 +19,7 @@ When writing, changing or reviewing TypeScript, invoke `principle-reader-first-c
 | No `as` casts | Every `as` is a runtime crash waiting. Cast only after validation. |
 | Narrowing hierarchy | Discriminant switch > `in` operator > `typeof`/`instanceof` > user-defined type guard > `as`. |
 | Type guards | Must verify the claim. A lying guard is worse than `as` because the bug hides behind a name that says it's safe. Name them `isX` or `hasX`. |
-| Exhaustiveness | Inline `const _exhaustive: never = x;` in default arms so the compiler errors when a new variant is added. |
+| Exhaustiveness | A `case` per variant, no `default`; lint-enforced, with fallbacks in `references/patterns.md`. |
 | `satisfies` over `as` | Validates the value without widening literal types. |
 | Boundary validation | Parse where data crosses in, into a named domain type. `Record<string, unknown>` (however spelled) stops at that parse. Trust types inside. Invoke `principle-boundary-discipline` when changing boundary parsing, validation or external adapters. |
 | Schema-derived types | Reach for `Pick`/`Omit`/`Parameters`/`ReturnType`/`Awaited`/`typeof` before declaring a new interface. |
@@ -37,5 +37,7 @@ When writing, changing or reviewing TypeScript, invoke `principle-reader-first-c
 | Generic cost | Generic machinery earns its cost: avoid four or more nested generic layers, drop a type parameter every implementer erases with overloads, and spell a union out in place of a distributive conditional type; replace per-variant overloads with one generic signature over a variant-keyed record of parsers, so per-variant code becomes a loop. Generic pass-through wrappers wait for a second caller; branded types and `[Symbol.dispose]` are fine. |
 | One meaning per value | A `null` carries one meaning. A constant field is typed as its literal (`version: 1`). |
 | `async` | Prefer marking every Promise-returning function `async`. |
+
+When creating or changing lint, format, compiler or CI settings, read `references/tooling-baseline.md`.
 
 Examples: `references/patterns.md`.
