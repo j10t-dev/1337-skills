@@ -71,6 +71,7 @@ Pi and other harnesses should consume the shared skill tree through `~/.agents/s
 **Principles** (agent-only; `user-invocable: false`, so no slash command)
 - `principle-type-system-discipline`
 - `principle-boundary-discipline`
+- `principle-reader-first-code`
 
 **Meta**
 - `using-skills`
