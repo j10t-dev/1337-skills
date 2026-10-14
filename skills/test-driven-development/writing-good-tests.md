@@ -51,6 +51,8 @@ Keep independently different operations, such as invitation revocation, in separ
 
 **Your code, not the framework.** Test the contract your code makes at its boundaries — the route you register, the query you emit, the payload you produce. Upstream mechanics are their maintainers' tests to write (the classic: asserting your router invokes a registered handler — that is the framework's test, not yours). When upstream behaviour genuinely surprised you, write one narrow characterisation test naming the assumption. The same boundary applies inside your code: constructors, getters, constants, and trivial forwarding earn tests only when they validate, normalise, default, derive, enforce, or cause side effects — otherwise assert the first consumer-visible result that depends on them.
 
+**The schema is its own specification.** Add no tests that merely restate a schema's declared constraints with representative valid or invalid values: the schema library owns decoding, and the declaration itself specifies a straightforward brand, struct or union. Test schema behaviour only where the application owns it beyond the declaration (a transformation, normalisation, custom filter, compatibility contract, encoded and decoded round trip, or a previously regressed edge case), and test it through the boundary's public interface when parsing failures produce caller-visible outcomes.
+
 ### Gate Function
 
 ```
@@ -81,15 +83,26 @@ expect(screen.getByTestId('sidebar-mock')).toBeInTheDocument();
 
 **Your human partner's correction:** "Are we testing the behaviour of a mock?"
 
+**Faithful doubles.** A test double crosses the same interface as production with a complete, behaviourally honest implementation, usually in memory: no partial mocks, and no production behaviour weakened solely to make the double convenient. In Effect, the double is a test Layer of the whole service (see Fakes as Layers).
+
 **Mock at the right level.** Learn every side effect of the real method before replacing it; mock the slow or external operation and keep what the test depends on real. When unsure, run the test against the real implementation first and observe what actually needs to happen.
 
 ```typescript
-// ❌ The hand-rolled mock swallows the config write that duplicate detection reads
-const catalog = { discoverAndCacheTools: async (): Promise<void> => undefined };
+// ❌ Every method answers, but `save` keeps nothing and `findByTitle` always misses, so duplicate detection never fires
+const notes = Layer.succeed(Notes, Notes.of({
+  save: (): Effect.Effect<void> => Effect.void,
+  findByTitle: (): Effect.Effect<Option.Option<Note>> => Effect.succeed(Option.none()),
+}));
 
-// ✅ Mock only the slow server startup, passed in through the dependencies; the config write stays real
-const startServer = mock<ServerManager["start"]>(async (): Promise<{ pid: number }> => ({ pid: 4242 }));
-const catalog = createToolCatalog({ startServer });
+// ✅ The whole service in memory: a saved note stays visible to `findByTitle` and to the test
+const saved: Array<Note> = [];
+const notes = Layer.succeed(Notes, Notes.of({
+  save: (note: Note): Effect.Effect<void> => Effect.sync((): void => {
+    saved.push(note);
+  }),
+  findByTitle: (title: string): Effect.Effect<Option.Option<Note>> =>
+    Effect.succeed(Array.findFirst(saved, (note: Note): boolean => note.title === title)),
+}));
 ```
 
 **Make doubles specific.** When arguments, call counts, or ordering are part of the contract, assert them — a fake that accepts anything verifies nothing. Give each branch (success, error, malformed) its own fixture or spy, so the wrong branch cannot satisfy the expectation.
@@ -119,7 +132,7 @@ BEFORE adding a mock or test helper:
 
 A reader opens a test file to learn what the code promises. The file reads as that promise: the function under test, an area of its behaviour, then one scenario stating its starting state, action and outcome.
 
-**Use the framework's idioms.** Reach for the runner's own groups, tests, parameterised tables, mocks and assertions (in bun:test, `describe`, `test`, `test.each`, `mock` and `expect`) before hand-rolling queues, call logs or assertion helpers.
+**Use the framework's idioms.** Reach for the runner's own groups, tests, parameterised tables, mocks and assertions (in `bun:test`, `describe`, `test`, `test.each`, `mock` and `expect`) before hand-rolling queues, call logs or assertion helpers. Effect programs run inside plain `bun:test` tests through `Effect.runPromise`.
 
 **Nest test groups.** The function under test names the outer group (`describe`); each inner group names an area of its behaviour with a short plain phrase (`quoteShipping` > `heavy parcels`).
 
@@ -127,52 +140,84 @@ A reader opens a test file to learn what the code promises. The file reads as th
 
 **Put an assertion within the first screen.** The reader sees what the test proves without scrolling through setup. Shared builders that supply defaults live in a fixtures file beside the tests (`*.fixtures.ts` in TypeScript); helpers used across files live in small modules named for their job, for example under `test-support/` (`unwrap.ts`, `branded-values.ts`), never a catch-all `common-fixtures.ts`. Scenario data stays local, in the test or its parameterised table (`test.each`): the builder supplies the defaults, the test passes the fields it is about, and the expected value is a literal, or an independent oracle's result, written beside the test. Fixtures never assert.
 
-**Show the call and its assertions in the body.** Setup can hide behind a builder; the call under test and what it must produce stay in the test. Bind the value under test to a local (`const quote = quoteShipping(parcel)`) and assert on it, rather than stacking the call inside the assertion.
+**Show the call and its assertions in the body.** Setup can hide behind a builder; the call under test and what it must produce stay in the test. Bind the value under test to a local (`const quote = await Effect.runPromise(quoteShipping(parcel))`) and assert on it, rather than stacking the call inside the assertion.
 
 ```typescript
 // shipping.test.ts
 import { describe, expect, test } from "bun:test";
-import { Result } from "better-result";
-import { quoteShipping } from "./shipping";
-import { buildParcel } from "./shipping.fixtures";
+import { Effect } from "effect";
+import { quoteShipping, shipParcel } from "./shipping";
+import { buildParcel, inMemoryMailer } from "./shipping.fixtures";
 
 describe("quoteShipping", (): void => {
   describe("heavy parcels", (): void => {
-    test("GIVEN a 30 kg parcel WHEN it is quoted THEN the quote is 1500, including the heavy surcharge", (): void => {
+    test("GIVEN a 30 kg parcel WHEN it is quoted THEN the quote is 1500, including the heavy surcharge", async (): Promise<void> => {
       const parcel = buildParcel({ weightKg: 30 });
 
-      const quote = quoteShipping(parcel);
+      const quote = await Effect.runPromise(quoteShipping(parcel));
 
-      expect(quote).toEqual(Result.ok(1500));
+      expect(quote).toBe(1500);
+    });
+  });
+});
+
+describe("shipParcel", (): void => {
+  describe("deliverable addresses", (): void => {
+    test("GIVEN a deliverable address WHEN the parcel ships THEN its label is sent and the carrier's receipt returned", async (): Promise<void> => {
+      const parcel = buildParcel({ weightKg: 5, address: "1 High St" });
+      const mailer = inMemoryMailer();
+
+      const sent = await Effect.runPromise(shipParcel(parcel).pipe(Effect.provide(mailer.layer)));
+
+      expect(sent).toEqual({ id: "label-1" });
+      expect(mailer.sent).toEqual([{ address: "1 High St", weightKg: 5 }]);
     });
   });
 });
 ```
 
-**Assert on the whole result value.** Compare it to its expected success or failure (with better-result, `Result.ok(…)` or `Result.err({ … })`), or unwrap it, so one assertion covers the variant and its payload. Narrowing first leaves the assertion inside an `if` that can silently never run.
+**Assert on the whole result value.** Compare a success whole against its expected value. Take a failure with `Effect.flip` and compare its `toJSON()`, never the error instance, against `{ _tag, …fields }`: one assertion covers the tag and every field, and a mismatch prints the fields where an instance mismatch prints only the class name on both sides. Narrowing first leaves the assertion inside an `if` that can silently never run.
 
 ```typescript
-// ❌ Assert, then narrow: when the quote is an error, the inner expect never runs
-expect(quote.isOk()).toBe(true);
-if (quote.isOk()) expect(quote.value).toBe(1500);
+const parcel = buildParcel({ weightKg: 80 });
 
-// ✅ One whole-value assertion
-expect(quote).toEqual(Result.ok(1500));
+// ❌ Check the outcome, then narrow: the field assertion hides inside an `if`
+const exit = await Effect.runPromiseExit(quoteShipping(parcel));
+expect(Exit.isFailure(exit)).toBe(true);
+if (Exit.isFailure(exit)) expect(String(exit.cause)).toContain("80");
+
+// ✅ One whole-value assertion on the flipped failure
+const failure = await Effect.runPromise(Effect.flip(quoteShipping(parcel)));
+expect(failure.toJSON()).toEqual({ _tag: "ParcelTooHeavy", weightKg: 80, limitKg: 70 });
 ```
 
 **Keep accepted and rejected inputs in separate tables.** One parameterised table lists the inputs the code accepts with their results; another lists the inputs it rejects with their errors.
 
-**Pass the runner's mocks in through the code's dependencies.** A mock is typed as the dependency's method (in bun:test, `mock<Mailer["send"]>`) and handed to the code through the dependencies object it already takes. Module mocking stays out. Give each mock a default that throws (as the fixture below shows), so a call the test did not expect fails where it happens; such a mock needs no "not called" check. This replaces hand-rolled queues and call logs, and a protocol fake with behaviour of its own stays.
+**Fakes as Layers.** Each service the code yields gets one in-memory fake: a function that returns the fake's Layer and the state a test inspects. A fake for one test file's subject lives in that file's fixtures file; a fake shared across test files lives in a `test-support/` module named for it (`test-support/in-memory-mailer.ts`). The test provides the Layer (`Effect.provide(mailer.layer)`) and asserts what happened through that state: the `shipParcel` test above compares the receipt whole, then `mailer.sent`; "nothing was sent" is `expect(mailer.sent).toEqual([])`. A `bun:test` `mock` wraps a fake's method only where its arguments, call count or order are the contract. Module mocking stays out.
 
 ```typescript
 // shipping.fixtures.ts
-export function buildDependencies(overrides: Partial<ShippingDependencies> = {}): ShippingDependencies {
-  return {
-    sendLabel: mock<Mailer["send"]>((): never => {
-      throw new Error("sendLabel was not configured");
-    }),
-    ...overrides,
-  };
+import { Effect, Layer } from "effect";
+import { type Label, LabelRejected, Mailer, type Parcel, type SentLabel } from "./shipping";
+
+/** A 2 kg parcel to a deliverable address; each test overrides the fields it is about. */
+export function buildParcel(overrides: Partial<Parcel> = {}): Parcel {
+  return { weightKg: 2, address: "1 High St", ...overrides };
+}
+
+/** A carrier in memory that refuses the given addresses and records every label it sends. */
+export function inMemoryMailer(refusedAddresses: ReadonlyArray<string> = []): { layer: Layer.Layer<Mailer>; sent: Array<Label> } {
+  const sent: Array<Label> = [];
+  const layer = Layer.succeed(Mailer, Mailer.of({
+    send: (label: Label): Effect.Effect<SentLabel, LabelRejected> =>
+      refusedAddresses.includes(label.address)
+        ? Effect.fail(new LabelRejected({ address: label.address }))
+        : Effect.sync((): SentLabel => {
+            sent.push(label);
+            return { id: `label-${sent.length}` };
+          }),
+  }));
+  return { layer, sent };
 }
 ```
 
@@ -180,7 +225,7 @@ export function buildDependencies(overrides: Partial<ShippingDependencies> = {})
 
 **Name test files and integration tests by what they cover.** A test file is named after the file it tests, and integration tests carry their own suffix: in TypeScript, `x.test.ts` tests `x.ts` and integration tests live in `*.integration.test.ts`.
 
-**Use the idioms production code uses.** For example, `yield*` inside `Result.gen` instead of a hand-rolled fold, `using` instead of a manual `.close()`, the project's shared helper (such as `required()`) instead of a local non-null assertion.
+**Use the idioms production code uses.** For example, `yield*` inside `Effect.gen` instead of a hand-rolled fold, `using` instead of a manual `.close()`, the project's shared helper (such as `required()`) instead of a local non-null assertion.
 
 ### Gate Function
 
@@ -199,9 +244,14 @@ BEFORE finishing a test file:
   expected value is a literal or an independent oracle's result, beside
   the test. Fixtures hold defaults only, and never assert.
 
-  A result value is compared whole or unwrapped.
-  Mocks arrive through the dependencies, typed as the method, each with
-  a default that throws. Order is asserted only for safety invariants.
+  An outcome is compared whole; a failure through Effect.flip and
+  toJSON(), never narrowed first.
+
+  Each service the code yields is one in-memory fake Layer, from the
+  fixtures file, or from a test-support/ module named for the fake when
+  several test files share it; mock wraps a fake's method only where
+  arguments, call count or order are the contract. Order is asserted
+  only for safety invariants.
 ```
 
 ## Tests Ship With the Implementation
@@ -236,7 +286,8 @@ A mutation nothing catches marks the behaviour as unprotected — or the test as
 | Watch mock setup balloon | Switch to an integration test with real components |
 | Name a test | Nested `describe`s, function outside and area inside; `GIVEN … WHEN … THEN …` with WHEN the user's action |
 | Share setup across tests | Builder with defaults in a fixtures file (`*.fixtures.ts`); scenario data stays in the test or its parameterised table, expected values literal or from an independent oracle |
-| Assert on a result value | Compare the whole value or unwrap it; never `isOk()` then narrow |
+| Stand in for a service | One in-memory fake of the whole service, provided as a Layer from the fixtures file, or from a `test-support/` module named for it when shared; `mock` wraps its method only where calls are the contract |
+| Assert on a result value | Compare the whole value; failures through `Effect.flip` and `toJSON()`; never narrow first |
 | Finish a test file | Run the mutation check |
 
 ## Warning Signs
