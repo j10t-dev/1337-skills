@@ -1,33 +1,29 @@
 # TypeScript patterns
 
-Code examples for each rule in `SKILL.md`. The underlying principles are language-agnostic; invoke the `principle-type-system-discipline` and `principle-boundary-discipline` skills.
+Code examples for each rule in `SKILL.md`, written in Effect. API mechanics come from `node_modules/effect/AGENTS.md`; these examples show the choices made here. The underlying principles are language-agnostic; invoke the `principle-type-system-discipline` and `principle-boundary-discipline` skills.
 
 ## Branded types
 
-Brand primitives so they can't be mixed up. Validate once at creation; downstream code trusts the type.
+Brand the base schema with `Schema.brand`. Decoding creates the branded value, so downstream code trusts the type.
 
 ```ts
-import { Result } from "better-result";
+import { Effect, Schema } from "effect";
 
-type AgentId = string & { readonly __brand: "AgentId" };
+const AgentId = Schema.String.check(Schema.isUUID()).pipe(Schema.brand("AgentId"));
+type AgentId = typeof AgentId.Type;
 
-function parseAgentId(input: string): Result<AgentId, string> {
-  if (!isUUID(input)) {
-    return Result.err(`Invalid agent id: ${input}`);
-  }
-  return Result.ok(input as AgentId);
+function parseAgentId(input: unknown): Effect.Effect<AgentId, Schema.SchemaError> {
+  return Schema.decodeUnknownEffect(AgentId)(input);
 }
 
-function focusAgent(id: AgentId): void {
-  /* input is trusted */
+function focusAgent(id: AgentId): Effect.Effect<void> {
+  return Effect.log(`Focusing agent ${id}`);
 }
 ```
 
-Match the `readonly __brand: 'X'` shape; don't invent a new convention.
-
 ## Discriminated unions
 
-If a bug forces the question "wait, can this combination actually happen?", the type is too loose. Model variants with a literal discriminant: every variant shares the field name and each variant's value is unique, so impossible combos can't be represented.
+If a bug forces the question "wait, can this combination actually happen?", the type is too loose. Model variants with a `_tag` literal: every variant has one and each variant's value is unique, so impossible combos can't be represented. `Schema.TaggedStruct` builds the same shape when the variants are decoded.
 
 ```ts
 // Don't. Boolean + optionals lets contradictory states exist.
@@ -35,38 +31,42 @@ type DiffState = { loading: boolean; diff?: GitDiff; error?: string };
 
 // Do. Only valid states exist.
 type DiffState =
-  | { kind: "loading" }
-  | { kind: "ready"; diff: GitDiff }
-  | { kind: "error"; error: string };
+  | { readonly _tag: "Loading" }
+  | { readonly _tag: "Ready"; readonly diff: GitDiff }
+  | { readonly _tag: "Failed"; readonly error: string };
 ```
-
-Pick one discriminant name (`kind`, `type`, `tag`) and stick to it.
 
 ## Constructive modelling
 
 Build the type from parts that are all legal instead of restricting a loose type with runtime checks. Adding is easier than subtracting.
 
-Non-empty, via a variadic tuple:
+Non-empty, via `Array.NonEmptyReadonlyArray`:
 
 ```ts
-type NonEmpty<T> = [T, ...T[]];
+import { Array } from "effect";
 
-// Don't: T[] plus a length check every caller must repeat
-function pickWinner(entries: string[]): string {
-  if (entries.length === 0) throw new Error("no entries");
+// Don't: a plain array plus a length check every caller must repeat
+function pickWinner(entries: ReadonlyArray<string>): string {
+  if (entries.length === 0) {
+    throw new Error("no entries");
+  }
   return entries[Math.floor(Math.random() * entries.length)];
 }
 
 // Do: an empty value of the type can't exist
-function pickWinner(entries: NonEmpty<string>): string {
+function pickWinner(entries: Array.NonEmptyReadonlyArray<string>): string {
   return entries[Math.floor(Math.random() * entries.length)];
 }
 ```
 
-Where a plain `T[]` arrives, narrow once with a guard. The fact then travels in the type:
+Where a plain array arrives, `Array.isReadonlyArrayNonEmpty` narrows it once. The fact then travels in the type:
 
 ```ts
-const isNonEmpty = <T>(arr: T[]): arr is NonEmpty<T> => arr.length > 0;
+import { Array, Option } from "effect";
+
+function drawWinner(entries: ReadonlyArray<string>): Option.Option<string> {
+  return Array.isReadonlyArrayNonEmpty(entries) ? Option.some(pickWinner(entries)) : Option.none();
+}
 ```
 
 Even length, as pairs. TypeScript has no refinement types (no `arr.length % 2 === 0` at the type level); you don't need one:
@@ -78,8 +78,8 @@ type Pairs<T> = [T, T][];
 A time range, as start plus duration:
 
 ```ts
-// Don't: a comment holds the invariant
-type TimeRange = { start: Date; end: Date }; // start <= end
+// Don't: start <= end holds only by convention
+type TimeRange = { start: Date; end: Date };
 
 // Do: a negative range can't be written; derive end when needed
 type TimeRange = { start: Date; durationMs: number };
@@ -89,43 +89,57 @@ Keep `durationMs` a plain number. Brand it (per Branded types) only if a raw num
 
 ## Simplest total type
 
-Don't strengthen everything. Keep `T[]` when every operation on it is total:
+Don't strengthen everything. Keep a plain array when every operation on it is total; the sum of no values is 0:
 
 ```ts
-const sum = (xs: number[]): number => xs.reduce((a, b): number => a + b, 0); // [] is 0, fine
+const sum = (values: ReadonlyArray<number>): number => values.reduce((total, value): number => total + value, 0);
 ```
 
 Strengthen when the loose type forces a lie at a use site. The tells are `!`, `arr[0] as T`, and a "should never happen" throw:
 
 ```ts
+import { Array } from "effect";
+
 // Don't: partiality smuggled past the compiler
-function newestSession(sessions: Session[]): Session {
+function newestSession(sessions: ReadonlyArray<Session>): Session {
   return sessions.at(0)!;
 }
 
 // Do: strengthen the input; the assertion disappears
-function newestSession(sessions: NonEmpty<Session>): Session {
-  return sessions[0];
+function newestSession(sessions: Array.NonEmptyReadonlyArray<Session>): Session {
+  return Array.headNonEmpty(sessions);
 }
 ```
 
-Weakening the result to `Session | undefined` is the other total signature. Either way the empty case lands at the call site, the one place that knows what empty means.
+Weakening the result to `Option.Option<Session>` is the other total signature. Either way the empty case lands at the call site, the one place that knows what empty means.
+
+```ts
+import { Array, Option } from "effect";
+
+function newestSession(sessions: ReadonlyArray<Session>): Option.Option<Session> {
+  return Array.head(sessions);
+}
+```
 
 ## `unknown` over `any`
 
-`any` disables type checking for everything it touches. External data is always `unknown`. Narrow before use.
+`any` disables type checking for everything it touches. External data is `unknown` until a `Schema` decodes it.
 
 ```ts
+import { Effect, Schema } from "effect";
+
 // Don't
-function handle(input: any): void {
-  consume(input.foo.bar);
+function senderName(input: any): string {
+  return input.sender.name;
 }
 
 // Do
-function handle(input: unknown): void {
-  if (typeof input === "object" && input !== null && "foo" in input) {
-    // narrowed; compiler verifies access
-  }
+const Message = Schema.Struct({ sender: Schema.Struct({ name: Schema.String }) });
+
+function senderName(input: unknown): Effect.Effect<string, Schema.SchemaError> {
+  return Schema.decodeUnknownEffect(Message)(input).pipe(
+    Effect.map((message: typeof Message.Type): string => message.sender.name),
+  );
 }
 ```
 
@@ -133,87 +147,131 @@ External sources include RPC payloads, `JSON.parse`, `postMessage`, IPC, file co
 
 ## No `as` casts
 
-Every `as` is a potential runtime crash. Cast only after the type system has verified the claim.
+A type assertion parses nothing. Decode unknown data with a `Schema` in place of claiming its type.
 
 ```ts
+import { Effect, Schema } from "effect";
+
 // Don't
 const user = data as User;
 
-// Do. Earn the cast at the boundary.
-function parseUser(data: unknown): Result<User, string> {
-  if (typeof data !== "object" || data === null) {
-    return Result.err("expected object");
+// Do
+const User = Schema.Struct({ id: Schema.String, name: Schema.String });
+type User = typeof User.Type;
+
+function parseUser(data: unknown): Effect.Effect<User, Schema.SchemaError> {
+  return Schema.decodeUnknownEffect(User)(data);
+}
+```
+
+Where TypeScript cannot express an invariant the code already holds, the cast follows the protocol in `principle-type-system-discipline`. `// SAFETY:` says where the value comes from, which invariant guarantees it and why TypeScript cannot see it; `Verified by:` names the test that fails if the invariant breaks; an `// oxlint-disable-next-line <rule>` line is added only where a configured rule fires, and the baseline configuration has no assertion rule. Here a registry holds values of different types, one per key, and a Map cannot tie a stored value's type to its key's type parameter. `Key` is invariant in `T` through `valueType`, a member that exists only in the type, so a `Key<number>` cannot be widened to `Key<string | number>` to store a string:
+
+```ts
+import { Option, type Types } from "effect";
+
+/** Names one value of type `T` in a `Registry`; two keys never collide, even with the same name. */
+export class Key<T> {
+  declare private readonly valueType: Types.Invariant<T>;
+  /** Identifies this key inside a `Registry`. */
+  readonly id: symbol;
+
+  constructor(name: string) {
+    this.id = Symbol(name);
   }
-  if (!("id" in data) || typeof (data as Record<string, unknown>).id !== "string") {
-    return Result.err("expected id");
+}
+
+/** Holds at most one value per key, each of its key's type. */
+export class Registry {
+  private readonly values = new Map<symbol, unknown>();
+
+  /** Stores `value` under `key`, replacing any earlier value. */
+  set<T>(key: Key<T>, value: T): void {
+    this.values.set(key.id, value);
   }
-  // ... validate all fields
-  return Result.ok(data as User); // OK, earned cast after full validation
+
+  /** The value stored under `key`, or none when nothing was stored. */
+  get<T>(key: Key<T>): Option.Option<T> {
+    if (!this.values.has(key.id)) {
+      return Option.none();
+    }
+    // SAFETY: `set` is the only writer of `values` and stores each value under its own key's `id`. Each `id` is a fresh
+    // symbol and `Key` is invariant in `T`, so the value under `key.id` is a `T`. A Map's value type cannot depend on its key.
+    // Verified by: registry.test.ts "GIVEN a number and a string stored under two keys WHEN each key is read THEN each read returns its own value"
+    return Option.some(this.values.get(key.id) as T);
+  }
 }
 ```
 
 When refactoring an `as` out of existing code, identify why TypeScript can't infer:
 
-- Missing discriminant: add one, switch to a discriminated union.
+- Missing discriminant: add a `_tag`, switch to a discriminated union.
 - Overly wide source type (e.g. `Record<string, unknown>`): narrow it.
-- Untyped boundary: add a parse function or schema.
-- Genuinely inexpressible: use a branded type or `satisfies`.
+- Untyped boundary: decode it with a `Schema`.
+- Genuinely inexpressible: a `Schema.brand`, `satisfies`, or the protocol above.
 
 ## Narrowing hierarchy
 
 From best to last-resort:
 
-1. **Discriminated union switch / if.** Compiler narrows automatically.
+1. **`_tag` switch / if.** Compiler narrows automatically.
 2. **`in` operator.** `"key" in obj` narrows to variants containing that key.
-3. **`typeof` / `instanceof`.** For primitives and class instances.
+3. **`Predicate` helpers, `instanceof`.** For primitives, structures and class instances.
 4. **User-defined type guard.** When the above aren't enough.
-5. **`as` cast.** Only after validation.
+5. **`as` cast.** Only under the protocol in No `as` casts.
 
 ```ts
-function area(s: Shape): number {
-  if ("radius" in s) {
-    return Math.PI * s.radius ** 2; // narrowed to circle
+function area(shape: Shape): number {
+  if ("radius" in shape) {
+    return Math.PI * shape.radius ** 2;
   }
-  return s.width * s.height; // narrowed to rect
+  return shape.width * shape.height;
 }
 ```
 
 ## Type guards
 
-A guard must actually verify the claim. A lying guard is worse than `as` because the bug hides behind a name that says it's safe.
+A domain guard must actually verify the claim. A lying guard is worse than `as` because the bug hides behind a name that says it's safe.
 
 ```ts
-function isCircle(s: Shape): s is Shape & { kind: "circle" } {
-  return s.kind === "circle";
+function isCircle(shape: Shape): shape is Shape & { readonly _tag: "Circle" } {
+  return shape._tag === "Circle";
 }
 ```
 
-Prefer discriminant narrowing when possible. The guard adds a layer the reader has to follow.
+Prefer `_tag` narrowing when possible. The guard adds a layer the reader has to follow. Primitive and structural checks come from `Predicate`, never a hand-written `isString`:
+
+```ts
+import { Predicate } from "effect";
+
+function labelOf(input: unknown): string {
+  return Predicate.isString(input) ? input : "unlabelled";
+}
+```
 
 ## Exhaustiveness
 
-Write a `case` per variant and no `default`. The `switch-exhaustiveness-check` lint rule enforces it; `tooling-baseline.md` configures it.
+Write a `case` per variant and no `default`. The `switch-exhaustiveness-check` lint rule enforces it; `tooling-baseline.md` configures it. Only where no exhaustiveness lint rule is configured does a `void` function end with `assertNever`, as `draw` does.
 
 ```ts
 function area(shape: Shape): number {
-  switch (shape.kind) {
-    case "circle":
+  switch (shape._tag) {
+    case "Circle":
       return Math.PI * shape.radius ** 2;
-    case "rect":
+    case "Rect":
       return shape.width * shape.height;
   }
 }
 
 function draw(shape: Shape): void {
-  switch (shape.kind) {
-    case "circle":
+  switch (shape._tag) {
+    case "Circle":
       drawCircle(shape);
       return;
-    case "rect":
+    case "Rect":
       drawRect(shape);
       return;
   }
-  assertNever(shape); // only where no exhaustiveness lint rule is configured
+  assertNever(shape);
 }
 
 function assertNever(value: never): never {
@@ -223,28 +281,51 @@ function assertNever(value: never): never {
 
 ## `satisfies` over `as`
 
-`satisfies` validates without widening literal types.
+`satisfies` validates without widening literal types: after the Do line, `config.theme` is the literal `"dark"`, not `string`.
 
 ```ts
 // Don't. Widens, loses literal types.
 const config = { theme: "dark", cols: 3 } as Config;
 
-// Do. Validates AND preserves literal types.
+// Do. Validates and keeps literal types.
 const config = { theme: "dark", cols: 3 } satisfies Config;
-// config.theme is "dark" (literal), not string
 ```
 
 ## Boundary validation
 
-Validate once where data crosses in; trust types inside. Invoke the `principle-boundary-discipline` skill.
+Decode once where data crosses in, and trust types inside. The decoder stays private beside its schema; the exported parser is named for the domain and takes the input type callers hold. That input picks the decoder: `Schema.decodeEffect` when a runtime step established it as the schema's exact encoded type, such as a `string` read from a file or a value an API returned with a type the caller did not supply as a type argument, and `Schema.decodeUnknownEffect` otherwise. A parsed JSON body or a database row is `unknown` however it is annotated. Invoke the `principle-boundary-discipline` skill.
 
-- **Wire formats** (proto, JSON-RPC): parse with `ignoreUnknownFields` so forward-compatible changes don't break old clients.
-- **Persisted data** (database rows, cache files) is a boundary: parse it where it is read and return corrupt data as a local failure.
+```ts
+import { Effect, Schema } from "effect";
+
+const InfrastructureStage = Schema.String.check(Schema.isPattern(/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/)).pipe(
+  Schema.brand("InfrastructureStage"),
+);
+type InfrastructureStage = typeof InfrastructureStage.Type;
+const decodeInfrastructureStage = Schema.decodeEffect(InfrastructureStage);
+
+/** Fails unless the input is lowercase letters, digits and inner hyphens. */
+export function parseInfrastructureStage(input: string): Effect.Effect<InfrastructureStage, Schema.SchemaError> {
+  return decodeInfrastructureStage(input);
+}
+
+const DeployRequest = Schema.Struct({ stage: InfrastructureStage, version: Schema.String });
+type DeployRequest = typeof DeployRequest.Type;
+const decodeDeployRequest = Schema.decodeUnknownEffect(DeployRequest);
+
+/** Decodes an HTTP request body. */
+export function parseDeployRequest(body: unknown): Effect.Effect<DeployRequest, Schema.SchemaError> {
+  return decodeDeployRequest(body);
+}
+```
+
+- **Wire formats** (proto, JSON-RPC): decode so unknown fields are ignored, so forward-compatible changes don't break old clients.
+- **Persisted data** (database rows, cache files) is a boundary: decode rows from `unknown` where they are read, never trusting a query's type argument, and fail with a tagged error on corrupt data.
 - **Don't re-validate** deep in call chains.
 
 ## Schema-derived types
 
-When a `.proto`, OpenAPI spec, GraphQL schema, or database migration already defines a shape, derive from the generated types instead of duplicating them.
+When a `.proto`, OpenAPI spec, GraphQL schema, database migration or `Schema` already defines a shape, derive from it instead of duplicating it.
 
 ```ts
 // Don't. Duplicate shape, drifts when the schema changes.
@@ -252,18 +333,18 @@ type CheckSummary = {
   totalCount: number;
   checks: { name: string; status: string }[];
 };
-function renderChecks(s: CheckSummary): void {
-  /* ... */
+function renderChecks(summary: CheckSummary): string {
+  return `${summary.checks.length} of ${summary.totalCount} checks`;
 }
 
 // Do. Derive from the generated schema type.
 import type { ChecksMessage } from "<generated module>";
-function renderChecks(s: Pick<ChecksMessage, "totalCount" | "checks">): void {
-  /* ... */
+function renderChecks(summary: Pick<ChecksMessage, "totalCount" | "checks">): string {
+  return `${summary.checks.length} of ${summary.totalCount} checks`;
 }
 ```
 
-Reach for `Pick`, `Omit`, `Parameters`, `ReturnType`, `Awaited`, `typeof` before writing a new interface.
+Reach for `Pick`, `Omit`, `Parameters`, `ReturnType`, `Awaited`, `typeof` and a schema's `.Type` before writing a new interface.
 
 ## Object args
 
@@ -290,45 +371,122 @@ openFile({
 
 Skip on hot paths: per-frame render, tokenisers, parsers, anything in a tight loop where the allocation cost matters.
 
-## Result library
+## Workflows
 
-`Result.try` wraps each throwing call on its own, and `parse` is the one bridge from Zod. Only a throw rolls a database transaction back, so a failure that must undo the writes is thrown inside the transaction and becomes a Result outside it.
+The generator holds the business steps: services yielded, intermediate values named, the cache decision an ordinary `if`. Cross-cutting policy wraps it, passed to `Effect.fn` after the generator as its pipe. One pure transform stays a `.pipe(Effect.map(…))`.
 
 ```ts
-import { Result, type Err } from "better-result";
+import { Effect, Option } from "effect";
 
-type ResultGenerator<T, E> = Generator<Err<never, E>, Result<T, E>, unknown>;
+// Don't. Three dependent flatMap steps bury the cache decision in nested callbacks.
+const fetchUserPosts = (userId: UserId): Effect.Effect<ReadonlyArray<Post>, DatabaseError | CacheError, UserDatabase | UserCache> =>
+  UserCache.pipe(
+    Effect.flatMap((cache: UserCache["Service"]): Effect.Effect<ReadonlyArray<Post>, DatabaseError | CacheError, UserDatabase> =>
+      cache.getUserPosts(userId).pipe(
+        Effect.flatMap((cached: Option.Option<ReadonlyArray<Post>>): Effect.Effect<ReadonlyArray<Post>, DatabaseError | CacheError, UserDatabase> =>
+          Option.isSome(cached)
+            ? Effect.succeed(cached.value)
+            : UserDatabase.pipe(
+                Effect.flatMap((database: UserDatabase["Service"]): Effect.Effect<ReadonlyArray<Post>, DatabaseError | CacheError> =>
+                  database.findPostsByUser(userId).pipe(
+                    Effect.tap((posts: ReadonlyArray<Post>): Effect.Effect<void, CacheError> => cache.setUserPosts(userId, posts)),
+                  ),
+                ),
+              ),
+        ),
+      ),
+    ),
+  );
 
-// Don't. The catch-all turns every defect and every failure into the same null.
-function loadSettings(file: string): Settings | null {
-  try {
-    return settingsSchema.parse(JSON.parse(readFileSync(file, "utf8")));
-  } catch {
-    return null;
-  }
-}
+// Do.
+const fetchUserPosts = Effect.fn("fetchUserPosts")(
+  function* (userId: UserId): Effect.fn.Return<ReadonlyArray<Post>, DatabaseError | CacheError, UserDatabase | UserCache> {
+    const database = yield* UserDatabase;
+    const cache = yield* UserCache;
+    const cachedPosts = yield* cache.getUserPosts(userId);
+    if (Option.isSome(cachedPosts)) {
+      return cachedPosts.value;
+    }
+    const posts = yield* database.findPostsByUser(userId);
+    yield* cache.setUserPosts(userId, posts);
+    return posts;
+  },
+  Effect.retry({ times: 2 }),
+);
 
-// Do. Failures are values, and each throwing call is wrapped on its own.
-function loadSettings(file: string): Result<Settings, string> {
-  return Result.gen(function* (): ResultGenerator<Settings, string> {
-    const text = yield* Result.try({
-      try: (): string => readFileSync(file, "utf8"),
-      catch: (cause): string => `Cannot read ${file}: ${String(cause)}`,
-    });
-    const json = yield* Result.try({
-      try: (): unknown => JSON.parse(text),
-      catch: (): string => `${file} is not JSON`,
-    });
-    return parse(settingsSchema, json);
+const countUserPosts = (userId: UserId): Effect.Effect<number, DatabaseError | CacheError, UserDatabase | UserCache> =>
+  fetchUserPosts(userId).pipe(Effect.map((posts: ReadonlyArray<Post>): number => posts.length));
+```
+
+## Errors
+
+Each expected failure is a `Schema.TaggedError` whose fields carry the operation's context, with a classified reason where the cause changes the next step. At the command line edge, `catchTags` gives each tag its own message, following the error-message rule in `principle-reader-first-code`. A new tag stays in the error channel, so the `never` in the signature is a type error until the new failure has its message.
+
+```ts
+import { Effect, Schema } from "effect";
+
+class OrderNotFound extends Schema.TaggedError<OrderNotFound>()("OrderNotFound", { orderId: Schema.String }) {}
+class MailNotSent extends Schema.TaggedError<MailNotSent>()("MailNotSent", {
+  orderId: Schema.String,
+  address: Schema.String,
+  reason: Schema.Literals(["address_refused", "carrier_unavailable"]),
+}) {}
+
+// Don't. The catch-all gives every failure, including ones added later, the same message.
+const shipCommand = (orderId: string): Effect.Effect<string, never, Orders | Mailer> =>
+  shipById(orderId).pipe(
+    Effect.map((sent: SentLabel): string => `Label ${sent.id} sent for order ${orderId}.`),
+    Effect.catch((): Effect.Effect<string> => Effect.succeed("Something went wrong.")),
+  );
+
+// Do.
+const shipCommand = (orderId: string): Effect.Effect<string, never, Orders | Mailer> =>
+  shipById(orderId).pipe(
+    Effect.map((sent: SentLabel): string => `Label ${sent.id} sent for order ${orderId}.`),
+    Effect.catchTags({
+      OrderNotFound: (error: OrderNotFound): Effect.Effect<string> =>
+        Effect.succeed(`Order ${error.orderId} was not found. Check the order ID and run the command again.`),
+      MailNotSent: (error: MailNotSent): Effect.Effect<string> =>
+        Effect.succeed(
+          error.reason === "address_refused"
+            ? `The carrier refused the address ${error.address} for order ${error.orderId}. Correct the address, then ship the order again.`
+            : `The carrier was unavailable for order ${error.orderId}. Ship the order again later.`,
+        ),
+    }),
+  );
+```
+
+## Throwing APIs
+
+`Effect.try` and `Effect.tryPromise` wrap each throwing call on its own, each into its own tagged error.
+
+```ts
+import { Effect, Schema } from "effect";
+
+class SettingsUnreadable extends Schema.TaggedError<SettingsUnreadable>()("SettingsUnreadable", { path: Schema.String }) {}
+class SettingsNotJson extends Schema.TaggedError<SettingsNotJson>()("SettingsNotJson", { path: Schema.String }) {}
+
+const Settings = Schema.Struct({ theme: Schema.String });
+type Settings = typeof Settings.Type;
+
+const loadSettings = Effect.fn("loadSettings")(function* (
+  path: string,
+): Effect.fn.Return<Settings, SettingsUnreadable | SettingsNotJson | Schema.SchemaError> {
+  const text = yield* Effect.tryPromise({
+    try: async (): Promise<string> => Bun.file(path).text(),
+    catch: (): SettingsUnreadable => new SettingsUnreadable({ path }),
   });
-}
+  const json = yield* Effect.try({
+    try: (): unknown => JSON.parse(text),
+    catch: (): SettingsNotJson => new SettingsNotJson({ path }),
+  });
+  return yield* Schema.decodeUnknownEffect(Settings)(json);
+});
+```
 
-// The one bridge from Zod's success/failure shape.
-function parse<T>(schema: z.ZodType<T>, input: unknown): Result<T, string> {
-  const parsed = schema.safeParse(input);
-  return parsed.success ? Result.ok(parsed.data) : Result.err(parsed.error.message);
-}
+Prefer an API option that doesn't throw over catching.
 
+```ts
 // Don't. Catching to detect a missing file.
 function isMissing(path: string): boolean {
   try {
@@ -343,28 +501,88 @@ function isMissing(path: string): boolean {
 function isMissing(path: string): boolean {
   return lstatSync(path, { throwIfNoEntry: false }) === undefined;
 }
+```
 
-// Do. The throw rolls the transaction back; Result.try turns that one failure into a value and lets defects through.
-class StaleNoteError extends Error {}
+## Optional values
 
-function saveNotes(db: Database, notes: Note[]): Result<void, string> {
-  return Result.try({
-    try: (): void => {
-      db.transaction((): void => {
-        for (const note of notes) {
-          if (!updateIfUnchanged(db, note)) {
-            throw new StaleNoteError(`Note ${note.id} changed since it was read`);
-          }
-        }
-      })();
-    },
-    catch: (error): string => {
-      if (error instanceof StaleNoteError) {
-        return error.message;
-      }
-      throw error;
-    },
-  });
+`Schema.OptionFromNullOr` turns a nullable field into an `Option` as it crosses in, and `Array.findFirst` returns one for a lookup that may miss.
+
+```ts
+import { Array, Effect, Option, Schema } from "effect";
+
+const Order = Schema.Struct({
+  id: Schema.String,
+  address: Schema.String,
+  deliveryNote: Schema.OptionFromNullOr(Schema.String),
+});
+type Order = typeof Order.Type;
+const decodeOrder = Schema.decodeUnknownEffect(Order);
+
+function parseOrder(input: unknown): Effect.Effect<Order, Schema.SchemaError> {
+  return decodeOrder(input);
+}
+
+function findOrder(orders: ReadonlyArray<Order>, id: string): Option.Option<Order> {
+  return Array.findFirst(orders, (order: Order): boolean => order.id === id);
+}
+```
+
+## Services
+
+A service declares its shape inline and carries its Layers as static members. With several implementations, each Layer is named for what differs: `layerCarrier` sends through the `CarrierClient` service, and `layerDryRun` logs the label and sends nothing. `Mailer["Service"]` names the shape's type where a signature needs it.
+
+```ts
+import { Context, Effect, Layer, Schema } from "effect";
+
+class Label extends Schema.Class<Label>("Label")({ orderId: Schema.String, address: Schema.String }) {}
+type SentLabel = { readonly id: string };
+
+/** Sends shipping labels. */
+export class Mailer extends Context.Service<Mailer, {
+  /** Sends one label; fails with `MailNotSent` when the carrier refuses the address or is unavailable. */
+  readonly send: (label: Label) => Effect.Effect<SentLabel, MailNotSent>;
+}>()("app/Mailer") {
+  static readonly layerCarrier: Layer.Layer<Mailer, never, CarrierClient> = Layer.effect(
+    Mailer,
+    Effect.gen(function* (): Effect.fn.Return<Mailer["Service"], never, CarrierClient> {
+      const carrier = yield* CarrierClient;
+      return Mailer.of({
+        send: (label: Label): Effect.Effect<SentLabel, MailNotSent> => carrier.postLabel(label),
+      });
+    }),
+  );
+
+  static readonly layerDryRun: Layer.Layer<Mailer> = Layer.succeed(Mailer, Mailer.of({
+    send: (label: Label): Effect.Effect<SentLabel> =>
+      Effect.log(`Dry run: label for order ${label.orderId} not sent`).pipe(Effect.as({ id: `dry-run-${label.orderId}` })),
+  }));
+}
+```
+
+Code yields the service. The composition root chooses the Layer: each entry point provides one at its top-level call, after supplying that Layer's own dependencies. Ordinary functions take no Layer.
+
+```ts
+import { Effect, Layer } from "effect";
+
+// Don't. The mailer arrives as an argument, so every caller must find one.
+function shipOrder(mailer: Mailer["Service"], order: Order): Effect.Effect<SentLabel, MailNotSent> {
+  return mailer.send(new Label({ orderId: order.id, address: order.address }));
+}
+
+// Do.
+const shipOrder = Effect.fn("shipOrder")(function* (order: Order): Effect.fn.Return<SentLabel, MailNotSent, Mailer> {
+  const mailer = yield* Mailer;
+  return yield* mailer.send(new Label({ orderId: order.id, address: order.address }));
+});
+
+const carrierMailer: Layer.Layer<Mailer> = Mailer.layerCarrier.pipe(Layer.provide(CarrierClient.layer));
+
+async function shipWithCarrier(order: Order): Promise<SentLabel> {
+  return Effect.runPromise(shipOrder(order).pipe(Effect.provide(carrierMailer)));
+}
+
+async function shipDryRun(order: Order): Promise<SentLabel> {
+  return Effect.runPromise(shipOrder(order).pipe(Effect.provide(Mailer.layerDryRun)));
 }
 ```
 
@@ -392,9 +610,11 @@ if (shouldDiscardDraft(draft)) {
 
 ## Closed sets
 
-An `as const` array or object holds the values, a derived type names them, and a schema reads the same constant. Literals from JSON, SQL and argv already are the domain value, so nothing converts them.
+An `as const` array or object holds the values, a derived type names them, and `Schema.Literals` decodes the same constant. Literals from JSON, SQL and argv already are the domain value once decoded, so nothing converts them.
 
 ```ts
+import { Schema } from "effect";
+
 // Don't. The enum generates runtime code, and strings from outside need converting.
 enum LogLevel {
   Debug = "debug",
@@ -402,12 +622,12 @@ enum LogLevel {
   Warn = "warn",
 }
 
-// Do. The array iterates, the type derives from it, and the schema reads it.
+// Do. The array iterates, the type derives from it, and the schema decodes it.
 const LOG_LEVELS = ["debug", "info", "warn"] as const;
 type LogLevel = (typeof LOG_LEVELS)[number];
-const logLevelSchema = z.enum(LOG_LEVELS);
+const LogLevel = Schema.Literals(LOG_LEVELS);
 
-// An object when each value needs a name.
+// Do. An object when each value needs a name.
 const EXIT = { success: 0, usage: 2 } as const;
 type ExitCode = (typeof EXIT)[keyof typeof EXIT];
 ```
@@ -417,6 +637,8 @@ type ExitCode = (typeof EXIT)[keyof typeof EXIT];
 `filter` then `map` reads as "keep these", then "convert them".
 
 ```ts
+import { Array } from "effect";
+
 // Don't. flatMap hides the filter inside the conversion.
 const emails = users.flatMap((user): string[] => (user.active ? [user.email] : []));
 
@@ -426,43 +648,51 @@ const emails = users.values().filter((user): boolean => user.active).map((user):
 // Do.
 const emails = users.filter((user): boolean => user.active).map((user): string => user.email);
 
-// flatMap fits when one input yields several outputs.
+// Do. flatMap fits when one input yields several outputs.
 const lines = orders.flatMap((order): Line[] => order.lines);
 
-// When find replaces a loop, the first match still decides.
-const owner = members.find((member): boolean => member.role === "owner");
+// Do. When findFirst replaces a loop, the first match still decides, and a miss is an Option.
+const owner = Array.findFirst(members, (member): boolean => member.role === "owner");
 ```
 
 ## Guard runs
 
-`require` turns a condition and its failure into a Result, so each guard is one `yield*` line over a named predicate. `ResultGenerator` is the alias from the Result library example.
+`require` turns a condition and its failure into an Effect, so each guard is one `yield*` line over a named predicate failing with a tagged error.
 
 ```ts
-type TransferFailure = { kind: "closed" } | { kind: "insufficient_funds" };
+import { Effect, Schema } from "effect";
 
-function require<const E>(condition: boolean, failure: E): Result<void, E> {
-  return condition ? Result.ok() : Result.err(failure);
+class AccountClosed extends Schema.TaggedError<AccountClosed>()("AccountClosed", { accountId: Schema.String }) {}
+class InsufficientFunds extends Schema.TaggedError<InsufficientFunds>()("InsufficientFunds", {
+  accountId: Schema.String,
+  shortBy: Schema.Number,
+}) {}
+
+function require<const E>(condition: boolean, failure: E): Effect.Effect<void, E> {
+  return condition ? Effect.void : Effect.fail(failure);
 }
 
-// Don't. Each guard repeats the return-an-error shape.
-function transfer(account: Account, amount: number): Result<Transfer, TransferFailure> {
-  return Result.gen(function* (): ResultGenerator<Transfer, TransferFailure> {
-    if (!isOpen(account)) {
-      return Result.err({ kind: "closed" });
-    }
-    if (!hasFunds(account, amount)) {
-      return Result.err({ kind: "insufficient_funds" });
-    }
-    return Result.ok(debit(account, amount));
-  });
-}
+// Don't. Each guard repeats the fail-and-return shape.
+const transfer = Effect.fn("transfer")(function* (
+  account: Account,
+  amount: number,
+): Effect.fn.Return<Transfer, AccountClosed | InsufficientFunds> {
+  if (!isOpen(account)) {
+    return yield* new AccountClosed({ accountId: account.id });
+  }
+  if (!hasFunds(account, amount)) {
+    return yield* new InsufficientFunds({ accountId: account.id, shortBy: amount - account.balance });
+  }
+  return debit(account, amount);
+});
 
 // Do. The reader sees the preconditions as one run.
-function transfer(account: Account, amount: number): Result<Transfer, TransferFailure> {
-  return Result.gen(function* (): ResultGenerator<Transfer, TransferFailure> {
-    yield* require(isOpen(account), { kind: "closed" });
-    yield* require(hasFunds(account, amount), { kind: "insufficient_funds" });
-    return Result.ok(debit(account, amount));
-  });
-}
+const transfer = Effect.fn("transfer")(function* (
+  account: Account,
+  amount: number,
+): Effect.fn.Return<Transfer, AccountClosed | InsufficientFunds> {
+  yield* require(isOpen(account), new AccountClosed({ accountId: account.id }));
+  yield* require(hasFunds(account, amount), new InsufficientFunds({ accountId: account.id, shortBy: amount - account.balance }));
+  return debit(account, amount);
+});
 ```
