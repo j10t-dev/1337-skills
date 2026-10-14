@@ -15,26 +15,28 @@ Two references hold the rest of the rules and the worked examples; read the one 
 
 ## Can the reader follow the operation?
 
-- **Entry point first.** The exported operation or public contract comes straight after the imports, so the reader meets what the file does before any of its ingredients, wherever the language allows either order. A single-operation module follows the entry point with its helpers in the order they run. A multi-operation module opens on its contract (the type and its factory), then a short paragraph on how the operations behave, then the operations; constants, key maps, schemas and helpers sit below them. The order serves reading rather than a mechanical sort.
+- **Entry point first.** The exported operation or public contract comes straight after the imports, so the reader meets what the file does before any of its ingredients, wherever the language allows either order. A single-operation module follows the entry point with its helpers in the order they run, then the types its signature names: the dependencies object and the data shapes sit below the operation, never above it. A multi-operation module opens on its contract (the type and its factory), then a short paragraph on how the operations behave, then the operations; constants, key maps, schemas and helpers sit below them. The order serves reading rather than a mechanical sort.
 - **Phases at a glance.** The entry point's body reads like a table of contents: each phase the requirement names is its own statement or call there, in the requirement's order, so the reader sees the whole operation without opening a helper. A phase that loops, branches or pages through results becomes one call to a named helper that holds that phase alone; a helper that also absorbs a neighbouring phase hides that phase from the reader.
 
   ```ts
+  /** The invoice as plain text: a header, one line per item, then the totals. */
   export function renderInvoice(order: Order): string {
     const lines = order.items.map(toInvoiceLine);
     const totals = sumTotals(lines);
     const header = formatHeader(order.customer, order.issuedOn);
     return joinSections(header, lines, totals);
   }
-  // Below: toInvoiceLine, sumTotals, formatHeader and joinSections, in that order.
   ```
+
+  Below it, `toInvoiceLine`, `sumTotals`, `formatHeader` and `joinSections` follow in the order the body calls them.
 - **Co-location.** Code the reader needs together sits together. Each helper stays near its caller, and each type sits just below the function that uses it, so plumbing types such as a dependencies object follow the operation they serve.
 - **Responsibilities before files.** Cut responsibilities before splitting files. Split a file when it does two jobs that fail differently, such as rejecting a whole response versus keeping one record as unreadable. A module that needs section-divider comments is asking to be split into files.
 - **Newcomer re-read.** After shrinking a module, re-read it as a newcomer. Cryptic one-word helpers and parallel pieces built differently are defects, however many lines were cut.
-- **Order and vocabulary.** Once the design is sound, fix readability with renames, reordering and short explanations; the architecture stays.
-- **Visible exceptions.** A deliberate exception or recovery rule gets its own branch and a one-line comment saying why.
+- **Order and vocabulary.** Once the design is sound, fix readability with renames and reordering; the architecture stays.
+- **Visible exceptions.** A deliberate exception or recovery rule gets its own branch whose named predicate or failure says why.
 - **Shape at a glance.** Lay code out so the reader tells methods, properties and return types apart at a glance. Parallel definitions share one visual shape, so an irregular one in the block gets reshaped to match. Line width exists to avoid awkward wraps, so a long line or a dense one-expression body gets broken into named steps.
-- **Own preconditions.** A function enforces the precondition its own comment states, rather than relying on every caller to pass only inputs where it holds. This differs from re-checking a boundary type, which stays trusted (see `principle-boundary-discipline`).
-- **Comments.** Code explains itself first, and a comment carries only what good code can't: a protocol quirk, a binary layout, which errors reject a whole response. Comments state the current contract or a rule a name can't carry, and documentation comments come when requested. Comments describe the code as it stands, because the reader can't see its past; words such as "existing", "preserve", "kept for" and "still" mark a comment to rewrite.
+- **Own preconditions.** A function enforces the precondition its contract states, rather than relying on every caller to pass only inputs where it holds. This differs from re-checking a boundary type, which stays trusted (see `principle-boundary-discipline`).
+- **Comments.** An inline comment is an anti-pattern: rewrite the code until it tells the reader the fact, and comment only what code cannot express, such as a protocol quirk or a binary layout. Every exported symbol, and every public member of an exported class or service shape, has one JSDoc block at its declaration stating the sharpest caller-visible fact its signature cannot show (constraints, expected failures, side effects, ownership, invariants), never restating its name; when the signature shows everything else, the block is a one-line purpose that adds to the name. Re-exports rely on the original's block. JSDoc and comments describe the code as it stands, because the reader can't see its past; words such as "existing", "preserve", "kept for" and "still" mark one to rewrite.
 
 ## Do the names say what things are?
 
@@ -59,7 +61,7 @@ Two references hold the rest of the rules and the worked examples; read the one 
 - **Generic helpers.** A generic helper knows only its general job, and each caller handles its own special cases.
 - **One home.** Identical production helpers live in one place. "Duplicates" that differ on edge inputs are different helpers, and merging them changes behaviour.
 - **Type aliases.** Extract a type alias only when its name explains a concept to the reader.
-- **One idiom per mechanism.** A correct piece of code in a second style is a defect. Convert every site, production and tests alike, including hand-rolled look-alikes such as an `"ok"` arm in a failure union beside an established result type. A pilot slice exists to judge a convention; once adopted, it reaches everything.
+- **One idiom per mechanism.** A correct piece of code in a second style is a defect, down to the import form: each library is imported one way everywhere. Convert every site, production and tests alike, including hand-rolled look-alikes such as an `"ok"` arm in a failure union beside an established result type. A pilot slice exists to judge a convention; once adopted, it reaches everything.
 - **One source.** Every rule, closed set and mapping that two layers depend on has one source the others derive from: the validator is built from the list constant, the query from the parser's field name, and parameters take the domain type rather than a bare `string`.
 - **Delete before renaming.** A wrapper whose extra fields are derivable from its contents, a bundle whose extra field nobody reads, fields written but never read, fields that duplicate another, and a nullable that is never null all get deleted rather than renamed.
 - **Direct calls.** When a framework has already made a decision, such as a command parser choosing the command, call the operation from its callback. When a union is built in one place only so another can switch on it to choose a function, call the function directly. Unions carry real outcomes the program handles differently (`archived | conflict | not_found`).
@@ -68,8 +70,9 @@ Two references hold the rest of the rules and the worked examples; read the one 
 - **Libraries.** Adopt a library when its pattern is codebase-wide, rather than to tidy one place. Taking the useful part of a framework without its architecture is fine when shipping comes first.
 - **Tooling.** Every tool earns its place by what it enforces, not by its size. A maintained standard tool beats a hand-rolled script that gets edge cases wrong. A lint rule that pushes code towards worse patterns is relaxed, and the preference it was meant to serve goes into the project's instructions. When a change removes a class of defect, it adds a gate so the class stays gone.
 - **Current docs.** Before reworking an adapter, read the current documentation and the installed types.
-- **Failures.** Report a failure directly, rather than wrapping it in a value the consumer discards. An unknown outcome is a failure. Bugs propagate to the process boundary: catch only the expected failures an operation can produce, so a type or range error never becomes an expected kind such as an I/O failure, and symmetric paths share one policy.
-- **Failure output.** A failure union maps to exit codes and messages in one module, with one exhaustive switch per mapping. Each kind of error message is written by one function, so every configuration error comes from one formatter; different kinds may look different. Escaping untrusted text probably belongs in one place, where it is composed into an output line, with one rule for every source.
+- **Failures.** Report a failure directly, rather than wrapping it in a value the consumer discards. An unknown outcome is a failure. Bugs propagate to the process boundary: catch only the expected failures an operation can produce, so a type or range error never becomes an expected kind such as an I/O failure, and symmetric paths share one policy. Each error variant has one shape: a literal code or tag with its own typed detail fields (the operation, safe identifiers, the reason), never a free-form details record, so the code and its details always agree.
+- **Failure output.** A failure union maps to exit codes and messages in one module, with one exhaustive switch per mapping (in Effect, one `catchTags` per mapping). Each kind of error message is written by one function, so every configuration error comes from one formatter; different kinds may look different. Escaping untrusted text probably belongs in one place, where it is composed into an output line, with one rule for every source.
+- **Error messages.** A message names the operation or outcome that failed and the most specific safe reason known, then gives the reader a way forward, such as correcting the input, retrying when the same operation is safe to repeat, or inspecting the named resource when the outcome is uncertain. It reassures only about what the code can prove was unaffected. Its tone is calm and direct, in the reader's domain words, without blame, jokes, apologies or implementation jargon. It begins with text searchable in the source, such as `No note has ID ${noteId}. List the notes to find its ID, then run the command again.`
 
 ## Do the tests explain and prove?
 
@@ -77,7 +80,7 @@ A test is a specification the reader understands at a glance and evidence that t
 
 - **Test names.** Each test name reads `GIVEN <state> WHEN <the action the user takes> THEN <observable outcome>`, and names exactly what the test asserts.
 - **Describe blocks.** The function under test names the outer group (`describe`); each inner group names an area of its behaviour in a short plain phrase.
-- **Whole values.** Compare a result value whole against its expected success or failure (`Result.ok(…)`, `Result.err({ … })`), or unwrap it, so one unconditional assertion covers the variant and its payload.
+- **Whole values.** Compare an outcome whole against its expected success or failure, or unwrap it, so one unconditional assertion covers the variant and its payload.
 - **Local scenarios.** Shared builders with defaults live in a fixtures file (`*.fixtures.ts`); each test's scenario data and expected values stay in the test or its parameterised table (`test.each`), with expected values written as literals or an independent oracle's result. Each test passes the fields it is about rather than relying on builder defaults.
 
 writing-good-tests.md holds the rest.
