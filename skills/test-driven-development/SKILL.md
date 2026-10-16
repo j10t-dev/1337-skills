@@ -5,19 +5,21 @@ description: Use when implementing any feature or bugfix, before writing impleme
 
 # Test-driven development
 
-New features, behaviour changes and bug fixes require a failing test before implementation. If you wrote implementation first, delete it and start over, without keeping it as reference or adapting it while writing tests. Throw away exploratory code before starting TDD. Throwaway prototypes and other exceptions to test-first require user permission.
+New features, behaviour changes and bug fixes require a failing test before implementation. Throwaway prototypes and other exceptions to test-first require user permission.
+
+If implementation was written first, preserve it and immediately derive tests from the original request and approved plan, independently of the implementation. Confirm that assertions cover those requirements rather than merely matching the code. Demonstrate that the tests detect missing or incorrect requested behaviour, then verify the implementation. Preserve work and permissions when temporarily removing or mutating the implementation to establish that evidence. Do not claim test-first compliance retrospectively. Independent review must check requirement-to-test alignment and whether the tests were adapted merely to make the implementation pass.
 
 For refactoring, reuse existing coverage; test uncovered behaviour first. Where no useful executable test exists, inspect prose, validate configuration or check generated output through its generator. Do not add tests that merely mirror implementation. Required project checks still apply.
 
-Before source edits, establish the required-check baseline under `verification-before-completion`. Planning-only work does not need that test run.
+Use [the shared verification policy](../shared/verification.md) for baselines, evidence reuse and failure handling. Reuse the design-stage baseline; direct work establishes it before implementation.
 
 ## Red, green, refactor
 
-1. **Red.** Write one minimal test of one behaviour, with a clear name and intended API. Exercise real code; mock only unavoidable dependencies. Run the focused test and observe an expected assertion failure caused by missing behaviour, not a typo or test error. If it passes immediately, correct the test; if it errors, fix the error and rerun until it fails correctly.
+1. **Red.** Write one minimal test of one behaviour, with a clear name and intended API. Exercise real code; mock only unavoidable dependencies. Run the focused test and observe an expected assertion failure caused by missing behaviour, not a typo or test error. If it passes immediately, check its coverage against the original requirements; do not change correct expectations just to force a failure. For implementation written first, use the recovery rule above. If the test errors, fix the error and rerun until it fails correctly.
 2. **Green.** Write the simplest implementation that passes. Keep the cycle within one reviewable unit, without extra features or unrelated refactoring. Run the test and applicable existing coverage. Fix code, not the test, when implementation fails. Investigate failures and new warnings against the baseline; distinguish expected diagnostics from defects.
 3. **Refactor.** Only after green, remove duplication, improve names or extract helpers. Keep tests green and add no behaviour. Repeat with the next failing test.
 
-For other failures, report the command, actual output and evidence to the controller. Never dismiss a failure as pre-existing without evidence, or treat a passing rerun as a diagnosis. Fix introduced regressions within scope; agree broader repairs with the user. Resolve failures before delivery unless the user explicitly accepts a stated limitation. Continue only independent authorised work while blocked.
+For other failures, follow the shared verification policy. Scoped agents report evidence and blockers to the controller.
 
 ## Test quality
 
@@ -42,4 +44,4 @@ Track applicable items using the current harness's task tracker, following `usin
 - [ ] Implementation was minimal and tests exercise real code.
 - [ ] Applicable tests and required project checks pass; unexpected output is explained.
 
-Apply test-first items only where test-first is required. Do not claim test-first without observed failure. Bug fixes use `systematic-debugging` for investigation and this cycle for the reproducer and fix. Use `verification-before-completion` before claiming completion.
+Apply test-first items only where test-first is required. If recovering from implementation-first, report the deviation and recovery evidence instead of marking retrospective test-first compliance. Do not claim test-first without observed failure before implementation. Bug fixes use `systematic-debugging` for investigation and this cycle for the reproducer and fix. Use `verification-before-completion` before claiming completion.

@@ -86,6 +86,7 @@ Return findings in your response, not review files.
 Reuse inspected test evidence for the current code/configuration under `verification-before-completion`. Run a focused check only for missing or invalidated evidence or a concrete unresolved doubt; do not repeat a suite merely because another agent or workflow phase supplied the result.
 
 - Tests actually test logic (not mocks)?
+- If implementation preceded tests, do recovery assertions follow the original request and approved plan rather than merely matching the code? Check evidence that they detect missing or incorrect requested behaviour; do not accept retrospective test-first claims.
 - Edge cases covered?
 - Integration tests where needed?
 - All tests passing?

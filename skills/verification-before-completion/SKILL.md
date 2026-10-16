@@ -7,21 +7,14 @@ description: Use when about to claim work is complete, fixed, or passing, before
 
 Make completion claims only with applicable verification evidence. This applies before accepting work, moving to the next task, describing or saving completed local changes, requesting bookmark advancement, integrating or submitting externally. Different wording does not bypass the gate.
 
-## Baseline before implementation
-
-Before source edits, run required project checks and report the starting revision, commands, exit statuses, elapsed times and results. Resolve a failed or unavailable baseline with the user before proceeding. Reuse applicable baseline results on resume; planning-only work needs no development test run.
-
-Investigate later failures against this evidence, changed code and environment. A pre-existing claim needs evidence; a green rerun alone does not explain an intermittent failure. Fix introduced regressions within scope and agree broader repairs with the user. Resolve failures before delivery unless the user explicitly accepts a stated limitation.
-
 ## Evidence gate
 
-1. Identify what proves each claim.
-2. Read existing results. Evidence survives handoffs and formatting differences; fix the report, not the test run.
-3. Run missing or invalidated checks. Rerun for relevant code, configuration or environment changes, failures or a specific doubt. Complete required project checks without broadening the suite by default.
-4. Confirm reported output supports the claim, including exit status, failures, elapsed time and checked scope; use the required reviewers' verdicts for code review.
-5. Flag unexplained changes in test runtime as potential defects, accounting for changes in checked scope and environment.
-6. Resolve failures or obtain explicit user-accepted limitations before delivery.
-7. Report results and remaining gaps concisely. Task-only checks do not prove the whole feature passed.
+Use [the shared verification policy](../shared/verification.md) for evidence reuse and failure handling. Baselines are established during design exploration, or before direct implementation, rather than deferred to this gate.
+
+1. Identify what proves each claim using the table below.
+2. Inspect existing evidence and fill only missing or invalidated checks under the shared policy.
+3. Confirm that actual output and required reviewer verdicts support the claimed scope and that unresolved limitations have explicit user acceptance.
+4. Report supported results and remaining gaps concisely.
 
 ## Match evidence to claims
 
