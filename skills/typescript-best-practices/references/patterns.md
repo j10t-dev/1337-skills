@@ -293,30 +293,31 @@ const config = { theme: "dark", cols: 3 } satisfies Config;
 
 ## Boundary validation
 
-Decode once where data crosses in, and trust types inside. The decoder stays private beside its schema; the exported parser is named for the domain and takes the input type callers hold. That input picks the decoder: `Schema.decodeEffect` when a runtime step established it as the schema's exact encoded type, such as a `string` read from a file or a value an API returned with a type the caller did not supply as a type argument, and `Schema.decodeUnknownEffect` otherwise. A parsed JSON body or a database row is `unknown` however it is annotated. Invoke the `principle-boundary-discipline` skill.
+Decode once where data crosses in, and trust types inside. The decoder stays private beside its schema, because an exported decoder accepts parse options from every caller, and `disableChecks` would return a branded value no check proved. The exported parser is named for the domain and takes the input type callers hold. That input picks the decoder: `Schema.decodeEffect` when a runtime step established it as the schema's exact encoded type, such as a `string` read from a file or a value an API returned with a type the caller did not supply as a type argument, and `Schema.decodeUnknownEffect` otherwise. A parsed JSON body or a database row is `unknown` however it is annotated. Invoke the `principle-boundary-discipline` skill.
 
 ```ts
 import { Effect, Schema } from "effect";
 
-const InfrastructureStage = Schema.String.check(Schema.isPattern(/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/)).pipe(
+const LOWERCASE_SLUG = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+
+/** Lowercase letters, digits and inner hyphens. */
+export const InfrastructureStage = Schema.String.check(Schema.isPattern(LOWERCASE_SLUG)).pipe(
   Schema.brand("InfrastructureStage"),
 );
-type InfrastructureStage = typeof InfrastructureStage.Type;
+export type InfrastructureStage = typeof InfrastructureStage.Type;
 const decodeInfrastructureStage = Schema.decodeEffect(InfrastructureStage);
 
-/** Fails unless the input is lowercase letters, digits and inner hyphens. */
-export function parseInfrastructureStage(input: string): Effect.Effect<InfrastructureStage, Schema.SchemaError> {
-  return decodeInfrastructureStage(input);
-}
+/** Decodes a stage name read from config. */
+export const parseInfrastructureStage = (input: string): Effect.Effect<InfrastructureStage, Schema.SchemaError> =>
+  decodeInfrastructureStage(input);
 
-const DeployRequest = Schema.Struct({ stage: InfrastructureStage, version: Schema.String });
-type DeployRequest = typeof DeployRequest.Type;
+export const DeployRequest = Schema.Struct({ stage: InfrastructureStage, version: Schema.String });
+export type DeployRequest = typeof DeployRequest.Type;
 const decodeDeployRequest = Schema.decodeUnknownEffect(DeployRequest);
 
 /** Decodes an HTTP request body. */
-export function parseDeployRequest(body: unknown): Effect.Effect<DeployRequest, Schema.SchemaError> {
-  return decodeDeployRequest(body);
-}
+export const parseDeployRequest = (body: unknown): Effect.Effect<DeployRequest, Schema.SchemaError> =>
+  decodeDeployRequest(body);
 ```
 
 - **Wire formats** (proto, JSON-RPC): decode so unknown fields are ignored, so forward-compatible changes don't break old clients.
