@@ -1,6 +1,6 @@
 # Naming examples
 
-The less frequent naming rules, then before/after cases showing what the reader gains from each rename.
+Less frequently relevant naming rules and before/after cases showing what the reader gains from each rename.
 
 - **Overloaded words.** Split a word that stands for several concepts into one name per concept, so the reader never guesses which meaning applies.
 - **Collections.** Name a collection by the action all its members need (`itemIdsToFetch`), rather than a category word that fits only some of them. A plural name makes clear what it is keyed by and how many values each key holds.
