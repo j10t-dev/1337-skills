@@ -1,0 +1,13 @@
+.pele {
+  --blueprint-paper: #123d73;
+  --blueprint-grid: rgba(255, 255, 255, 0.08);
+  --pele-bg: var(--blueprint-paper);
+  --pele-fg: #e8f1ff;
+  --pele-muted: #a9c3e8;
+  --pele-line: #e8f1ff;
+  --pele-surface: transparent;
+  --pele-surface-alt: rgba(255, 255, 255, 0.06);
+  --pele-border: #e8f1ff;
+  --pele-accent: #7fd1ff;
+  --pele-radius: 0px;
+}
