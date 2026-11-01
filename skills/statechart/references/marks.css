@@ -1,0 +1,28 @@
+.pele .blue rect { fill: rgba(127, 209, 255, 0.16); }
+.pele .orange rect { fill: rgba(255, 190, 110, 0.18); }
+.pele .purple rect { fill: rgba(200, 160, 255, 0.18); }
+.pele .yellow rect { fill: rgba(255, 230, 120, 0.16); }
+.pele .teal rect { fill: rgba(120, 240, 220, 0.16); }
+.pele .tan rect { fill: rgba(220, 190, 150, 0.16); }
+.pele .pink rect { fill: rgba(255, 150, 210, 0.16); }
+.pele .breaks rect {
+  fill: rgba(255, 90, 90, 0.18) !important;
+  stroke: #ff7a7a !important;
+  stroke-width: 2.5px !important;
+}
+.pele .breaks text { fill: #ffb0b0 !important; }
+.pele .mayBreak rect {
+  fill: rgba(255, 170, 80, 0.18) !important;
+  stroke: #ffaa55 !important;
+  stroke-width: 2.5px !important;
+}
+.pele .mayBreak text { fill: #ffd0a0 !important; }
+.pele .bugPath rect {
+  stroke: #7fd1ff !important;
+  stroke-width: 2.5px !important;
+}
+.pele .repeats rect {
+  stroke: #c9a0ff !important;
+  stroke-width: 2.5px !important;
+  stroke-dasharray: 6 3;
+}

@@ -1,0 +1,43 @@
+#!/bin/sh
+set -eu
+
+if [ -n "${TLA2TOOLS:-}" ]; then
+  printf '%s\n' "$TLA2TOOLS"
+  exit 0
+fi
+
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/1337-skills/tla2tools"
+jar="$cache/tla2tools.jar"
+if [ -f "$jar" ]; then
+  printf '%s\n' "$jar"
+  exit 0
+fi
+
+fail() {
+  printf 'Could not download tla2tools.jar: %s. Connect to the network and run statechart again, or set TLA2TOOLS to a jar.\n' "$1" >&2
+  exit 2
+}
+
+for tool in curl jq; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    printf 'statechart needs %s to download tla2tools.jar. Install %s, or set TLA2TOOLS to a jar.\n' "$tool" "$tool" >&2
+    exit 2
+  fi
+done
+
+api=https://api.github.com/repos/tlaplus/tlaplus/releases/latest
+release=$(curl -fsSL "$api") || fail "the release lookup at $api failed"
+tag=$(printf '%s' "$release" | jq -er '.tag_name' 2>/dev/null) || fail "the release lookup at $api returned no release tag"
+printf '%s' "$tag" | grep -Eqx 'v[0-9]+\.[0-9]+\.[0-9]+' || fail "the latest release tag $tag is not a version"
+asset='first(.assets[] | select(.name == "tla2tools.jar"))'
+url=$(printf '%s' "$release" | jq -er "$asset | .browser_download_url" 2>/dev/null) || fail "release $tag has no tla2tools.jar"
+size=$(printf '%s' "$release" | jq -er "$asset | .size" 2>/dev/null) || fail "release $tag lists no size for tla2tools.jar"
+
+mkdir -p "$cache"
+tmp=$(mktemp "$cache/tla2tools.jar.XXXXXX")
+trap 'rm -f "$tmp"' EXIT
+curl -fsSL -o "$tmp" "$url" || fail "the download of $url failed"
+bytes=$(wc -c < "$tmp" | tr -d ' ')
+[ "$bytes" = "$size" ] || fail "the download of $url has $bytes bytes, but the release lists $size"
+mv "$tmp" "$jar"
+printf '%s\n' "$jar"

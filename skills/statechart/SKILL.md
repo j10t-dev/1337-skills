@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Statechart
 
-The chart shows how a system moves between states, in the words of the person who reads it. That person, the reader, decides whether the behavior is right.
+The chart shows how a system moves between states, in the words of the person who reads it. That person, the reader, decides whether the behaviour is right.
 
 ## Run
 
@@ -18,7 +18,7 @@ Work in a scratch folder outside the repo. Write a TLA+ spec and its config. The
 
 `scripts/statechart.ts` is TypeScript, so run it with a runtime that can execute TypeScript.
 
-The first run installs TLC and Java with mise and needs the network.
+The first run downloads the latest stable `tla2tools.jar` into `$XDG_CACHE_HOME/1337-skills/tla2tools/`, which defaults to `~/.cache`, and needs the network, `curl` and `jq`. TLC runs on the system `java`, Java 11 or later. Set `TLA2TOOLS` to use another jar.
 
 ## Write the spec
 
@@ -28,7 +28,7 @@ The first run installs TLC and Java with mise and needs the network.
 
 ## Pick the chart
 
-You do the work that needs judgment: the words on each state and arrow, the phases and their colors, the title, and the report to the reader. Put your work in a view module, and give it with `--view`.
+You do the work that needs judgement: the words on each state and arrow, the phases and their colours, the title, and the report to the reader. Put your work in a view module, and give it with `--view`.
 
 To show the reader's words, the view exports `state(vars)`. The value that `state()` returns picks the form:
 
@@ -44,8 +44,8 @@ When a step can occur only in some conditions, end its label with the condition 
 
 The view can also export these:
 
-- `group(vars)` returns the name of a phase. Each chart state gets the color of its group. When the model states behind one chart state are in different groups, that state gets no color.
-- `colors` gives each group name a color class.
+- `group(vars)` returns the name of a phase. Each chart state gets the colour of its group. When the model states behind one chart state are in different groups, that state gets no colour.
+- `colors` gives each group name a colour class.
 - `title` is a string that the chart shows at the top.
 
 The command calls `state()` and `group()` at most once for each model state, and `step()` at most once for each step. The chart and the report both use those answers. So make each function depend only on its arguments.
@@ -71,9 +71,9 @@ Aim for about 20 arrows or fewer, because a busier chart is hard to read. First 
 
 ## Show the chart
 
-Show `chart.mmd` to the user as a `mermaid` code block. The chart has a budget of 500 states, counted by TLC on the config as written. Above that, the chart draws only the paths to the rules that break, and when no rule breaks, the command writes no `chart.mmd`. It still checks each rule, and the report gives the state count and each bug path. To see the whole graph, make the model smaller.
+Render `chart.mmd` with the `drawing-diagrams` skill: run `<skill dir>/../drawing-diagrams/scripts/render chart.mmd --css <skill dir>/references/marks.css`, then show the user the SVG and the Mermaid text as that skill says. The chart has a budget of 500 states, counted by TLC on the config as written. Above that, the chart draws only the paths to the rules that break, and when no rule breaks, the command writes no `chart.mmd`. It still checks each rule, and the report gives the state count and each bug path. To see the whole graph, make the model smaller.
 
-Render charts with Pele. When the user asks for an image, or a chart is too large to read as text, follow `references/render.md`. Do not use a different renderer unless the user asks for it.
+`references/marks.css` colours each group class, the `breaks` and `mayBreak` marks, `bugPath` on each state of the shortest path to a bug, and `repeats` on each state that a PROPERTY counterexample repeats forever. Use another renderer only when the user asks for it.
 
 ## Hand off
 

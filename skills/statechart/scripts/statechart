@@ -8,6 +8,10 @@ while [ -L "$self" ]; do
   esac
 done
 entry=$(dirname "$self")/statechart.ts
+if [ -z "${TLA2TOOLS:-}" ]; then
+  TLA2TOOLS=$("$(dirname "$self")/tla2tools") || exit 2
+  export TLA2TOOLS
+fi
 version() {
   command -v "$1" >/dev/null || { echo 0; return; }
   "$1" --version 2>/dev/null | sed -n '1s/[^0-9]*\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1 \2 \3/p' | {
