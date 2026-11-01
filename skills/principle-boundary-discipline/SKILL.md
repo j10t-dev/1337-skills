@@ -38,6 +38,7 @@ Validation and error handling:
 - Do not re-export transport, storage, framework, or wire types through the public surface
 - No redundant nil checks deep in call chains if the boundary already validated
 - Stored local data is a boundary: parse it where it is read, and report corrupt data there as a local failure
+- An application error's identity, user-facing diagnostic and persisted representation are separate contracts. Translate each at its owning boundary. Preserve an already-correct error unchanged; wrap it only when the operation adds meaning that changes handling.
 
 Code organisation:
 - Business logic in pure functions with no framework dependencies
