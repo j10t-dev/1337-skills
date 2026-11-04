@@ -119,7 +119,7 @@ Tests:
 
 ## Applicability and change control
 
-A change without executable flow still includes the `Program Design` section. Replace each inapplicable artefact with a specific explanation of why no runtime behaviour, callable interface, dependency substitution, or execution path changes. Do not invent runtime behaviour to satisfy the template.
+A change without executable flow still includes the `Program Design` section. Keep each inapplicable artefact's heading and replace its body with a specific explanation of why no runtime behaviour, callable interface, dependency substitution, or execution path changes. Do not invent runtime behaviour to satisfy the template.
 
 Establish existing execution paths from repository evidence. Continue exploring or label an assumption for user approval; never fabricate a current call path.
 

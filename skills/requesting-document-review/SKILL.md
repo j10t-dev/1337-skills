@@ -17,7 +17,7 @@ Dispatch mechanics — role, model, and result inspection — follow the `workin
 
 1. **Dispatch one reviewer for this round.** Use a fresh subagent of the current harness with no session history, and give it the prompt template for the document type:
 
-   - `design`: the `brainstorming` skill's `design-document-reviewer-prompt.md`. Resolve `[DESIGN_FILE_PATH]` to the document under review. Supply the user's request and agreed clarifications as `[APPROVAL_CONTEXT]` so review can catch added scope before approval. The approved design remains the source of truth.
+   - `design`: the `brainstorming` skill's `design-document-reviewer-prompt.md`. Resolve `[DESIGN_FILE_PATH]` to the document under review and `[TEMPLATE_FILE_PATH]` to the same skill's `design-document-template.md`, so the reviewer checks the headings against the template rather than from memory. Supply the user's request and agreed clarifications as `[APPROVAL_CONTEXT]` so review can catch added scope before approval. The approved design remains the source of truth.
    - `plan`: the `writing-plans` skill's `plan-document-reviewer-prompt.md`. Resolve `[PLAN_FILE_PATH]` to the document under review and `[DESIGN_FILE_PATH]` to the design the plan must align with. A plan review always checks the plan against its design, so that reference is required.
 
    Instruct the reviewer to return only Status, Issues, Planning questions (design reviews) and Recommendations in its response, read-only and without further delegation. Do not create review files.
