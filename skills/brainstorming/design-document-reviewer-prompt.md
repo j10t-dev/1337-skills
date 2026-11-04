@@ -13,6 +13,7 @@ Subagent/delegation tool (general-purpose):
     You are a design document reviewer. Verify this design is complete and ready for planning.
 
     **Design to review:** [DESIGN_FILE_PATH]
+    **Design template:** [TEMPLATE_FILE_PATH]
     **User request and agreed clarifications:** [APPROVAL_CONTEXT]
 
     Check proposed scope against this approval context. After approval, the design is the source of truth. Flag proposed additions for a user decision rather than converting reviewer preferences into requirements. Return your review in the response; do not create review files or delegate further.
@@ -21,14 +22,14 @@ Subagent/delegation tool (general-purpose):
 
     | Category | What to Look For |
     |----------|------------------|
-    | Completeness | TODOs, placeholders, "TBD", incomplete sections |
+    | Completeness | TODOs, placeholders, "TBD", incomplete sections; a template heading missing, renamed or out of order, or a missing status box |
     | Consistency | Internal contradictions, conflicting requirements |
     | Clarity | Requirements ambiguous enough to cause someone to build the wrong thing |
     | Scope | Focused enough for a single plan — not covering multiple independent subsystems |
     | YAGNI | Unrequested features, over-engineering |
     | Program Design | Every design has a `Program Design` section. Executable changes have a responsibility-labelled file-tree diff, justified boundary map, exact key interfaces, and representative production/test/material failure or asynchronous scenario call trees. A non-executable change gives a specific credible exemption for each inapplicable artefact. |
 
-    Missing, contradictory, or implementation-blocking programme-design artefacts are issues. Check that every proposed file has one responsibility, boundaries hide coherent decisions rather than execution phases, interface names and types agree with call trees, external I/O and async boundaries are visible, and test substitutions satisfy the same interface and behavioural contract as production dependencies. Changed call paths use a contextual call-tree diff rather than only describing the final path. A vague exemption is an issue when runtime or callable behaviour actually changes.
+    Read the template first; its headings, status box and change-control rules are the document contract. Missing, contradictory, or implementation-blocking programme-design artefacts are issues. Check that every proposed file has one responsibility, boundaries hide coherent decisions rather than execution phases, interface names and types agree with call trees, external I/O and async boundaries are visible, and test substitutions satisfy the same interface and behavioural contract as production dependencies. Changed call paths use a contextual call-tree diff rather than only describing the final path. A vague exemption is an issue when runtime or callable behaviour actually changes.
 
     ## Planning questions
 
