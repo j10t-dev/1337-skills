@@ -136,7 +136,7 @@ Subagent/delegation tool (general-purpose):
 - `[TASK_BRIEF]` — the requirements supplied to the implementer
 - `[GLOBAL_CONSTRAINTS]` — the binding requirements copied verbatim from the plan's Global Constraints section or the spec: exact values, formats, and stated relationships between components (not process rules — those are already in this template)
 - `[IMPLEMENTER_RESULT]` — the implementer's response, including check results
-- `[DIFF]` — the task diff; `scripts/review-package @- @` can produce a file when useful
+- `[DIFF]` — the task diff; the SDD skill's `bash <skill dir>/scripts/review-package -R <working copy> @- @`, run by absolute path, can produce a file when useful
 
 **Reviewer returns:** Spec Compliance verdict (Spec compliant / Issues found / Cannot verify from diff), Strengths, Issues (Critical/Important/Minor), Task quality verdict
 

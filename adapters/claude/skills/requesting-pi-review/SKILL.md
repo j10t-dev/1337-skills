@@ -15,11 +15,11 @@ This skill runs **only** when the user explicitly asks for a cross-harness check
 
 Load `requesting-document-review` and follow its loop unchanged — triage under `receiving-code-review`, the 3-round bound, convergence, and reporting all apply exactly as written. Substitute the wrapper for the reviewer dispatch:
 
-The wrapper is not on `PATH`. Invoke it by its canonical absolute path:
+The wrapper is not on `PATH`. Invoke it by interpreter and absolute path, from any directory:
 
 ```
-~/.claude/skills/requesting-pi-review/pi-review design <doc>
-~/.claude/skills/requesting-pi-review/pi-review plan <doc> <design-ref>
+sh <skill dir>/pi-review design <doc>
+sh <skill dir>/pi-review plan <doc> <design-ref>
 ```
 
 `design-ref` (the design doc the plan must align with) is **required** for `plan` reviews and rejected for `design` reviews.

@@ -13,7 +13,7 @@ The chart shows how a system moves between states, in the words of the person wh
 Work in a scratch folder outside the repo. Write a TLA+ spec and its config. Then run:
 
 ```sh
-<skill dir>/scripts/statechart SPEC.tla [--config FILE] [--view FILE] [--out DIR]
+sh <skill dir>/scripts/statechart SPEC.tla [--config FILE] [--view FILE] [--out DIR]
 ```
 
 `scripts/statechart.ts` is TypeScript, so run it with a runtime that can execute TypeScript.
@@ -71,7 +71,7 @@ Aim for about 20 arrows or fewer, because a busier chart is hard to read. First 
 
 ## Show the chart
 
-Render `chart.mmd` with the `drawing-diagrams` skill: run `<skill dir>/../drawing-diagrams/scripts/render chart.mmd --css <skill dir>/references/marks.css`, then show the user the SVG and the Mermaid text as that skill says. The chart has a budget of 500 states, counted by TLC on the config as written. Above that, the chart draws only the paths to the rules that break, and when no rule breaks, the command writes no `chart.mmd`. It still checks each rule, and the report gives the state count and each bug path. To see the whole graph, make the model smaller.
+Render `chart.mmd` with the `drawing-diagrams` skill: run `sh <skill dir>/../drawing-diagrams/scripts/render chart.mmd --css <skill dir>/references/marks.css`, then show the user the SVG and the Mermaid text as that skill says. The chart has a budget of 500 states, counted by TLC on the config as written. Above that, the chart draws only the paths to the rules that break, and when no rule breaks, the command writes no `chart.mmd`. It still checks each rule, and the report gives the state count and each bug path. To see the whole graph, make the model smaller.
 
 `references/marks.css` colours each group class, the `breaks` and `mayBreak` marks, `bugPath` on each state of the shortest path to a bug, and `repeats` on each state that a PROPERTY counterexample repeats forever. Use another renderer only when the user asks for it.
 
