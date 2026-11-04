@@ -75,7 +75,7 @@ case "$type" in
       echo "pi-review: design review does not take a design-ref-path" >&2
       exit 2
     fi
-    prompt="$repo_root/skills/brainstorming/spec-document-reviewer-prompt.md"
+    prompt="$repo_root/skills/brainstorming/design-document-reviewer-prompt.md"
     placeholder="[DESIGN_FILE_PATH]"
     ;;
   plan)
@@ -103,7 +103,7 @@ directive="Resolve the prompt's $placeholder placeholder to $doc."
 if [ "$type" = "plan" ]; then
   directive="$directive Resolve the prompt's [DESIGN_FILE_PATH] placeholder to $design_ref."
 fi
-directive="$directive Ignore the subagent-dispatch framing in the prompt file -- you are not dispatching a subagent, you are the reviewer. Review the document directly and emit only the Status block (Status, Issues, Recommendations) as your entire response."
+directive="$directive Ignore the subagent-dispatch framing in the prompt file -- you are not dispatching a subagent, you are the reviewer. Review the document directly and emit only the Status block (Status, Issues, Planning questions where the prompt asks for them, Recommendations) as your entire response."
 
 set -- pi -p --no-session --no-context-files --no-extensions --no-skills --approve -t read,grep,find,ls
 if [ -n "$model" ]; then
