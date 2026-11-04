@@ -11,9 +11,11 @@ Dispatch a fresh implementer and task reviewer for each task, then a final whole
 
 The approved design is the source of truth. Follow the plan; ask before adding behaviour or architecture. Execute authorised tasks without routine continuation prompts.
 
+Rule on conflicts, ambiguities and reviewer findings that the approved design settles, and record each ruling in `progress.md` as one line, `Ruling: <what> because <design clause>`. A ruling never adds behaviour. Ask the user about anything the design leaves open, about a `BLOCKED` you cannot resolve, and at the fix cap.
+
 ## Dispatch
 
-Every implementer, fixer, and task-reviewer dispatch explicitly supplies a model selected under `working-with-subagents`. Every final-review dispatch does the same. Use known inheritance when no explicit model is exposed. The final whole-branch reviewer handles architecture and high-risk judgement, so use the most capable available model.
+Every implementer, fixer, and task-reviewer dispatch explicitly supplies a model and reasoning effort selected under `working-with-subagents`. Every final-review dispatch does the same. Use known inheritance when no explicit model is exposed. The final whole-branch reviewer handles architecture and high-risk judgement, so use the most capable available model.
 
 Keep implementation serial in a shared working copy. Independent read-only work may run concurrently. Only the controller performs VCS operations.
 
@@ -28,9 +30,9 @@ Supply this context directly or by reference when a file is useful. `bash <skill
 
 ## Start or resume
 
-1. Read the plan, its required context and skills, `Builds On`, `Feature Bookmark`, and each task's `Commit` subject. Ask about missing or conflicting requirements.
+1. Read the plan, the approved design named by its `Design:` line (stop and ask if it is missing or unreachable), its required context and skills, `Builds On`, `Feature Bookmark`, and each task's `Commit` subject. Ask about missing or conflicting requirements the design does not settle.
 2. Resolve `Builds On` to one local bookmark target and retain its full change and commit IDs as the run base.
-3. Read `.agents/sdd/progress.md` if it exists. On resume, follow [recovery.md](recovery.md); do not restart completed tasks.
+3. Read `.agents/sdd/progress.md` if it exists; its `plan:` line identifies the plan it records. To resume that plan, follow [recovery.md](recovery.md); do not restart completed tasks. A fresh run overwrites the file only when it shows `Final review -> complete`; otherwise stop and ask.
 4. On a fresh run, require the feature bookmark to be absent and stop on unexplained edits. Position empty `@` on the run base with `jj new <Builds On>` if needed, then create the declared feature bookmark there.
 5. Establish the baseline under `verification-before-completion` before source edits.
 
@@ -45,19 +47,20 @@ feature bookmark: feature-b
 run base: change <full change ID>, commit <full commit ID>
 
 Task 1 -> change <full change ID>, commit <full commit ID> (complete)
-Task 2 -> in progress
+Task 2 -> in progress (fix round 2 of 5)
 Task 3 -> pending
 Final review -> pending | in progress | complete
+Ruling: <what> because <design clause>
 ```
 
-Create the file when starting a plan and update it as work progresses.
+Create the file when starting a plan and update it as work progresses. The task line carries `fix round N of 5` while fixes run; `Ruling:` lines are appended at the end in the order made, one line each, and are the only record of rulings.
 
 ## Task loop
 
 1. Mark the next task `in progress` and keep its undescribed `@` directly above the feature bookmark.
 2. Dispatch a fresh implementer using [implementer-prompt.md](implementer-prompt.md).
-3. For `DONE`, send the task, implementer response and diff to a fresh reviewer using [task-reviewer-prompt.md](task-reviewer-prompt.md). For `DONE_WITH_CONCERNS`, include the concerns. For `NEEDS_CONTEXT` or `BLOCKED`, supply the missing context or resolve the blocker before continuing.
-4. Require passing checks and both spec-compliance and code-quality verdicts. Handle feedback under [review-handling.md](review-handling.md); fix genuine defects and re-review.
+3. For `DONE`, send the task, implementer response and diff to a fresh reviewer using [task-reviewer-prompt.md](task-reviewer-prompt.md). For `DONE_WITH_CONCERNS`, include the concerns. For `NEEDS_CONTEXT` or `BLOCKED`, supply the missing context or resolve the blocker before continuing. A `NEEDS_CONTEXT`, `BLOCKED` or `DONE_WITH_CONCERNS` status is handled under step 4's re-read rule.
+4. Require passing checks and both spec-compliance and code-quality verdicts. Read [review-handling.md](review-handling.md) each time review feedback or a non-`DONE` status arrives, even when you read it earlier: it holds the fix cap, and your memory of it does not survive compaction. Handle the feedback under it; fix genuine defects and re-review.
 5. Accept the task using the sequence below, mark it complete and continue.
 
 The controller uses the reviewers' verdicts and reported check results; it does not conduct an additional code review.
