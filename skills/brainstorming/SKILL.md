@@ -10,7 +10,7 @@ description: Use when asked to create, add, or change any feature, component, or
 Explore and clarify a requested change, then route it by capacity. Work that is one reviewable task, fits the current session, and has no unresolved consequential design choice takes the direct path. Everything else keeps the full design and planning path.
 
 <HARD-GATE>
-Full-path implementation needs design approval. The user's request authorises direct work within its scope; ask before adding scope or at a requested checkpoint.
+Full-path implementation needs design approval. Implementation includes product code, scaffolding, installing dependencies, creating projects and invoking implementation skills; reading and exploration are not. The user's request authorises direct work within its scope; ask before adding scope or at a requested checkpoint.
 </HARD-GATE>
 
 ## Checklist
@@ -22,7 +22,7 @@ Track these items in the current harness's task tracker and complete the applica
 3. **Assess scope internally** - evaluate full-path triggers and investigate unknown files
 4. **Direct path** - proceed within the request and agreed clarifications; no compulsory classification or brief output
 5. **Direct execution** - invoke `test-driven-development`, then mandatory `requesting-code-review`, then `finishing-development` at Step 3
-6. **Full path** - compare approaches, present and approve the design, write and review it, then invoke `writing-plans`
+6. **Full path** - play back the understanding, compare approaches, present and approve the design, write and review it, then invoke `writing-plans`
 7. **Upgrade when needed** - stop direct work that fires a trigger and re-enter at clarification
 
 ## Process flow
@@ -60,9 +60,9 @@ digraph brainstorming {
 
 ## Shared exploration and clarification
 
-Check the current project state first: files, docs, recent changes, and representative execution paths. Existing execution paths must come from repository evidence. Continue exploring or label an assumption for user approval; never invent a current call path.
+Check the current project state first: files, docs, recent changes, and representative execution paths. Existing execution paths must come from repository evidence. Continue exploring or label an assumption for user approval; never invent a current call path. Read supplied specs, plans, handoffs and the code they connect to before the first message, until you can explain how the relevant parts work today and what the change touches.
 
-Assess scope before detailed questions. If the request contains independent subsystems, identify the pieces, their relationship, and their delivery order before continuing. Ask one decision per question. Do not bundle optional features into a clarification or treat a single answer as approval for several additions. Use concrete examples when they help. Clarify only enough to establish the purpose, constraints, success criteria, task boundaries, and consequential design choices. Look up facts yourself; questions block only dependent work.
+Assess scope before detailed questions. If the request contains independent subsystems, identify the pieces, their relationship, and their delivery order before continuing. Ask only when the answer changes what gets built and neither the request nor the repository answers it; otherwise state your call and your reason as a proposal and continue. Process steps are yours: exploration depth, file placement within the repository layout, and presentation. Document locations follow `../shared/docs-root.md`; VCS actions follow the active VCS rules. Ask one decision per question. Do not bundle optional features into a clarification or treat a single answer as approval for several additions. On the full path, if the purpose is unstated, ask why first: one open question with no options. Ask the full-path questions in numbered rounds: every question whose prerequisites are settled goes in the same round, each with your recommended answer; a question that depends on an answer still open waits for the next round. Give each nameable choice concretely with its trade-offs and your recommendation. Build each question on the previous answer or a finding, and say what the answer would change. Surface any constraint, conflict or cheaper path found during exploration. State each significant how-choice you make (platform, language, library, dependency, storage) in one line; follow the existing stack by default. Never reopen a decision the user has made. When a decision concerns something the user will see (a screen, layout, CLI output, flow or structure), show it as a text mockup or a `drawing-diagrams` diagram. Clarify only enough to establish the purpose, constraints, success criteria, task boundaries, and consequential design choices. Look up facts yourself; questions block only dependent work.
 
 ## Internal scope assessment
 
@@ -107,15 +107,19 @@ If a full-path trigger emerges, preserve completed work, name the trigger and re
 
 ## Full path
 
+### Play back the understanding
+
+Before proposing approaches, play the understanding back once, compactly: first what the user said, then what you inferred, each inference as a proposal with its reason. Merge the playback into the message that carries the next round of questions, or into the approaches message when nothing remains open. One playback; no alternating chunks and no repeated checkpoints.
+
 ### Compare approaches
 
-Propose two or three approaches with their trade-offs. Lead with the recommended option and explain why it best fits the clarified constraints. If the project is too large for one design, decompose it and take the first sub-project through this full path; each sub-project gets its own design, plan, and implementation cycle.
+Propose two or three approaches with their trade-offs. Lead with the recommended option and explain why it best fits the clarified constraints. If the project is too large for one design, decompose it and take the first sub-project through this full path; each sub-project gets its own design, plan, and implementation cycle. Drop approaches that work against the purpose or that existing work rules out. When there is one sensible way, say so and explain why the others do not fit.
 
 ### Present the design
 
 Read `design-document-template.md` from this skill directory and enforce its headings, status box and body-content rules.
 
-Choose the simplest implementation that satisfies the requested outcome, using existing code and patterns. 
+Choose the simplest implementation that satisfies the requested outcome, using existing code and patterns.
 
 Before approval, check the proposed design against the user's request and agreed clarifications. Resolve any additions explicitly. The approved design then becomes the source of truth; reviewer suggestions cannot silently expand it.
 
@@ -125,15 +129,15 @@ Read `../shared/docs-root.md` for document locations and naming, then write the 
 
 Before sharing the written design, self-review it for:
 
-- completeness across purpose, constraints, success criteria, architecture, components, data flow, errors, testing, and programme design;
-- internal consistency, conformance to the user's request and agreed clarifications,
+- completeness across purpose, constraints, success criteria, non-goals, architecture, components, data flow, errors, testing, and programme design;
+- internal consistency, conformance to the user's request and agreed clarifications;
 - explicit assumptions and open questions;
-- scope as minimal and direct as necessary to meet the users request
+- scope as minimal and direct as necessary to meet the user's request;
 - absence of placeholders and undefined references;
 - conformance to `design-document-template.md`, including its programme-design and change-control checks;
 - enough detail for a plan writer with no session history.
 
-Fix any issue found by self-review. Then load `requesting-document-review` and run it with `type=design` and no design reference. This review is mandatory. Present the written design. Existing approval covers unchanged decisions; ask for approval of material revisions. Apply corrections and repeat affected checks.
+Fix any issue found by self-review. Then load `requesting-document-review` and run it with `type=design` and no design reference. This review is mandatory. Present the written design together with the review report's list of calls settled without the user, so the user can check them while reading. Existing approval covers unchanged decisions; ask for approval of material revisions. Apply corrections and repeat affected checks.
 
 Once approved, invoke `writing-plans`. This is the full path's terminal state.
 
@@ -143,5 +147,5 @@ Once approved, invoke `writing-plans`. This is the full path's terminal state.
 - **One decision per question.** Clarify only what affects routing or design.
 - **Evidence before assumptions.** Establish current execution paths from the repository.
 - **YAGNI.** Exclude work that does not serve the accepted outcome.
-- **Full-path alternatives.** Compare two or three approaches when the full path fires.
+- **Full-path alternatives.** Compare two or three approaches when the full path fires; when only one sensible way exists, say so and why the others do not fit.
 - **Full-path validation.** Keep design sections explicit; approve decisions without repeated checkpoints.

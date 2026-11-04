@@ -13,6 +13,8 @@ Use these headings in this order when presenting and writing a design. Keep them
 
 ## Success Criteria
 
+## Non-goals
+
 ## Architecture
 
 ## Components and Boundaries
@@ -34,11 +36,15 @@ Use these headings in this order when presenting and writing a design. Keep them
 ### Scenario call trees
 ```
 
-This design should only contain final feature descripions and not descrine the process used to arrive at them.
+Section guidance:
+
+- `Purpose`: the outcome, who it serves, and why it is wanted now.
+- `Non-goals`: exclusions, and anti-goals (outcomes that would count as failure even if the feature works).
+- `Architecture`: the chosen shape, then one line per rejected alternative stating why it does not fit.
 
 `Approved` only after user approval. The body describes the problem, intended behaviour, decisions, constraints and technical rationale. State genuine technical limitations once, in the relevant section.
 
-This document only contains final production design requirements and does not describe the process that lead up to its final form. 
+This document only contains final production design requirements and does not describe the process that led up to its final form.
 The first sections describe intended behaviour and system-level decisions. The `Program Design` section describes the proposed code shape compactly enough for a reviewer to assess boundaries, interfaces, and representative execution before planning.
 
 ## Program Design

@@ -17,14 +17,14 @@ Dispatch mechanics — role, model, and result inspection — follow the `workin
 
 1. **Dispatch one reviewer for this round.** Use a fresh subagent of the current harness with no session history, and give it the prompt template for the document type:
 
-   - `design`: the `brainstorming` skill's `spec-document-reviewer-prompt.md`. Resolve `[DESIGN_FILE_PATH]` to the document under review. Supply the user's request and agreed clarifications as `[APPROVAL_CONTEXT]` so review can catch added scope before approval. The approved design remains the source of truth.
+   - `design`: the `brainstorming` skill's `design-document-reviewer-prompt.md`. Resolve `[DESIGN_FILE_PATH]` to the document under review. Supply the user's request and agreed clarifications as `[APPROVAL_CONTEXT]` so review can catch added scope before approval. The approved design remains the source of truth.
    - `plan`: the `writing-plans` skill's `plan-document-reviewer-prompt.md`. Resolve `[PLAN_FILE_PATH]` to the document under review and `[DESIGN_FILE_PATH]` to the design the plan must align with. A plan review always checks the plan against its design, so that reference is required.
 
-   Instruct the reviewer to return only Status, Issues and Recommendations in its response, read-only and without further delegation. Do not create review files.
+   Instruct the reviewer to return only Status, Issues, Planning questions (design reviews) and Recommendations in its response, read-only and without further delegation. Do not create review files.
 
    If the dispatch fails, or the response contains no Status block, that is a failed invocation to diagnose and retry — it is not a review round and consumes nothing from the 3-round review bound. Stop after 2 consecutive failed invocations; report the failure plainly instead of retrying indefinitely.
 
-2. **Load `receiving-code-review` and triage.** Check every finding against the actual document. Correct operative instructions for legitimate defects. Added behaviour or architectural changes require user approval. Reject misreads with a one-line reason. Advisory recommendations do not block approval.
+2. **Load `receiving-code-review` and triage.** Check every finding against the actual document. Correct operative instructions for legitimate defects. Added behaviour or architectural changes require user approval. Reject misreads with a one-line reason. Advisory recommendations do not block approval. Sort each planning question into one of three piles. Answered by the request, the agreed clarifications or the repository: write the answer into the design. Minor, which a planner could settle without changing what gets built: settle it in the design and list it in the report. User-owned, which only the user can answer and whose answer changes what gets built: ask these in one message, most important first, then revise the design with the answers.
 
 3. **Dispatch a fresh reviewer** on the revised document.
 
@@ -34,7 +34,7 @@ Dispatch mechanics — role, model, and result inspection — follow the `workin
    - 2 consecutive failed invocations occur, or
    - the review has converged — every remaining finding is one already assessed and deliberately not actioned.
 
-5. **Report:** rounds run, fixes applied (with a diff summary), findings rejected and why, final reviewer status. If issues remain at the cap, say so plainly — no false "done".
+5. **Report:** rounds run, fixes applied (with a diff summary), minor calls settled without the user (one line each), findings rejected and why, final reviewer status. If issues remain at the cap, say so plainly — no false "done".
 
 ## Substituting an External Reviewer
 
