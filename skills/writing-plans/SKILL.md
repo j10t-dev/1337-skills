@@ -132,7 +132,7 @@ List shared principles under Skills to Use and task-specific principles in their
 
 ## Review focus
 
-[Input classes or failure modes implied by the approved behaviour that the initial task tests missed. Name each expected outcome and the owning task, then add its test there. Write "None" when the check finds no gaps. New features require scope agreement.]
+[At most five input classes or failure modes implied by the approved behaviour that the initial task tests missed, most likely first. Name each expected outcome, using the outcome a reasonable user would expect where the design is silent, and the owning task, then add its test there. Write "None" when the check finds no gaps. New features require scope agreement.]
 
 ---
 ```
@@ -186,7 +186,8 @@ Review the plan yourself before sharing it.
 - **Dependency order:** Sequential dependencies are ordered; independent tasks are marked as safe to parallelise only if they do not edit the same files.
 - **TDD shape:** Behaviour changes specify concrete cases and RED before implementation, then GREEN; apply TDD's prose/configuration exception where appropriate.
 - **Verification:** Every task has exact commands and expected results, with illustrative commands clearly labelled.
-- **Implementation completeness:** Code, precise instructions and named references settle the implementation and integration choices. Existing reuse candidates have been considered. Test bodies retain independent expectations and parameterised cases for one behaviour.
+- **Implementation completeness:** Code, precise instructions and named references settle the implementation and integration choices. Existing reuse candidates have been considered. Test bodies retain independent expectations and parameterised cases for one behaviour. Replace production bodies that the interfaces and tests already determine; test bodies stay.
+- **Proportion:** Compare the plan with the design. When the plan runs several times the design's length, or production code blocks dominate, replace bodies the interfaces and tests determine with signatures and one-line approaches. Test bodies, cases and copied contracts stay.
 - **Review focus:** Check for input classes and failure modes implied by the approved behaviour but missing from the initial tests. Add their cases to the owning tasks and summarise them in Review focus; keep new features outside this check.
 - **Scope and complexity:** Every new mechanism serves the approved design. Equivalent outputs alone do not justify additional machinery.
 - **Type consistency:** Types, method signatures, and property names used in later tasks match what earlier tasks defined. A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
@@ -214,13 +215,15 @@ Fix any issues inline before sharing the plan.
 
 **VCS for the docs repo is the user's responsibility. Do not run jj/git commands in `$DOCS_ROOT` unless the user explicitly asks.**
 
-Preserve the user's existing execution choice. Otherwise recommend an approach based on task coupling, risk and the benefit of independent task reviews, then present these options:
+Preserve the user's existing execution choice. Otherwise recommend an approach based on task coupling, risk, the benefit of independent task reviews and plan length (later tasks of a long plan would run inline on a compacted context), then present these options:
 
 **"Plan complete and saved to `<plan-file>`. Two execution options:**
 
 **1. Subagent-Driven** - Fresh implementer per task and independent task review; useful when those reviews justify the context transfer
 
 **2. Inline Execution** - Execute and verify in this session with less coordination overhead, then hand off to finishing-development for independent final review
+
+**Recommended: <option>, because <one plan-derived reason>**
 
 **Which approach?"**
 
