@@ -20,7 +20,7 @@ Preserve exact cases and independently derived expectations. Parameterise one be
 ## Start or Resume
 
 1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task. Stop on missing, duplicate or ambiguous metadata.
-2. Keep the plan path, bookmarks, run-base IDs and task progress in `.agents/sdd/progress.md`, ignored by VCS. Read it on resume and update it as work progresses. On a fresh run, require the feature bookmark to be absent, stop on unexplained edits, position empty `@` on the run base and create the declared bookmark there.
+2. Keep the plan path, bookmarks, run-base IDs and task progress in `.agents/sdd/progress.md`; before its first write, create `.agents/sdd/.gitignore` containing `*` if absent, never overwriting an existing one, and tell the user if the file is already tracked. Read it on resume and update it as work progresses. On a fresh run, require the feature bookmark to be absent, stop on unexplained edits, position empty `@` on the run base and create the declared bookmark there.
 3. On resume, follow `../subagent-driven-development/recovery.md`; resume the unfinished execution task, not completed work or final review.
 4. Establish the baseline under `verification-before-completion` before source edits; reuse applicable results on resume.
 
