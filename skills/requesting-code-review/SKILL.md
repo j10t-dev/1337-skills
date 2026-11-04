@@ -45,7 +45,7 @@ Use absolute paths. Expand `$DOCS_ROOT`, `$projectName` and `~` before dispatch;
 
 **3. Act on feedback:**
 - Communicate disagreements directly, using implementer or reviewer evidence as needed.
-- Fix genuine code defects and re-review the smallest scope that proves resolution until clean. Escalate actual blockers, not arbitrary round limits.
+- Fix genuine code defects and re-review the smallest scope that proves resolution until clean. Escalate actual blockers; under a formal plan the five-round cap in `../subagent-driven-development/review-handling.md` ends the loop by putting the open findings to the user.
 - Broader repair scope requires user agreement, not merely a review finding.
 - Return reviews in responses, not forced files.
 

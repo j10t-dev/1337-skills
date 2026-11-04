@@ -11,7 +11,9 @@ Read the complete feedback, understand the requirements, then implement or expla
 
 Communicate disagreements directly, using implementer or reviewer evidence as needed.
 
-Fix genuine code defects, verify and re-review until clean. Escalate actual blockers rather than stopping at an arbitrary round count. Agree repairs beyond approved scope with the user. Continue independent authorised work; resolve failures before delivery unless the user explicitly accepts a stated limitation.
+Fix genuine code defects, verify and re-review until clean. Escalate actual blockers; under a formal plan the five-round cap in `../subagent-driven-development/review-handling.md` ends the loop by putting the open findings to the user. Agree repairs beyond approved scope with the user. Continue independent authorised work; resolve failures before delivery unless the user explicitly accepts a stated limitation.
+
+Rule on each Declined-to-judge line the approved design settles: set it aside when the design excludes the behaviour, or turn it into a finding graded by its effect on a reasonable user when the design requires it. Record `Ruling: <what> because <design clause>` in `.agents/sdd/progress.md` under a formal plan, otherwise in your report. List the remaining lines for the user. A ruling never adds behaviour.
 
 ## Evaluate feedback
 
