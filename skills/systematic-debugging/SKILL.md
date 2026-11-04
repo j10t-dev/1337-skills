@@ -14,7 +14,7 @@ Investigation is not repair authority. Compare failures with the recorded baseli
 - Read errors, warnings and complete stack traces. Note paths, line numbers and error codes.
 - Establish exact reproduction steps and frequency. If reproduction is unreliable, gather data rather than guess.
 - Inspect relevant changes, dependencies, configuration and environment differences using supplied evidence within the task boundary. Use VCS/history only when permitted.
-- For multi-component systems, instrument each boundary before proposing fixes. Record inputs, outputs, environment/configuration propagation and state at each layer. Run to locate the failing component, then investigate it.
+- For multi-component systems, instrument each boundary before proposing fixes. Record inputs, outputs, environment/configuration propagation and state at each layer. Report whether secrets are set, never their values. Run to locate the failing component, then investigate it.
 - Trace bad values backwards through callers to their source, not just the symptom. For deep call stacks, read `root-cause-tracing.md`.
 
 Proceed when evidence explains what fails and why.
