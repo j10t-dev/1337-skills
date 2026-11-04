@@ -36,7 +36,7 @@ Supply this context directly or by reference when a file is useful. `bash <skill
 
 ## Progress
 
-Keep the repository's current progress in `.agents/sdd/progress.md`, ignored by VCS. This is the single record of completed work, work underway and where to resume after compaction.
+Keep the repository's current progress in `.agents/sdd/progress.md`. Before its first write, create `.agents/sdd/.gitignore` containing `*` if it does not exist; never overwrite an existing one. If `progress.md` is already tracked from an earlier run, tell the user; untracking is a VCS operation that needs their instruction. This is the single record of completed work, work underway and where to resume after compaction.
 
 ```text
 plan: /absolute/path/to/plan.md
