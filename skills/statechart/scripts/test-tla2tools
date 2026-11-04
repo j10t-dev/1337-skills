@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+here="$(cd "$(dirname "$0")" && pwd)"
+scratch=$(mktemp -d)
+trap 'rm -rf "$scratch"' EXIT
+api=https://api.github.com/repos/tlaplus/tlaplus/releases/latest
+jar_url=https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar
+message_end='Connect to the network and run statechart again, or set TLA2TOOLS to a jar.'
+
+# The stub serves the release JSON and the jar from files, logs each URL, and fails with curl's -f status on request.
+mkdir "$scratch/bin"
+cat > "$scratch/bin/curl" <<'STUB'
+#!/usr/bin/env bash
+set -euo pipefail
+out=
+url=
+while [ $# -gt 0 ]; do
+  case $1 in
+    -o) out=$2; shift 2 ;;
+    -*) shift ;;
+    *) url=$1; shift ;;
+  esac
+done
+printf '%s\n' "$url" >> "$STUB_LOG"
+case $url in
+  "$STUB_API_URL") [ "$STUB_API_FAILS" = yes ] && exit 22; cat "$STUB_RELEASE" ;;
+  "$STUB_JAR_URL") [ "$STUB_JAR_FAILS" = yes ] && exit 22; cat "$STUB_JAR" > "$out" ;;
+  *) exit 6 ;;
+esac
+STUB
+chmod +x "$scratch/bin/curl"
+printf 'fake-jar' > "$scratch/jar"
+
+release() {
+  printf '{"tag_name":"%s","assets":[{"name":"tla2tools.jar","size":%s,"browser_download_url":"%s"}]}' \
+    "$1" "$2" "$jar_url" > "$scratch/release.json"
+}
+
+fresh_cache() {
+  cache=$(mktemp -d "$scratch/cache.XXXXXX")
+  : > "$scratch/log"
+  api_fails=no
+  jar_fails=no
+  release v1.7.4 8
+}
+
+run() {
+  set +e
+  out=$(env -u TLA2TOOLS PATH="$scratch/bin:$PATH" XDG_CACHE_HOME="$cache" \
+    STUB_LOG="$scratch/log" STUB_API_URL="$api" STUB_JAR_URL="$jar_url" \
+    STUB_RELEASE="$scratch/release.json" STUB_JAR="$scratch/jar" \
+    STUB_API_FAILS="$api_fails" STUB_JAR_FAILS="$jar_fails" "$@" 2>"$scratch/err")
+  status=$?
+  set -e
+  err=$(cat "$scratch/err")
+}
+
+fail() { printf 'FAIL: %s\n' "$1" >&2; exit 1; }
+jar_dir() { printf '%s/1337-skills/tla2tools' "$cache"; }
+
+# GIVEN TLA2TOOLS is set WHEN tla2tools runs THEN it prints that path and makes no network call
+fresh_cache
+run env TLA2TOOLS=tla2tools.jar "$here/tla2tools"
+[ "$status" = 0 ] && [ "$out" = tla2tools.jar ] || fail "preset TLA2TOOLS: status $status, out $out"
+[ ! -s "$scratch/log" ] || fail "preset TLA2TOOLS called curl"
+
+# GIVEN a cached jar WHEN tla2tools runs THEN it prints the cached path and makes no network call
+fresh_cache
+mkdir -p "$(jar_dir)" && printf 'cached' > "$(jar_dir)/tla2tools.jar"
+run "$here/tla2tools"
+[ "$status" = 0 ] && [ "$out" = "$(jar_dir)/tla2tools.jar" ] || fail "cached jar: status $status, out $out"
+[ "$(cat "$(jar_dir)/tla2tools.jar")" = cached ] || fail "cached jar was replaced"
+[ ! -s "$scratch/log" ] || fail "cached jar called curl"
+
+# GIVEN an empty cache WHEN tla2tools runs THEN it downloads the latest stable jar and prints its path
+fresh_cache
+run "$here/tla2tools"
+[ "$status" = 0 ] && [ "$out" = "$(jar_dir)/tla2tools.jar" ] || fail "download: status $status, out $out, err $err"
+[ "$(cat "$(jar_dir)/tla2tools.jar")" = fake-jar ] || fail "download wrote the wrong bytes"
+[ "$(ls -A "$(jar_dir)")" = tla2tools.jar ] || fail "download left other files: $(ls -A "$(jar_dir)")"
+[ "$(cat "$scratch/log")" = "$api"$'\n'"$jar_url" ] || fail "download called: $(cat "$scratch/log")"
+
+# GIVEN a failure after the cache is empty WHEN tla2tools runs THEN it exits 2 with the message and leaves no jar or temporary file
+while IFS='|' read -r name tag size api_failure jar_failure; do
+  fresh_cache
+  release "$tag" "$size"
+  api_fails=$api_failure
+  jar_fails=$jar_failure
+  run "$here/tla2tools"
+  [ "$status" = 2 ] || fail "$name: status $status"
+  [[ $err == "Could not download tla2tools.jar: "*"$message_end" ]] || fail "$name: stderr $err"
+  [ -z "$(find "$cache" -type f)" ] || fail "$name left files: $(find "$cache" -type f)"
+done <<'CASES'
+malformed tag|latest|8|no|no
+failed lookup|v1.7.4|8|yes|no
+failed download|v1.7.4|8|no|yes
+size mismatch|v1.7.4|999|no|no
+CASES
+
+# GIVEN a required tool is not installed WHEN tla2tools runs with an empty cache THEN it exits 2 naming the tool and makes no download
+mkdir "$scratch/jq-only"
+ln -s "$(command -v jq)" "$scratch/jq-only/jq"
+while IFS='|' read -r tool tool_path; do
+  fresh_cache
+  set +e
+  err=$(env -u TLA2TOOLS PATH="$tool_path" XDG_CACHE_HOME="$cache" STUB_LOG="$scratch/log" "$here/tla2tools" 2>&1 >/dev/null)
+  status=$?
+  set -e
+  [ "$status" = 2 ] || fail "missing $tool: status $status"
+  [ "$err" = "statechart needs $tool to download tla2tools.jar. Install $tool, or set TLA2TOOLS to a jar." ] || fail "missing $tool: stderr $err"
+  [ ! -s "$scratch/log" ] || fail "missing $tool called curl"
+  [ -z "$(find "$cache" -type f)" ] || fail "missing $tool left files"
+done <<CASES
+jq|$scratch/bin
+curl|$scratch/jq-only
+CASES
+
+# GIVEN tla2tools fails WHEN the statechart wrapper runs without TLA2TOOLS THEN it exits 2 with the helper's message
+fresh_cache
+api_fails=yes
+run "$here/statechart" Spec.tla
+[ "$status" = 2 ] || fail "wrapper: status $status"
+[[ $err == *"Could not download tla2tools.jar: "*"$message_end"* ]] || fail "wrapper: stderr $err"
+
+printf 'test-tla2tools: all cases pass\n'

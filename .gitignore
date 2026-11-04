@@ -1,2 +1,4 @@
 .worktrees/
 .private-journal/
+node_modules/
+bun.lock

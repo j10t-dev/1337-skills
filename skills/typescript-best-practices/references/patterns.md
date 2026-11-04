@@ -350,24 +350,14 @@ Reach for `Pick`, `Omit`, `Parameters`, `ReturnType`, `Awaited`, `typeof` and a 
 ## Object args
 
 ```ts
-// Don't. Swap two args, still compiles.
-openFile(uri, {
-  startLineNumber: 10,
-  startColumn: 1,
-  endLineNumber: 10,
-  endColumn: 1,
-});
+// One self-explanatory value stays positional.
+findAccount(accountId);
 
-// Do. Order-independent, self-documenting.
-openFile({
-  uri,
-  selection: {
-    startLineNumber: 10,
-    startColumn: 1,
-    endLineNumber: 10,
-    endColumn: 1,
-  },
-});
+// Ambiguous positional arguments hide which account receives the transfer.
+transfer(sourceId, destinationId, amount);
+
+// Named contextual inputs make the direction explicit.
+transfer({ sourceId, destinationId, amount });
 ```
 
 Skip on hot paths: per-frame render, tokenisers, parsers, anything in a tight loop where the allocation cost matters.
@@ -658,7 +648,7 @@ const owner = Array.findFirst(members, (member): boolean => member.role === "own
 
 ## Guard runs
 
-`require` turns a condition and its failure into an Effect, so each guard is one `yield*` line over a named predicate failing with a tagged error.
+The library already supports yielding tagged errors. Keep each condition beside its failure; a generic guard adapter adds no domain behaviour.
 
 ```ts
 import { Effect, Schema } from "effect";
@@ -669,11 +659,7 @@ class InsufficientFunds extends Schema.TaggedError<InsufficientFunds>()("Insuffi
   shortBy: Schema.Number,
 }) {}
 
-function require<const E>(condition: boolean, failure: E): Effect.Effect<void, E> {
-  return condition ? Effect.void : Effect.fail(failure);
-}
-
-// Don't. Each guard repeats the fail-and-return shape.
+// Each branch states the refused condition and its typed context.
 const transfer = Effect.fn("transfer")(function* (
   account: Account,
   amount: number,
@@ -684,16 +670,6 @@ const transfer = Effect.fn("transfer")(function* (
   if (!hasFunds(account, amount)) {
     return yield* new InsufficientFunds({ accountId: account.id, shortBy: amount - account.balance });
   }
-  return debit(account, amount);
-});
-
-// Do. The reader sees the preconditions as one run.
-const transfer = Effect.fn("transfer")(function* (
-  account: Account,
-  amount: number,
-): Effect.fn.Return<Transfer, AccountClosed | InsufficientFunds> {
-  yield* require(isOpen(account), new AccountClosed({ accountId: account.id }));
-  yield* require(hasFunds(account, amount), new InsufficientFunds({ accountId: account.id, shortBy: amount - account.balance }));
   return debit(account, amount);
 });
 ```

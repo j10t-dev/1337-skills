@@ -16,6 +16,7 @@ Have opinions and react to facts. Vary sentence rhythm, acknowledge complexity, 
 - Cut puffery, promotional language and formulaic "despite challenges" narratives. State facts neutrally.
 - Replace name-dropping with one named source and what it actually said. Name vague sources or delete the attribution. Expand superficial "highlighting" or "ensuring" clauses with sourced substance, or cut them.
 - Prefer plain words. Replace AI vocabulary such as additionally, crucial, delve, enduring, enhance, fostering, garner, interplay, intricate, abstract landscape, pivotal, showcase, abstract tapestry, testament, underscore and vibrant. Say "is" or "has" rather than "serves as" or "boasts"; "use" rather than "utilize" or "leverage".
+- Progress updates report new information: a changed result, blocker or required decision. While work is pending, avoid repeating unchanged counts or stages; reserve a consolidated summary for completion.
 - State the point directly instead of "not just X, but Y". Use the natural number of items, not forced groups of three. Repeat the same term rather than cycling synonyms. Use "from X to Y" only for a meaningful scale.
 - Replace abstract metaphor jargon with concrete words or the mechanism's name. Examples include substrate, wedge, vector, locus, vantage, nexus, primitive as a noun, metaphorical harness or scaffolding, API surface, bedrock, modality, paradigm, gold-plating, ratchet, evacuate, endgame, north star and flywheel.
 

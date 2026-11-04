@@ -11,14 +11,18 @@ Process PR review feedback: fetch → self-evaluate → iterate → fix → repl
 
 ### 0. Validate PR and Local Workspace
 
-Before any PR operations, verify the PR number and local workspace are correct.
+Identify the target PR and verify its head against the local workspace before making changes.
+
+If no PR number is supplied, list open PRs for the repository:
 
 ```bash
-# If PR number provided, inspect its head ref
-gh pr view {N} --json number,headRefName,headRepositoryOwner,title,state
+gh pr list --state open --json number,headRefName,title,url
+```
 
-# If no PR number provided, ask the user for the PR number.
-# Do not infer from ambient repository state.
+If exactly one is open, select it. If none or several are open, ask which PR to use. Inspect the selected or supplied PR and compare its head with the local jj bookmark/change stack:
+
+```bash
+gh pr view {N} --json number,headRefName,headRefOid,headRepositoryOwner,title,state
 ```
 
 Confirm with the user before editing if:
@@ -105,7 +109,7 @@ Repeat steps 3-6 for each comment. No summary comment at the end.
 |------|---------|
 | Inspect PR head | `gh pr view {N} --json number,headRefName,headRepositoryOwner,title,state` |
 | Confirm local stack | Use jj status/log commands appropriate to the repository |
-| Missing PR number | Ask the user; do not infer from ambient repository state |
+| Missing PR number | List open PRs and follow Step 0 |
 | Line comments | `gh api repos/{o}/{r}/pulls/{N}/comments --paginate` |
 | Reply to comment | `gh api repos/{o}/{r}/pulls/{N}/comments/{id}/replies -f body="..."` |
 | Resolve thread | GraphQL `resolveReviewThread` mutation |

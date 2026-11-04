@@ -236,7 +236,7 @@ Review the plan yourself before sharing it.
 **Inline self-review checklist:**
 
 - **Spec coverage:** Every requirement from the design has a task or explicit non-goal.
-- **File accuracy:** Every referenced file path exists or is explicitly marked `Create:`.
+- **File accuracy:** Every referenced file path exists or is explicitly marked `Create:`. For a representation migration, trace each changed union or discriminant through all producers and consumers, including nested failures and partial-success paths. Account for every affected file in the task's file list or an explicit unchanged-contract exclusion.
 - **Task boundaries:** Each task is large enough to justify subagent context transfer, but small enough to review independently.
 - **Dependency order:** Sequential dependencies are ordered; independent tasks are marked as safe to parallelise only if they do not edit the same files.
 - **TDD shape:** Behaviour changes specify concrete cases and RED before implementation, then GREEN; apply TDD's prose/configuration exception where appropriate.
