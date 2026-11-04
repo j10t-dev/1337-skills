@@ -24,7 +24,7 @@ Every implementer, fixer, and task-reviewer dispatch includes:
 - relevant baseline commands, results and elapsed times;
 - the task-scoped context boundary from the prompt template.
 
-Supply this context directly or by reference when a file is useful. `scripts/task-brief PLAN_FILE N` extracts common plan requirements and the selected task, ignoring headings inside code blocks. Check handoff completeness before dispatch. Further delegation requires controller permission.
+Supply this context directly or by reference when a file is useful. `bash <skill dir>/scripts/task-brief PLAN_FILE N` (run from any directory; paths are absolute) extracts common plan requirements and the selected task, ignoring headings inside code blocks. Check handoff completeness before dispatch. Further delegation requires controller permission.
 
 ## Start or resume
 
@@ -75,7 +75,7 @@ This authorises only the declared feature bookmark and planned task commits. Rev
 
 Task reviews cover `@-` through `@`; the final review covers the run base through the feature bookmark, or through `@` while fixes are uncommitted.
 
-Supply the diff directly, or use `scripts/review-package BASE HEAD` when a file helps. Supply requirements and relevant test results, not the session's history. Do not tell reviewers which findings to suppress or how to grade them. Reuse applicable checks rather than asking reviewers to rerun the suite.
+Supply the diff directly, or use `bash <skill dir>/scripts/review-package -R <working copy> BASE HEAD` when a file helps; run it by its absolute path from any directory, and on the 1337-skills repository itself always pass `-R` or supply the diff directly. Supply requirements and relevant test results, not the session's history. Do not tell reviewers which findings to suppress or how to grade them. Reuse applicable checks rather than asking reviewers to rerun the suite.
 
 Each fix assignment names the defect and tests that exercise the changed behaviour. The implementer reports the result before re-review.
 

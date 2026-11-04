@@ -10,7 +10,7 @@ Write the diagram in Mermaid, render it to a blueprint SVG, and show the user th
 ## Draw
 
 1. Write the Mermaid to a `.mmd` file in a scratch folder outside the repo, unless the user wants it kept in the repo.
-2. Run `<skill dir>/scripts/render DIAGRAM.mmd`. Add `--css FILE` for extra rules, once per file. It writes the SVG beside the `.mmd` file and prints the SVG's absolute path. The first run installs Pele with bun and needs the network.
+2. Run `sh <skill dir>/scripts/render DIAGRAM.mmd` from any directory. Add `--css FILE` for extra rules, once per file. It writes the SVG beside the `.mmd` file and prints the SVG's absolute path. The first run installs Pele with bun and needs the network.
 3. Show the user the SVG as an image by its absolute path, such as `![Checkout flow](/tmp/diagrams/checkout.svg)`, where the harness displays images. Otherwise give the path to open in a browser. Give the Mermaid text with it.
 
 The diagram is done when the user has the image or its path, and the Mermaid text.

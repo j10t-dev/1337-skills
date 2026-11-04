@@ -86,7 +86,7 @@ Retain practical sizing discipline: normally 1–5 tasks per plan and 10 minutes
 
 ## Plan Document Header
 
-Keep global constraints, shared contracts and required repository context before the first task heading so `scripts/task-brief` includes them in every handoff.
+Keep global constraints, shared contracts and required repository context before the first task heading so the SDD `task-brief` helper includes them in every handoff.
 
 List shared principles under Skills to Use and task-specific principles in their owning tasks. Give absolute skill paths and the decisions they bear on.
 

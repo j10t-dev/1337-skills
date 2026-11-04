@@ -119,6 +119,7 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
   - `fast-check` uses a caret range, and the `test` script runs `test-tla2tools` and supplies `TLA2TOOLS`.
   - `test/render.test.ts` uses `drawing-diagrams`' Pele, unpinned Mermaid and jsdom, and `marks.css`.
   - The `SKILL.md` prose is in UK English, and identifiers keep upstream's spelling.
+  - `scripts/statechart` runs `tla2tools` through `sh`, and `SKILL.md` invokes `statechart` and `render` through `sh`, so neither depends on executable bits.
 
   Upstream's scripts are not type-checked here. At the pinned commit, `tsc` reports four errors in upstream code: `run.ts:455` and `:471`, `test/cli.test.ts:430` and `:453`.
 
