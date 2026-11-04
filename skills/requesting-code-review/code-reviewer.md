@@ -53,6 +53,8 @@ You are the only reviewer this boundary gets. Reach your verdict from your own r
 
 Use the supplied brief or request when no plan exists. Review code against approved requirements; scope or architectural changes require user approval. Combined repair reviews must explicitly include both scopes.
 
+**Behaviour the requirements do not name.** Requirements state what the software must do; they do not list every input, environment or condition it will meet. Grade a defect on an unnamed input (crash, hang, data loss, corrupted state, misleading output) by its effect on a reasonable user, not by whether the requirements mention the trigger. Silence in the requirements is not permission for such a defect. Missing features remain scope questions for the user.
+
 Return findings in your response, not review files.
 
 **Applicable Code Principles:**
@@ -140,6 +142,9 @@ If you find significant deviations from the plan, flag them specifically so the 
 ### Recommendations
 [Improvements for code quality, architecture, or process]
 
+### Declined to judge
+[One line per behaviour you considered and set aside as outside the requirements, with the reason. Write None if you set nothing aside.]
+
 ### Assessment
 
 **Ready for user review?** [Yes/No/With fixes]
@@ -191,6 +196,9 @@ If you find significant deviations from the plan, flag them specifically so the 
 
 ### Recommendations
 - No additional features recommended.
+
+### Declined to judge
+- Concurrent indexers on one directory: not in the requirements; locking would be a design decision
 
 ### Assessment
 
