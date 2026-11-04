@@ -4,7 +4,7 @@ Use this template when dispatching a design document reviewer subagent.
 
 **Purpose:** Verify the design is complete, consistent, and ready for implementation planning.
 
-**Dispatch after:** Design document (DESIGN.md) is written.
+**Dispatch after:** the design document is written at its `docs-root.md` location.
 
 ```
 Subagent/delegation tool (general-purpose):
@@ -30,11 +30,15 @@ Subagent/delegation tool (general-purpose):
 
     Missing, contradictory, or implementation-blocking programme-design artefacts are issues. Check that every proposed file has one responsibility, boundaries hide coherent decisions rather than execution phases, interface names and types agree with call trees, external I/O and async boundaries are visible, and test substitutions satisfy the same interface and behavioural contract as production dependencies. Changed call paths use a contextual call-tree diff rather than only describing the final path. A vague exemption is an issue when runtime or callable behaviour actually changes.
 
+    ## Planning questions
+
+    After the checks above, read the design as the engineer who must write its implementation plan, with no access to the author. List only the questions you would still need answered: places where you would have to guess and a wrong guess would change the plan. For each, give the question and why the answer changes the plan, ranked by importance. Skip what a planner could reasonably decide. Programme-design artefacts are never left to planning; a missing or vague artefact is a Program Design issue, not a planning question. A question that would add behaviour beyond the approval context is a scope issue, not a planning question.
+
     ## Calibration
 
     **Flag violations of the document contract above and issues that would cause real problems during implementation planning.** A missing section, a contradiction, or a requirement so ambiguous it could be interpreted two different ways — those are issues. Minor wording improvements, stylistic preferences, and "sections less detailed than others" are not.
 
-    Approve when no serious gaps remain that would lead to a flawed plan. Do not request exhaustive call graphs or incidental framework plumbing. Stylistic notation preferences are advisory unless they hide a planning-blocking ambiguity.
+    Approve when no serious gaps remain that would lead to a flawed plan. Do not request exhaustive call graphs or incidental framework plumbing. Stylistic notation preferences are advisory unless they hide a planning-blocking ambiguity. An open planning question means Issues Found.
 
     ## Output Format
 
@@ -45,8 +49,12 @@ Subagent/delegation tool (general-purpose):
     **Issues (if any):**
     - [Section X]: [specific issue] - [why it matters for planning]
 
+    **Planning questions (ranked):**
+    - [question] - [why the answer changes the plan]
+    [One line per question, most important first; when there are none, write `**Planning questions (ranked):** None` on one line.]
+
     **Recommendations (advisory, do not block approval):**
     - [suggestions for improvement]
 ```
 
-**Reviewer returns:** Status, Issues (if any), Recommendations
+**Reviewer returns:** Status, Issues (if any), Planning questions (ranked, or `None` on the same line), Recommendations
