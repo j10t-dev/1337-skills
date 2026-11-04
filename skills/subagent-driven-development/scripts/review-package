@@ -2,22 +2,64 @@
 # Generate a review package: stat summary and full diff between two exact
 # revisions, written to a file the reviewer reads in one call.
 #
-# Usage: review-package BASE HEAD [OUTFILE]
-# Task and fix rounds: review-package @- @
-# Stable final review: review-package RUN_BASE FEATURE_BOOKMARK
-# Pending final-fix review: review-package RUN_BASE @
+# Usage: review-package [-R DIR] BASE HEAD [OUTFILE]
+# Task and fix rounds: review-package -R <working copy> @- @
+# Stable final review: review-package -R <working copy> RUN_BASE FEATURE_BOOKMARK
+# Pending final-fix review: review-package -R <working copy> RUN_BASE @
+# -R DIR names the repository to package: DIR or any directory inside it.
+# Without -R the repository is the current directory's, and the script
+# refuses to package the repository it is installed in.
 # BASE and HEAD may be any jj revisions that each resolve to one distinct
-# commit. The lifecycle documentation determines which boundary applies.
-# Default OUTFILE: a new /tmp/review-<base>..<head>.* file
+# commit, BASE an ancestor of HEAD. The lifecycle documentation determines
+# which boundary applies.
+# Default OUTFILE: a new /tmp/review-<base>..<head>.* file. An existing
+# OUTFILE is replaced only on success. Stdout is the output path and nothing
+# else.
+#
+# Exit codes:
+#   2  usage, OUTFILE is a directory, no jj repository at DIR, implicit
+#      self-repository, or BASE or HEAD does not resolve to exactly one commit
+#   3  BASE == HEAD, BASE is not an ancestor of HEAD, or the diff is empty
+#   4  creating or writing the temporary file failed after validation
+#   other: jj's own status when a jj command fails after both revisions resolved
 set -euo pipefail
 
-if [ $# -lt 2 ] || [ $# -gt 3 ]; then
-  echo "usage: review-package BASE HEAD [OUTFILE]" >&2
+usage() {
+  echo "usage: review-package [-R DIR] BASE HEAD [OUTFILE]" >&2
   exit 2
+}
+
+dir=.
+explicit=0
+if [ "${1:-}" = -R ]; then
+  [ $# -ge 2 ] || usage
+  dir=$2
+  explicit=1
+  shift 2
+fi
+
+if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+  usage
 fi
 
 base=$1
 head=$2
+
+root=$(cd "$dir" 2>/dev/null && jj root 2>/dev/null) \
+  || { echo "no jj repository at $dir; pass -R <working copy>" >&2; exit 2; }
+
+# Without -R the current directory is an accident of where the caller stood;
+# refuse when it is the repository this script lives in.
+self=$(cd "$(dirname "$(readlink -f "$0")")" && jj root 2>/dev/null) || self=
+if [ "$explicit" -eq 0 ] && [ -n "$self" ] && [ "$root" = "$self" ]; then
+  echo "refusing to package the skills repository; pass -R <working copy>" >&2
+  exit 2
+fi
+
+if [ $# -eq 3 ] && [ -d "$3" ]; then
+  echo "OUTFILE is a directory: $3" >&2
+  exit 2
+fi
 
 # Resolve a revision to exactly one commit's short ID, or fail. In jj a
 # revset matching no commits exits 0 with empty output, and one matching
@@ -25,7 +67,7 @@ head=$2
 # singleton.
 resolve_one() {
   local rev=$1 name=$2 ids n
-  ids=$(jj log --no-graph -r "$rev" -T 'commit_id.short() ++ "\n"' 2>/dev/null) \
+  ids=$(jj -R "$root" log --no-graph -r "$rev" -T 'commit_id.short() ++ "\n"' 2>/dev/null) \
     || { echo "bad $name: $rev (revset error)" >&2; exit 2; }
   # awk counts non-empty lines and always exits 0; `grep -c` exits 1 on zero
   # matches, which under `set -e` would abort before the diagnostic below.
@@ -41,31 +83,45 @@ hs=$(resolve_one "$head" HEAD)
 # any task, fix, or final review pass vacuously.
 if [ "$bs" = "$hs" ]; then
   echo "BASE and HEAD resolve to the same commit ($bs) — nothing to review" >&2
-  echo "Use review-package @- @ for task/fix rounds, or distinct exact revisions for final review" >&2
+  echo "Use review-package -R <working copy> @- @ for task/fix rounds, or distinct exact revisions for final review" >&2
   exit 3
 fi
 
-if [ $# -eq 3 ]; then
-  out=$3
-else
-  out=$(mktemp "/tmp/review-${bs}..${hs}.XXXXXX")
-fi
+# A diff between unrelated commits is not a review of HEAD's work.
+[ -n "$(jj -R "$root" log --no-graph -r "$bs & ::$hs" -T '"x"')" ] \
+  || { echo "BASE $bs is not an ancestor of HEAD $hs" >&2; exit 3; }
 
-body=$(jj diff --git --from "$bs" --to "$hs")
+# Compute the whole package before any file exists, so a failed validation
+# leaves nothing behind.
+body=$(jj -R "$root" diff --git --from "$bs" --to "$hs")
 if [ -z "$body" ]; then
   echo "empty diff between ${bs} and ${hs} — nothing to review." >&2
   echo "Either the implementer made no edits, or BASE already contains the task's work." >&2
   exit 3
 fi
+stat=$(jj -R "$root" diff --stat --from "$bs" --to "$hs")
 
-{
-  echo "# Review package: ${bs}..${hs}"
-  echo
-  echo "## Files changed"
-  jj diff --stat --from "$bs" --to "$hs"
-  echo
-  echo "## Diff"
-  printf '%s\n' "$body"
-} > "$out"
+# Publish through a temporary file in the destination directory, so an
+# existing OUTFILE is replaced only by a complete package and the rename
+# stays on one filesystem.
+if [ $# -eq 3 ]; then
+  out=$3
+  created=
+else
+  out=$(mktemp "/tmp/review-${bs}..${hs}.XXXXXX" 2>/dev/null) \
+    || { echo "write failed: cannot create /tmp/review-${bs}..${hs}" >&2; exit 4; }
+  created=$out
+fi
+dest_dir=$(dirname "$out")
+tmp=$(mktemp "$dest_dir/.review-package.XXXXXX" 2>/dev/null) \
+  || { rm -f "$created"; echo "write failed: cannot create a temporary file in $dest_dir" >&2; exit 4; }
+# On any failure below, remove the temporary file and the default-output file.
+trap 'rm -f "$tmp" "$created"' EXIT
+
+printf '# Review package: %s..%s\n\n## Files changed\n%s\n\n## Diff\n%s\n' \
+  "$bs" "$hs" "$stat" "$body" > "$tmp" \
+  || { echo "write failed: $tmp" >&2; exit 4; }
+mv -f "$tmp" "$out" || { echo "write failed: $out" >&2; exit 4; }
+trap - EXIT
 
 echo "$out"
