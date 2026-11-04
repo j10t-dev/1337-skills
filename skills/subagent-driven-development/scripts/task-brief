@@ -1,55 +1,113 @@
 #!/usr/bin/env bash
 # Extract the shared plan preamble and one task into a self-contained brief.
 # The preamble carries global constraints, shared contracts and required context.
+# A task includes its deeper contiguous sub-tasks (7 keeps 7a and 7.1, not 70).
 #
-# Usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]
+# Usage: task-brief PLAN_FILE TASK_ID [OUTFILE]
 # Default OUTFILE: a new /tmp/task-brief.* file
+# Prints the output path and nothing else.
+# Exit: 2 usage or bad argument, 3 no such task, 4 an unclosed fence hid a task heading,
+#       5 the brief could not be written.
 set -euo pipefail
 
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then
-  echo "usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]" >&2
+  echo "usage: task-brief PLAN_FILE TASK_ID [OUTFILE]" >&2
   exit 2
 fi
 
 plan=$1
 n=$2
 [ -f "$plan" ] || { echo "no such plan file: $plan" >&2; exit 2; }
-
-if [ $# -eq 3 ]; then
-  out=$3
-else
-  out=$(mktemp /tmp/task-brief.XXXXXX)
+[[ $n =~ ^[A-Za-z0-9]+(\.[A-Za-z0-9]+)*$ && $n =~ [0-9] ]] || { echo "malformed task id: $n" >&2; exit 2; }
+if [ $# -eq 3 ] && [ -d "$3" ]; then
+  echo "OUTFILE is a directory: $3" >&2
+  exit 2
 fi
 
-# Keep code-block headings out of task selection.
-if ! awk -v n="$n" '
-  /^[ \t]*(```+|~~~+)/ {
+# Select the brief before creating any file, so a failed selection leaves nothing behind.
+# Fenced lines never count as headings; a fence that never closes and hid one is an error.
+set +e
+brief=$(awk -v n="$n" -v plan="$plan" '
+  function task_id(line,   rest) {        # "" when not task-shaped
+    if (line !~ /^#+[ \t]+Task[ \t]+[A-Za-z0-9]/) return ""
+    rest = line; sub(/^#+[ \t]+Task[ \t]+/, "", rest)
+    match(rest, /^[A-Za-z0-9]+(\.[A-Za-z0-9]+)*/)
+    rest = substr(rest, 1, RLENGTH)
+    return (rest ~ /[0-9]/) ? rest : ""
+  }
+  function depth(line) { match(line, /^#+/); return RLENGTH }
+  function is_sub_task_of_selected(id, line) {   # reads the selected level and the requested n
+    return depth(line) > level && substr(id, 1, length(n)) == n && substr(id, length(n) + 1, 1) ~ /[A-Za-z.]/
+  }
+
+  # Fence tracking: open, close, and whether a task-shaped line sits inside the open fence.
+  /^ ? ? ?(```+|~~~+)/ {
     line = $0
-    sub(/^[ \t]*/, "", line)
+    sub(/^ */, "", line)
     match(line, /^`+|^~+/)
     marker = substr(line, 1, RLENGTH)
     rest = substr(line, RLENGTH + 1)
     if (!fence) {
       fence = substr(marker, 1, 1)
       width = length(marker)
+      fence_line = NR
+      hidden = 0
     } else if (substr(marker, 1, 1) == fence && length(marker) >= width && rest ~ /^[ \t]*$/) {
       fence = ""
+      hidden = 0
     }
   }
-  !fence && /^#+[ \t]+Task[ \t]+[0-9]+/ {
-    seen_task = 1
-    intask = ($0 ~ ("^#+[ \t]+Task[ \t]+" n "([^0-9]|$)"))
-    if (intask) found = 1
+  fence && task_id($0) != "" { hidden = 1 }
+
+  # Selection: the requested task, then its deeper contiguous sub-tasks.
+  !fence {
+    id = task_id($0)
+    if (id != "") {
+      seen_task = 1
+      if (nseen < 5) seen[++nseen] = id
+      if (id == n) { intask = 1; found = 1; level = depth($0) }
+      else intask = intask && is_sub_task_of_selected(id, $0)
+    }
   }
   !seen_task { preamble = preamble $0 "\n" }
   intask { task = task $0 "\n" }
+
   END {
-    if (!found) exit 3
+    if (fence && hidden) {
+      printf "code fence opened at line %d of %s never closes and hides a task heading; close it and rerun\n", fence_line, plan > "/dev/stderr"
+      exit 4
+    }
+    if (fence) printf "warning: code fence opened at line %d of %s never closes\n", fence_line, plan > "/dev/stderr"
+    joined = seen[1]
+    for (i = 2; i <= nseen; i++) joined = joined ", " seen[i]
+    if (!found) {
+      print "task " n " not found in " plan "; task headings seen: " (nseen ? joined : "none") > "/dev/stderr"
+      exit 3
+    }
     printf "%s%s", preamble, task
   }
-' "$plan" > "$out"; then
-  echo "task ${n} not found in ${plan} (no heading matching 'Task ${n}')" >&2
-  exit 3
+' "$plan")
+selection_status=$?
+set -e
+[ "$selection_status" -eq 0 ] || exit "$selection_status"
+
+# Publish through a temporary file beside the destination, so a failure never damages an existing OUTFILE.
+if [ $# -eq 3 ]; then
+  out=$3
+  created=
+else
+  out=$(mktemp /tmp/task-brief.XXXXXX 2>/dev/null) || { echo "write failed: cannot create /tmp/task-brief" >&2; exit 5; }
+  created=$out
 fi
+dest_dir=$(dirname "$out")
+tmp=$(mktemp "$dest_dir/.task-brief.XXXXXX" 2>/dev/null) || {
+  rm -f "$created"
+  echo "write failed: cannot create a temporary file in $dest_dir" >&2
+  exit 5
+}
+trap 'rm -f "$tmp" "$created"' EXIT
+printf '%s\n' "$brief" > "$tmp" || { echo "write failed: $tmp" >&2; exit 5; }
+mv -f "$tmp" "$out" || { echo "write failed: $out" >&2; exit 5; }
+trap - EXIT
 
 echo "$out"

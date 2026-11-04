@@ -122,5 +122,5 @@ Subagent/delegation tool (general-purpose):
 
 **Placeholders:**
 - `[MODEL]` — REQUIRED: implementer model selected via `working-with-subagents`
-- `[TASK_BRIEF]` — complete task text and shared requirements; `scripts/task-brief PLAN N` can extract them when a file is useful
+- `[TASK_BRIEF]` — complete task text and shared requirements; the SDD skill's `bash <skill dir>/scripts/task-brief PLAN N`, run by absolute path, can extract them when a file is useful
 - `[directory]` — working directory for the task

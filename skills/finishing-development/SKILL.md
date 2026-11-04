@@ -98,6 +98,3 @@ Report the outcome, checked scope and consequential decisions concisely.
 
 **Always:**
 - Verify tests before offering options
-
-## Integration
-

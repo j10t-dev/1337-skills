@@ -9,7 +9,7 @@ while [ -L "$self" ]; do
 done
 entry=$(dirname "$self")/statechart.ts
 if [ -z "${TLA2TOOLS:-}" ]; then
-  TLA2TOOLS=$("$(dirname "$self")/tla2tools") || exit 2
+  TLA2TOOLS=$(sh "$(dirname "$self")/tla2tools") || exit 2
   export TLA2TOOLS
 fi
 version() {

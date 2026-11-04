@@ -20,3 +20,10 @@ The invocation cut of splitting (the sequence cut lives in `SKILL.md`): split of
 ## Router skills
 
 When user-invoked skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one user-invoked skill that names the others and when to reach for each, so the human has one skill to remember instead of many. It can only hint, never fire them: user-invoked skills have no description, so nothing but the human can reach them.
+
+## Bundled scripts and body hazards
+
+- Name a bundled script by its interpreter and `<skill dir>/` path and say which directory to run it from. An agent that changes into the skill directory to make a relative path resolve runs the script against the wrong repository, and some installers drop executable bits.
+- Keep a dollar sign followed by a digit out of `SKILL.md` bodies. Claude Code substitutes such sequences as skill arguments. Write the sequence in words; a literal example in a body would itself be substituted.
+- Keep each `SKILL.md` under 20,000 bytes with load-bearing rules near the top. Claude Code re-attaches the first 5,000 tokens of each invoked skill after compaction, within a shared 25,000-token budget (Claude Code skills documentation, compaction section). 5,000 tokens is roughly the 20,000 characters upstream superpowers cites.
+- An `@path` in a `SKILL.md` body attaches that file on invocation. Use it only for deliberate includes, never for a reference the reader may follow.
