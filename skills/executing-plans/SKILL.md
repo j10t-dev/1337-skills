@@ -1,13 +1,13 @@
 ---
 name: executing-plans
-description: Use when partner provides a complete implementation plan to execute
+description: "Use when executing an implementation plan inline, without task subagents: the user chose inline execution or no subagent tool is available"
 ---
 
 # Executing Plans
 
 Execute inline when requested or subagents are unavailable.
 
-Execute the approved plan and supplied context; do not reopen design or plan approval. Ask the controller about missing requirements, or the user when working standalone.
+Execute the approved plan and supplied context; do not reopen design or plan approval. Ask the controller about missing requirements, or the user when working standalone. Execute all authorised tasks without routine continuation prompts.
 
 ## Planned implementation
 
@@ -19,8 +19,8 @@ Preserve exact cases and independently derived expectations. Parameterise one be
 
 ## Start or Resume
 
-1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task. Stop on missing, duplicate or ambiguous metadata.
-2. Keep the plan path, bookmarks, run-base IDs and task progress in `.agents/sdd/progress.md`; before its first write, create `.agents/sdd/.gitignore` containing `*` if absent, never overwriting an existing one, and tell the user if the file is already tracked. Read it on resume and update it as work progresses. On a fresh run, require the feature bookmark to be absent, stop on unexplained edits, position empty `@` on the run base and create the declared bookmark there.
+1. Read the plan, its required skills and constraints, `Builds On`, `Feature Bookmark`, and one `Commit` subject per task; stop on missing, duplicate or ambiguous metadata. Read the design the plan's `Design:` line names; stop if it is missing, and escalate a plan-design conflict the same way as any other.
+2. Keep the plan path, bookmarks, run-base IDs and task progress in `.agents/sdd/progress.md`; before its first write, create `.agents/sdd/.gitignore` containing `*` if absent, never overwriting an existing one, and tell the user if the file is already tracked. Read it on resume and update it as work progresses. Its `plan:` line identifies the plan it records; a fresh run overwrites an existing file only when it shows `Final review -> complete`, otherwise stop and ask. On a fresh run, require the feature bookmark to be absent, stop on unexplained edits, position empty `@` on the run base and create the declared bookmark there.
 3. On resume, follow `../subagent-driven-development/recovery.md`; resume the unfinished execution task, not completed work or final review.
 4. Establish the baseline under `verification-before-completion` before source edits; reuse applicable results on resume.
 
@@ -30,13 +30,18 @@ For each task in order:
 
 1. Confirm the progress file and feature bookmark identify the accepted tip, then mark the task `in progress`.
 2. Keep `@` undescribed with the feature bookmark at `@-`.
-3. Follow the plan's skills and TDD steps. Use `verification-before-completion` for required checks.
-4. Only after verification passes for the task and any agreed blocking repair, accept the task:
+3. Follow the plan's skills and TDD steps. Use `verification-before-completion` for required checks; send long output to a file under `.agents/sdd/` and read its tail.
+4. Accept the task, and any agreed blocking repair, only when:
+   - each specified test was seen failing before implementation and passes in a focused run, or the inspection a prose-exception task names has been done;
+   - each `Verification` expected result matches actual output;
+   - each required project check named by `../shared/verification.md` passes; a failure blocks acceptance until fixed within scope or escalated;
+   - each reported substitution or extraction is recorded as `Task N note: <what>`.
+5. Accept in one call:
    - confirm non-empty undescribed `@` has the feature bookmark as its sole parent;
    - run `jj commit -m "<exact planned subject>"`;
    - run `jj bookmark set "<Feature Bookmark>" -r @-`;
-   - record `@-`'s full change and commit IDs as complete.
-5. Mark the task complete in `progress.md` and continue in the new empty `@`.
+   - record `@-`'s full change and commit IDs as complete, with one `Task N check: <command as typed> -> <last non-blank output line>` per required check beneath.
+6. Continue in the new empty `@`.
 
 Verification is the execution gate. Do not commission plan, task, repair or final reviews here. Never amend accepted work or move another bookmark.
 

@@ -39,7 +39,7 @@ Stop affected delivery unless the user explicitly accepts the stated limitation.
 
 ### Step 2: Code Review
 
-Reuse a completed review of unchanged code; otherwise review the whole feature from its run base, including uncommitted fixes. For other work, perform required review or ask about optional review:
+Select the most capable available model explicitly for the whole-feature review, with its reasoning effort, under `working-with-subagents`. Reuse a completed review of unchanged code; otherwise review the whole feature from its run base, including uncommitted fixes. For other work, perform required review or ask about optional review:
 
 ```
 Question: "Tests pass. Want code review before finishing?"
@@ -54,6 +54,8 @@ Dispatch code-reviewer with an explicit jj boundary:
 ```
 Subagent/delegation tool (code-reviewer):
   description: "Review completion boundary"
+  model: [most capable available model, selected under working-with-subagents]
+  reasoning effort: [set together with the model]
   prompt: |
     Use the template at requesting-code-review/code-reviewer.md.
 
@@ -67,15 +69,17 @@ Subagent/delegation tool (code-reviewer):
 
 If a documentation path needs resolution before dispatch, read `../shared/docs-root.md`.
 
-Fix genuine issues, verify the changes and re-review until clean; explain mistaken findings directly and escalate blockers.
+Without a subagent tool, read `../requesting-code-review/code-reviewer.md` and perform that review yourself as a separate pass over the same boundary. Label it a self-review in the delivery report and ask whether that is enough; under a formal plan, keep `Final review -> in progress` until the user accepts, then write `Final review -> complete (self-review: no subagent tool)`. If the user rejects, dispatch a reviewer when one is available.
 
-After a clean final review of a formal plan, absorb fixes into its task commits with `jj absorb --from @ --into '<run-base>..<Feature Bookmark>'`. If changes remain, squash them into the relevant task commit or ask if ownership is unclear. Refresh completed commit IDs in the progress file; leave the run base and other features untouched. Reuse verification and review when the code is unchanged.
+Handle findings under `receiving-code-review`, within the rounds and five-round cap of `../subagent-driven-development/review-handling.md`; read it again before each fix pass. Under a formal plan, record `Final review -> in progress (fix round N of 5)` and one `Ruling:` line in `.agents/sdd/progress.md` for each finding or Declined-to-judge line the approved design settles. For ad-hoc work, the user's request settles findings, with the reason stated in the delivery report. Everything else at the cap goes to the user. Explain mistaken findings directly and escalate blockers.
+
+After a clean final review of a formal plan, absorb fixes into its task commits with `jj absorb --from @ --into '<run-base>..<Feature Bookmark>'`. List what remains with `jj diff --summary -r @`: squash task files into their task commit, ask if ownership is unclear, and put files that belong to no task (notes, scratch output) to the user. Refresh completed commit IDs in the progress file; leave the run base and other features untouched. Reuse verification and review when the code is unchanged.
 
 ### Step 3: Present Completion Options
 
 Deliver when required checks pass and review is complete, or state the limitations the user explicitly accepted.
 
-Report the outcome, checked scope and consequential decisions concisely.
+Report the outcome, checked scope, every `Ruling:` line from the progress file in order, and the Declined-to-judge lines left for the user, concisely.
 
 **Do not perform integration operations** (rebase shared work, move bookmarks, submit externally, create/update PRs, or advance the target bookmark) unless the user explicitly asks. The user controls final jj/git-colocated integration.
 
