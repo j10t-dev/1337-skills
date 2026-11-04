@@ -1,11 +1,12 @@
 # Implementer Subagent Prompt Template
 
-Use this template when dispatching an implementer subagent. If the harness exposes only a known inherited model, omit the model field under SDD's inheritance exception.
+Use this template when dispatching an implementer subagent. If the harness exposes only a known inherited model, omit the model and reasoning-effort fields under SDD's inheritance exception.
 
 ```
 Subagent/delegation tool (general-purpose):
   description: "Implement Task N: [task name]"
   model: [MODEL — REQUIRED: select via working-with-subagents]
+  reasoning effort: [EFFORT — REQUIRED: set together with the model via working-with-subagents]
   prompt: |
     You are implementing Task N: [task name]
 
@@ -20,6 +21,7 @@ Subagent/delegation tool (general-purpose):
     Applicable baseline: [pre-edit revision, commands, exit statuses, elapsed times and results, supplied here or by reference]
 
     Applicable code principles: [absolute skill paths and the decisions they bear on, or None]
+    Fix history: [None, or on fix round 4 or 5: "A prior implementer attempted this task N times; you own it now." (N is the number of fix rounds completed so far), followed by the open findings and the fix history]
 
     ## Context Boundary
 
@@ -122,5 +124,6 @@ Subagent/delegation tool (general-purpose):
 
 **Placeholders:**
 - `[MODEL]` — REQUIRED: implementer model selected via `working-with-subagents`
+- `[EFFORT]` — REQUIRED: reasoning effort set together with the model via `working-with-subagents`
 - `[TASK_BRIEF]` — complete task text and shared requirements; the SDD skill's `bash <skill dir>/scripts/task-brief PLAN N`, run by absolute path, can extract them when a file is useful
 - `[directory]` — working directory for the task

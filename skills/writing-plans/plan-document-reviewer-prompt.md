@@ -19,7 +19,7 @@ Subagent/delegation tool (general-purpose):
 
     | Category | What to Look For |
     |----------|------------------|
-    | Completeness | Behaviour, scenario, outcome, dependencies, files, exact interfaces, implementation and integration decisions, concrete test bodies, exclusions, cases and verification. Missing production bodies block only when a necessary decision remains unresolved |
+    | Completeness | Behaviour, scenario, outcome, dependencies, files, exact interfaces, implementation and integration decisions, concrete test bodies, exclusions, cases and verification. Missing production bodies block only when a necessary decision remains unresolved; a production body the interfaces and tests already determine is a transcript, not completeness |
     | Design Alignment | Plan covers design requirements, no major scope creep |
     | Task Decomposition | Tasks have clear boundaries, steps are actionable |
     | Buildability | Do code, precise instructions or named inspected code settle the approach, reuse and integration edits without requiring neighbouring tasks? Global constraints and shared contracts survive the handoff |
@@ -30,7 +30,7 @@ Subagent/delegation tool (general-purpose):
     | Integrated Verification | Every task ends with an exact check of its observable integrated outcome, not only unit or component checks; RED precedes implementation and GREEN follows, subject to TDD's prose/configuration exception |
     | Concrete Cases | Actual inputs, preconditions, results and side effects with independently derived expectations; require one parameterised case table for the same behaviour's inputs, separate tests for distinct behaviours |
     | Review Focus | Missing input classes or failure modes implied by approved behaviour have cases in their owning tasks and a short summary in Review focus; this does not introduce new features |
-    | Complexity | Planned mechanisms serve the approved design with minimal cognitive complexity; additional architecture has explicit user approval |
+    | Complexity | Planned mechanisms serve the approved design with minimal cognitive complexity; additional architecture has explicit user approval; a plan several times the design's length, or dominated by production code blocks, replaces determined bodies with signatures and one-line approaches while test bodies, cases and copied contracts stay |
     | Foundation Exceptions | A foundation-only task explains why no vertical slice is practical, proves an independently verifiable state, and names the later behaviour that consumes it |
     | Task/Commit Coherence | Each task is one coherent reviewable unit normally suitable for one commit; unrelated behaviours are not bundled |
 
