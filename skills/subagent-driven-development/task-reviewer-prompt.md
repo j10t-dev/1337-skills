@@ -1,6 +1,6 @@
 # Task Reviewer Prompt Template
 
-Use this template when dispatching a task reviewer subagent. The reviewer reads the task's diff once and returns two verdicts: spec compliance and code quality. If the harness exposes only a known inherited model, omit the model field under SDD's inheritance exception.
+Use this template when dispatching a task reviewer subagent. The reviewer reads the task's diff once and returns two verdicts: spec compliance and code quality. If the harness exposes only a known inherited model, omit the model and reasoning-effort fields under SDD's inheritance exception.
 
 **Purpose:** Verify one task's implementation matches its requirements (nothing more, nothing less) and is well-built (clean, tested, maintainable)
 
@@ -8,6 +8,7 @@ Use this template when dispatching a task reviewer subagent. The reviewer reads 
 Subagent/delegation tool (general-purpose):
   description: "Review Task N (spec + quality)"
   model: [MODEL — REQUIRED: select via working-with-subagents]
+  reasoning effort: [EFFORT — REQUIRED: set together with the model via working-with-subagents]
   prompt: |
     You are reviewing one task's implementation: first whether it matches its requirements, then whether it is well-built. This is a task-scoped gate, not a merge review — a broad whole-branch review happens separately after all tasks are complete.
 
@@ -104,7 +105,7 @@ Subagent/delegation tool (general-purpose):
 
     ## Calibration
 
-    Categorise issues by actual severity. Not everything is Critical. Important means this task cannot be trusted until it is fixed: incorrect or fragile behaviour, a missed requirement, or maintainability damage you would block a merge over — verbatim duplication of a logic block, swallowed errors, tests that assert nothing. "Coverage could be broader" and polish suggestions are Minor. If the plan or brief explicitly mandates something this rubric calls a defect (a test that asserts nothing, verbatim duplication of a logic block), that IS a finding — report it as Important, labelled plan-mandated. The plan's authorship does not grade its own work; the human decides. Acknowledge what was done well before listing issues — accurate praise helps the implementer trust the rest of the feedback.
+    Categorise issues by actual severity. Not everything is Critical. Important means this task cannot be trusted until it is fixed: incorrect or fragile behaviour, a missed requirement, or maintainability damage you would block a merge over — verbatim duplication of a logic block, swallowed errors, tests that assert nothing. "Coverage could be broader" and polish suggestions are Minor. If the plan or brief explicitly mandates something this rubric calls a defect (a test that asserts nothing, verbatim duplication of a logic block), that IS a finding — report it as Important, labelled plan-mandated. The plan's authorship does not grade its own work; the controller rules on it under the approved design or puts it to the user. Acknowledge what was done well before listing issues — accurate praise helps the implementer trust the rest of the feedback.
 
     ## Output Format
 
@@ -133,6 +134,7 @@ Subagent/delegation tool (general-purpose):
 
 **Placeholders:**
 - `[MODEL]` — REQUIRED: reviewer model selected via `working-with-subagents`
+- `[EFFORT]` — REQUIRED: reasoning effort set together with the model via `working-with-subagents`
 - `[TASK_BRIEF]` — the requirements supplied to the implementer
 - `[GLOBAL_CONSTRAINTS]` — the binding requirements copied verbatim from the plan's Global Constraints section or the spec: exact values, formats, and stated relationships between components (not process rules — those are already in this template)
 - `[IMPLEMENTER_RESULT]` — the implementer's response, including check results
