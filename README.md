@@ -25,7 +25,6 @@ Claude Code links:
 
 ```text
 ~/.claude-pihost/skills/1337-skills -> ~/.agents/1337-skills
-~/.claude-pihost/skills/requesting-pi-review -> ~/.agents/1337-skills/adapters/claude/skills/requesting-pi-review
 ~/.claude/skills/<name> -> ~/.agents/1337-skills/skills/<name>
 ```
 
@@ -105,9 +104,6 @@ Agents select applicable code principles and name the concrete decisions they sh
 - `using-skills`
 - `writing-for-agents`
 
-**Claude-only adapters** (`adapters/claude/skills/`)
-- `requesting-pi-review`
-
 ## Intentional Divergences from Upstream
 
 Deliberate deltas from obra/superpowers. Anything not listed here that differs from upstream is fair game for a sync.
@@ -117,7 +113,7 @@ Deliberate deltas from obra/superpowers. Anything not listed here that differs f
 - **Controller-owned task commits.** Formal plan execution commits each accepted task with the plan's exact conventional subject and advances one declared feature bookmark. Ad-hoc commits, integration, and `$DOCS_ROOT` VCS remain user-controlled.
 - **Harness neutrality.** Canonical skill content avoids harness-specific tool names ("task tracker", "current harness's skill mechanism"); harness specifics live in adapter files.
 - **External docs repository.** Approved designs and plans remain in `$DOCS_ROOT/$projectName/{designs,plans}/`.
-- **Independent document review (addition, not replacement).** After the inline self-review checklist, brainstorming and writing-plans hand the document to `requesting-document-review`, which dispatches a native reviewer subagent of the running harness using fork-maintained reviewer prompt templates derived from upstream's v6.2 templates (upstream removed its plan template in v6.4.2 and its design template in v7.0.0). Self-review still runs first. `requesting-pi-review` is a Claude-only adapter that substitutes pi as the document reviewer on explicit user request. Its `trail` mode runs when the finishing or trail skill requests a cross-model trail review, printing reviewer provider/model and an `Attention` block; caller-side validation and retry follow `show-me-your-work`. The design reviewer receives the design template and checks the headings against it. It also reads the design as the plan writer with no access to the author and returns ranked planning questions; `requesting-document-review` sorts them into answered, minor and user-owned, asks the user-owned ones in one message, and reports the calls it settled without the user, which brainstorming shows with the written design. There is no subagent-less fallback: an undispatchable review is a failed invocation, not a self-review.
+- **Independent document review (addition, not replacement).** After the inline self-review checklist, brainstorming and writing-plans hand the document to `requesting-document-review`, which dispatches a native reviewer subagent of the running harness using fork-maintained reviewer prompt templates derived from upstream's v6.2 templates (upstream removed its plan template in v6.4.2 and its design template in v7.0.0). Self-review still runs first. The design reviewer receives the design template and checks the headings against it. It also reads the design as the plan writer with no access to the author and returns ranked planning questions; `requesting-document-review` sorts them into answered, minor and user-owned, asks the user-owned ones in one message, and reports the calls it settled without the user, which brainstorming shows with the written design. There is no subagent-less fallback: an undispatchable review is a failed invocation, not a self-review.
 - **Mandatory programme design and vertical increments.** Brainstorming designs include a file-tree diff, boundary map, key interfaces, and representative scenario call trees (or a credible non-executable exemption); writing-plans preserves those decisions in observable vertical behaviour increments rather than horizontal layer batches.
 - **Implementation decisions before execution.** Plans use code, precise instructions or references to inspected code, whichever is clearest and most compact. Planners inspect reuse candidates and settle approach and integration choices; concrete test bodies, exact interfaces, cases, exclusions and checks remain required. Executors may extract small local helpers for demonstrated duplication or reuse suitable existing code the planner missed after checking its contract and reporting the substitution. Approved behaviour, responsibilities, interfaces and dependency constraints remain binding; consequential changes go to the controller. The approved design remains the source of truth.
 - **Review focus.** Planning checks for input classes and failure modes implied by approved behaviour but missing from initial tests, adds their cases to the owning tasks and identifies them for reviewers.
