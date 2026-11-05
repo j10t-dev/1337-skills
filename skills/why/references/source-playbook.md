@@ -1,17 +1,9 @@
 # Source playbooks
 
-The why skill spawns one investigator per available evidence category, each reading a single source-specific playbook below. The playbooks are concrete examples for common MCPs. Adapt them for a different MCP in the same category.
+Select guidance for evidence that bears on the question and is already part of the project or explicitly supplied. Start with the repository and its documented project files.
 
-| Category | Playbook | Example MCP it documents |
-|---|---|---|
-| Source control history | [`code-archaeology.md`](./sources/code-archaeology.md) | git, `gh` |
-| Issue / ticket tracker | [`linear.md`](./sources/linear.md) | Linear (adapt for Jira, GitHub Issues, Plane, Shortcut) |
-| Long-form documents | [`notion.md`](./sources/notion.md) | Notion (adapt for Confluence, Google Docs, Coda) |
-| Real-time team chat | [`slack.md`](./sources/slack.md) | Slack (adapt for Discord, Microsoft Teams, Mattermost) |
-| Infrastructure observability | [`datadog.md`](./sources/datadog.md) | Datadog (adapt for New Relic, Honeycomb, Grafana, Splunk) |
-| Error / exception tracking | [`sentry.md`](./sources/sentry.md) | Sentry (adapt for Rollbar, Bugsnag, Airbrake) |
-| Product analytics warehouse | [`databricks.md`](./sources/databricks.md) | Databricks SQL (adapt for Snowflake, BigQuery, ClickHouse, dbt) |
+- [Code archaeology](sources/code-archaeology.md): jj history, code comments, tests, and relevant PRs or issues through the repository's existing host tools.
+- Project documents: follow the repository's pointers to designs, plans, ADRs and notes. Search the target's symbols, terminology and linked decisions; read the relevant versions and record dates and citations.
+- [Incident and postmortem context](sources/incident-postmortem.md): add this when defensive code may have followed a bug or incident.
 
-Cross-cutting:
-
-- [`incident-postmortem.md`](./sources/incident-postmortem.md). Add this if the target code looks defensive (null checks, retry, timeout, rate limit, feature flag, egress guard, OOM handler).
+Additional evidence is selected for a concrete lead, not to fill a fixed roster. Give an investigator its actual source, available read tools and question-specific search terms. Keep any unavailable-evidence report tied to the question or a reference found during investigation.

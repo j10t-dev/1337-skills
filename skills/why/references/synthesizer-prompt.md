@@ -4,7 +4,7 @@ Fill in the placeholders.
 
 ---
 
-You are answering a "why" question about a piece of code by synthesising findings from investigators who searched different historical sources (source control, issue / ticket tracker, long-form documents, real-time team chat, infrastructure observability, error / exception tracking, product analytics warehouse, and code comments). Produce a confidence-weighted, evidence-cited narrative that says honestly what the evidence supports, and just as honestly what it doesn't.
+You are answering a "why" question about a piece of code by synthesising findings from investigators who searched the relevant project sources selected for this question. Produce a confidence-weighted, evidence-cited narrative that says honestly what the evidence supports, and just as honestly what it doesn't.
 
 ## The Question
 
@@ -20,9 +20,9 @@ You are answering a "why" question about a piece of code by synthesising finding
 
 {ALL_INVESTIGATOR_FINDINGS}
 
-## Sources That Weren't Searched
+## Relevant Evidence Not Retrieved
 
-{SKIPPED_SOURCES_WITH_REASONS}
+{UNAVAILABLE_EVIDENCE_WITH_REASONS}
 
 ## Epistemics Framework
 
@@ -41,7 +41,7 @@ You MUST follow `references/epistemics.md`. Read it in full before writing. The 
 2. **Merge overlaps.** When several investigators cite the same PR, ticket, or doc, give it one authoritative reference.
 3. **Surface contradictions.** When two items disagree, show both. Don't pick one.
 4. **Calibrate each claim.** Find its evidence and tier. Direct: cite it and state it plainly. Inferred: hedge it and show the inference. Speculative: mark it. No evidence: put it in the gaps.
-5. **Verify citations by spot-checking.** If you're uncertain a cited item exists or says what the investigator claims, check it by reading the codebase or calling MCP tools. Don't propagate errors. Do not write files, commit, or modify external state.
+5. **Verify citations by spot-checking.** If you're uncertain a cited item exists or says what the investigator claims, check it through the available read tools for the cited source. Don't propagate errors. Do not write files, commit, or modify external state.
 6. **Don't overreach.** The user will act on this. Leave an open question open rather than fill it with a confident guess.
 
 ## Output Format
@@ -91,26 +91,20 @@ Specific gaps: "We searched the issue tracker for [query1], [query2], [query3] a
 
 - Questions that went unanswered
 - Searches that returned nothing
-- Sources that were unavailable, and why (such as a missing real-time team chat MCP)
+- Relevant evidence that could not be retrieved, and why, such as an inaccessible linked PR. Unused services are not evidence gaps.
 - People who would likely know but whom you can't ask
 
 ### Sources Consulted
 
 What was actually searched, so the user can judge coverage and redirect:
 
-- **Source control history**: {file paths}, {number of commits reviewed}, PRs #{numbers}, and code comments searched. Or "Not searched. This should not happen because jj and `gh` are always expected."
-- **Issue / ticket tracker**: {ticket IDs and keyword searches}. Or "Not searched. No matching MCP available in this environment."
-- **Long-form documents**: {page titles and search queries}. Or "Not searched. No matching MCP available in this environment."
-- **Real-time team chat**: {channels searched, date ranges, queries}. Or "Not searched. No matching MCP available in this environment."
-- **Infrastructure observability**: {dashboards, monitors, metrics, logs, traces, or incidents searched}. Or "Not searched. No matching MCP available in this environment."
-- **Error / exception tracking**: {issues, events, or releases searched}. Or "Not searched. No matching MCP available in this environment."
-- **Product analytics warehouse**: {fully-qualified tables queried, the time windows, and the numeric summaries (counts, percentiles, first/last-seen timestamps) that bore on the question}. Or "Not searched. No matching MCP available in this environment."
+List only the sources actually investigated, with concrete coverage: files and commit ranges, PR or issue numbers, document paths and versions, and search terms. Include empty searches. Separately identify relevant references that could not be read. Do not enumerate absent services or require a fixed set of source categories.
 
 ### Confidence Summary
 
 One or two sentences on overall confidence, e.g.:
 
-> "The core rationale (A) is well-supported by direct PR and ticket evidence. The specific threshold value (100) is inferred from the surrounding context but not explicitly documented. The question of whether this was driven by a customer request could not be answered. No relevant issue tracker or long-form doc content surfaced, and real-time team chat search was unavailable."
+> "The core rationale (A) is well-supported by direct PR and ticket evidence. The specific threshold value (100) is inferred from the surrounding context but not explicitly documented. The question of whether this was driven by a customer request could not be answered. The linked issue records the symptom but does not explain the threshold."
 
 ---
 
@@ -121,7 +115,7 @@ Revise if any item fails:
 1. Does every claim in "What We Found" have a citation? If not, add one or move it to "Inferred" or "Hypotheses."
 2. Is the phrasing tier-appropriate? (Direct claims can use "because". Inferred claims cannot.)
 3. Did you surface every contradiction you noticed, or quietly pick one?
-4. Does "What We Don't Know" name specific gaps? If it's empty or missing, be suspicious. Historical investigations almost always have gaps.
+4. Does "What We Don't Know" name only unresolved questions and evidence gaps relevant to this investigation? Omit it when the evidence answers the question.
 5. Did you check any hypothesis embedded in the question against the evidence rather than rubber-stamp it?
 6. Did you cite code as evidence for its own intent? Remove it. Code is mechanics, not motivation.
 7. Is the tone calibrated? A confident-sounding answer on weak evidence is the exact failure this skill exists to prevent.

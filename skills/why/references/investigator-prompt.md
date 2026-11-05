@@ -1,6 +1,6 @@
 # Investigator Prompt Template
 
-Fill in the placeholders. Append the one category playbook `sources/<source>.md` for this investigator's evidence category (index: `source-playbook.md`). If the target code looks defensive (null checks, retry logic, timeout handling, rate limiting, feature flags, egress guards, OOM handlers), also append `sources/incident-postmortem.md` so the investigator runs incident-flavoured queries inside its own source.
+Fill in the placeholders with the assigned source and available read tools. Use the relevant guidance from `source-playbook.md`. If the target code looks defensive, also append `sources/incident-postmortem.md`. The source must already be used by the project or explicitly supplied for the question.
 
 ---
 
@@ -35,7 +35,7 @@ Work like a **careful, cautious, and precise investigator**. Surface evidence an
 
 1. **Cast a wide net first** so you don't miss related context. Only then narrow in on specific items.
 2. **Read the whole thing.** Read each PR, ticket, doc, or thread fully, not just the title or summary. The key evidence is often in a comment, a subtask, or a follow-up.
-3. **Follow links within your source only.** Pull the PR or commit a PR references, the parent or sibling of a ticket, the doc a doc links. Do NOT chase a cross-source reference. Record it under Additional Leads for that source's investigator. The one-investigator-per-category design depends on this. Chasing it duplicates work and confuses scope.
+3. **Follow links within your source only.** Pull the PR or commit a PR references, the parent or sibling of a ticket, the doc a doc links. Do NOT chase a cross-source reference. Record it under Additional Leads for that source's investigator. The assignments have non-overlapping scopes. Chasing it duplicates work and confuses scope.
 4. **Quote verbatim**, with the exact location (PR number, ticket ID, URL, commit hash, file:line), so the reader can confirm the claim in seconds.
 5. **Record what you searched, not just what you found.** Write queries verbatim. An empty search is a finding.
 6. **Resist the story.** If two items in your source disagree, record both. Don't suppress the inconvenient one. If three items line up and a fourth contradicts them, the contradiction is the most interesting finding.
@@ -55,7 +55,7 @@ Before reporting a finding as strong, ask whether you would expect to find it if
 Return your findings in this structure. The synthesiser reads it directly.
 
 ### Source
-Which source you investigated (source control, issue / ticket tracker, long-form documents, real-time team chat, infrastructure observability, error / exception tracking, product analytics warehouse, code comments, etc.).
+The actual assigned source and scope, such as repository history, linked PRs and issues, or the project's design documents.
 
 ### What I Searched
 The queries you ran, items you opened, and places you looked. Be specific. This shows how thorough the search was and what is still unsearched.
@@ -81,4 +81,4 @@ Items that disagree with each other, with both citations.
 What you searched for and didn't find, specifically: "Searched the issue tracker for [query] across [time range]. No matching issues."
 
 ### Additional Leads
-Anything that suggests further investigation in a different source, for its investigator or a follow-up pass. For example, a chat thread that a PR mentions.
+Anything that suggests further investigation in a different source, for its investigator or a follow-up pass. For example, a design document linked from a PR.

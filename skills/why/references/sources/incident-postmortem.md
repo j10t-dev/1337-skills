@@ -1,5 +1,9 @@
-# Incident & Postmortem Context
+# Incident and postmortem context
 
-- **Linear**: look for tickets labelled `incident`, `sev-*`, `postmortem-action-item`, `reliability`
-- **Slack**: search `#sev-*` and `#incident-*` channels around the dates the target code was added
-- **Git**: commits with messages like "fix for incident", "add defensive check", "revert" followed by "re-apply with..." are strong signals
+For defensive code, trace the change to its triggering bug using existing project evidence:
+
+- Search jj history for the relevant symbols, bug fixes, reverts and regression tests around the change.
+- Read linked PRs and issues through the repository's existing host tools, when available.
+- Read incident notes, postmortems and relevant logs already supplied or documented by the project. Match their dates and symptoms to the change.
+
+A defensive check alone does not prove that an incident occurred. If the record does not establish the trigger, report the reason as unknown.
