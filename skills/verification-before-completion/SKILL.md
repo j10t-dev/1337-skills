@@ -13,6 +13,7 @@ Use [the shared verification policy](../shared/verification.md) for evidence reu
 
 1. Identify what proves each claim using the table below.
 2. Inspect existing evidence and fill only missing or invalidated checks under the shared policy.
+   At feature completion, require the [verification maintenance result](../shared/verification-maintenance.md) for the final change boundary. Reuse it across handoffs; task-level acceptance alone does not start another maintenance pass.
 3. Confirm that actual output and required reviewer verdicts support the claimed scope and that unresolved limitations have explicit user acceptance.
 4. Report supported results and remaining gaps concisely.
 

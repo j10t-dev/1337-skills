@@ -39,6 +39,8 @@ Stop affected delivery unless the user explicitly accepts the stated limitation.
 
 ### Step 2: Code Review
 
+Complete the [verification maintenance gate](../shared/verification-maintenance.md) before dispatching the final reviewer, including when execution enters directly at this step. Pass its result and maintenance edits with the review.
+
 Select the most capable available model explicitly for the whole-feature review, with its reasoning effort, under `working-with-subagents`. Reuse a completed review of unchanged code; otherwise review the whole feature from its run base, including uncommitted fixes. For other work, perform required review or ask about optional review:
 
 ```
@@ -78,6 +80,8 @@ After a clean final review of a formal plan, absorb fixes into its task commits 
 ### Step 3: Present Completion Options
 
 Deliver when required checks pass and review is complete, or state the limitations the user explicitly accepted.
+
+Confirm the maintenance gate's result covers the final state. If it is missing or invalidated, complete it and review any resulting edits before delivery; a direct entry at this step does not bypass the gate.
 
 Report the outcome, checked scope, the scope's operative ruling rows in order (or, without a trail, the rulings stated during review), and the Declined-to-judge lines left for the user, concisely. When `.agents/sdd/decisions.tsv` holds a row whose run is this run's id, first audit this run's rows against the transcript, derive the scope's operative ruling rows, run the cross-model trail review, and log the stop row, all under `../show-me-your-work/SKILL.md` ("Stopping and resuming"), and end the report with the `reviewed by` line and the `Attention` block.
 

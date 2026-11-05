@@ -18,6 +18,10 @@ Focused task checks do not replace required project checks. A task that names on
 
 Investigate material, repeatable test-runtime changes or timeout failures, accounting for checked scope and environment. Ordinary timing variation alone does not require a diagnostic investigation.
 
+## Maintain verification at feature completion
+
+Before final review and delivery, follow [verification-maintenance.md](verification-maintenance.md) to assess the completed change and maintain affected project verification. This is a feature-completion gate, with evidence reused across workflow handoffs.
+
 ## Failures and unavailable checks
 
 Investigate failed or unavailable baseline checks. Continue only authorised work whose implementation and verification do not depend on the unresolved check. Record the limitation and its consequences before design approval; do not present a dependent design or task as verified. Fix introduced regressions within scope. Ask before broader repairs. Unresolved verification limitations still require explicit user acceptance before delivery.

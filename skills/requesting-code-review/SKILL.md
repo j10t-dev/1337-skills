@@ -37,6 +37,8 @@ Assume task workflows create reliable jj changes. Do not ask the reviewer to inf
 
 Reuse reviews of unchanged code and requirements. Use `verification-before-completion` for test evidence.
 
+Before a final feature or ad-hoc completion review, complete the [verification maintenance gate](../shared/verification-maintenance.md). Include its result and all maintenance edits in the review boundary. Intermediate task reviews do not trigger this gate.
+
 **2. Dispatch code-reviewer subagent:**
 
 Use the current harness's subagent/delegation tool with the code-reviewer type if available, filling the template at `code-reviewer.md`. Supply `CODE_PRINCIPLES` as absolute skill paths and the decisions they bear on, or None.

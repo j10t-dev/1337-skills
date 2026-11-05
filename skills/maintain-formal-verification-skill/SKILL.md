@@ -1,12 +1,17 @@
 ---
 name: maintain-formal-verification-skill
-description: "Bring a project's formal verification back in line with the code after the code changes: find the commits that touched verified code, update the model, harness, or properties to describe the code as it is now, rerun, and say whether each failure is drift in the verification or a bug in the code. Use for /maintain-formal-verification-skill, \"is the model still true to the code\", or after merges and refactors that touched verified code without rechecking it."
-disable-model-invocation: true
+description: "Use when the completion gate selects affected formal properties or covered code, or for /maintain-formal-verification-skill and requests to check whether a model still describes the code."
 ---
 
 # Maintain a formal verification skill
 
-A formal check proves a property of what it describes. When the code changes and the verification does not, the check can keep passing while it describes code that no longer exists. That pass is the dangerous case, because it looks like a proof. This skill is the upkeep loop for a verify skill that `/create-formal-verification-skill` generated, or for any project-local skill that runs a model checker, prover, or code-level verifier against named code. The project-local skill handles a change that an agent makes while it uses that skill. This skill handles the changes that skipped it: merges, edits made without the skill, and drift that builds up across many commits.
+A formal check proves a property of what it describes. When the code changes and the verification does not, the check can keep passing while it describes code that no longer exists. That pass is the dangerous case, because it looks like a proof. This skill is the upkeep loop for a verify skill that `/create-formal-verification-skill` generated, or for any project-local skill that runs a model checker, prover, or code-level verifier against named code. The project-local skill handles a change that an agent makes while it uses that skill. This skill handles the changes that skipped it: merges, edits made without the skill, and drift that builds up across many commits. It also maintains affected coverage selected by the completion gate.
+
+## Scope
+
+An explicit audit covers all checks in the requested area, or all project formal checks when no area is named. A [completion pass](../shared/verification-maintenance.md) receives the target skill and selected properties and covered code. "Each check" below means every selected check; report which checks were selected and why, without claiming that unselected checks were maintained.
+
+For each selected check, inspect all changes to its covered code since its sync commit, including uncommitted edits. Expand selection for shared state or assumptions that affect other checks. Reuse applicable results under [the shared verification policy](../shared/verification.md); changed models, properties or harnesses require new evidence, including proof that the updated check can fail.
 
 ## Outcomes
 
@@ -25,9 +30,9 @@ Edit only the verification: models, harnesses, property files, and the verify sk
 
 ## Pass
 
-1. **Find the checks.** A verify skill has no fixed name, so find it by what it does: a project skill that runs a model checker, a prover, or another verifier against named code. Read each one you find, or the one the user named. For each check, collect the property, the code it covers, the bounds and assumptions, the command that runs it, and the commit where it was last confirmed to describe the code. If no verify skill exists, stop and point at `/create-formal-verification-skill`. If the skill does not record a sync commit, use the last commit that changed the verification files, and say that you did.
+1. **Find the checks.** A verify skill has no fixed name, so find it by what it does: a project skill that runs a model checker, a prover, or another verifier against named code. Read the supplied targets for a completion pass; for a full audit, read each one you find, or the one the user named. For each check, collect the property, the code it covers, the bounds and assumptions, the command that runs it, and the commit where it was last confirmed to describe the code. If no verify skill exists, stop and point at `/create-formal-verification-skill`. If the skill does not record a sync commit, use the last commit that changed the verification files, and say that you did.
 
-2. **Run it as it is.** Run each check once before you change anything, and record the result. A pass here does not tell you that the code is correct. It tells you that the old description still holds. A failure here can be drift or a bug. Do not decide which until step 5.
+2. **Run it as it is.** Record each check's baseline before changing its verification, reusing applicable results or running the check when evidence is missing or invalidated. A pass here does not tell you that the code is correct. It tells you that the old description still holds. A failure here can be drift or a bug. Do not decide which until step 5.
 
 3. **Read every change to covered code.** Diff the covered files from the sync commit to the current commit, and read each commit message. Use `jj diff --from <sync commit> root:"<file>"` and `jj log -p -r '<sync commit>::@ & files(root:"<file>")'`; find moved code with `jj log -r 'diff_lines(substring:"<covered name>")'`, since jj has no --follow. Also look for code that moved: a covered function that is renamed, split, or moved to another file is still covered code. Also look for new code that touches the state that a check guards, such as a new function that writes the same fields. For each change, decide which of these it is:
    - **No effect.** The change does not alter anything the verification describes, such as formatting, comments, or code paths that the verification does not cover. Check this against the model or harness, not against the commit message.
@@ -55,4 +60,4 @@ Tell the user, for each check:
 
 Say outright which failures were drift in the verification and which were bugs in the code. For a check that passed before you updated it and fails after, say that the old pass was on a stale description.
 
-Leave the verification updates uncommitted and ask for them to be committed separately from any product fix.
+In a completion pass, return the outcomes, selected coverage, proof and edits to the controller for final review under the development task's existing VCS authority. Standalone, leave the verification updates uncommitted and ask for them to be committed separately from any product fix.
