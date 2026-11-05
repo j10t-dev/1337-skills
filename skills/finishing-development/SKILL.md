@@ -71,7 +71,7 @@ If a documentation path needs resolution before dispatch, read `../shared/docs-r
 
 Without a subagent tool, read `../requesting-code-review/code-reviewer.md` and perform that review yourself as a separate pass over the same boundary. Label it a self-review in the delivery report and ask whether that is enough; under a formal plan, keep `Final review -> in progress` until the user accepts, then write `Final review -> complete (self-review: no subagent tool)`. If the user rejects, dispatch a reviewer when one is available.
 
-Handle findings under `receiving-code-review`, within the rounds and five-round cap of `../subagent-driven-development/review-handling.md`; read it again before each fix pass. Under a formal plan, record `Final review -> in progress (fix round N of 5)` and one `Ruling:` line in `.agents/sdd/progress.md` for each finding or Declined-to-judge line the approved design settles. For ad-hoc work, the user's request settles findings, with the reason stated in the delivery report. Everything else at the cap goes to the user. Explain mistaken findings directly and escalate blockers.
+Handle findings under `receiving-code-review`, within the rounds and five-round cap of `../subagent-driven-development/review-handling.md`; read it again before each fix pass. Under a formal plan, record `Final review -> in progress (fix round N of 5)` in `.agents/sdd/progress.md`. Under a formal plan or when a trail exists, log to `.agents/sdd/decisions.tsv` under `../show-me-your-work/SKILL.md`: a `ruling` row for each finding or Declined-to-judge line the approved design settles, a `fix` row when a fix round opens and a `review` row with the final outcome. For ad-hoc work without a trail, the user's request settles findings, with the reason stated in the delivery report. Everything else at the cap goes to the user. Explain mistaken findings directly and escalate blockers.
 
 After a clean final review of a formal plan, absorb fixes into its task commits with `jj absorb --from @ --into '<run-base>..<Feature Bookmark>'`. List what remains with `jj diff --summary -r @`: squash task files into their task commit, ask if ownership is unclear, and put files that belong to no task (notes, scratch output) to the user. Refresh completed commit IDs in the progress file; leave the run base and other features untouched. Reuse verification and review when the code is unchanged.
 
@@ -79,7 +79,7 @@ After a clean final review of a formal plan, absorb fixes into its task commits 
 
 Deliver when required checks pass and review is complete, or state the limitations the user explicitly accepted.
 
-Report the outcome, checked scope, every `Ruling:` line from the progress file in order, and the Declined-to-judge lines left for the user, concisely.
+Report the outcome, checked scope, the scope's operative ruling rows in order (or, without a trail, the rulings stated during review), and the Declined-to-judge lines left for the user, concisely. When `.agents/sdd/decisions.tsv` holds a row whose run is this run's id, first audit this run's rows against the transcript, derive the scope's operative ruling rows, run the cross-model trail review, and log the stop row, all under `../show-me-your-work/SKILL.md` ("Stopping and resuming"), and end the report with the `reviewed by` line and the `Attention` block.
 
 **Do not perform integration operations** (rebase shared work, move bookmarks, submit externally, create/update PRs, or advance the target bookmark) unless the user explicitly asks. The user controls final jj/git-colocated integration.
 

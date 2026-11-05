@@ -1,9 +1,10 @@
 #!/bin/sh
-# Invoke pi as an independent, read-only reviewer for a design or plan
-# document, using the shared reviewer-prompt templates from this repo.
+# Invoke pi as an independent, read-only reviewer for a design, plan or decision
+# trail, using the shared reviewer-prompt templates from this repo.
 #
 # Usage: pi-review [--model M] [--effort LEVEL] design <doc-path>
 #        pi-review [--model M] [--effort LEVEL] plan <doc-path> <design-ref-path>
+#        pi-review [--model M] [--effort LEVEL] trail <log-path> <transcript-path> <run-id>
 #
 # A plan review always checks the plan against the design it must align
 # with, so design-ref-path is required for type "plan" and rejected for
@@ -22,10 +23,14 @@ script_dir=$(cd "$(dirname "$0")" && pwd -P)
 repo_root=$(cd "$script_dir/../../../.." && pwd -P)
 
 model=${PI_REVIEW_MODEL:-}
-effort=${PI_REVIEW_EFFORT:-high}
+effort=${PI_REVIEW_EFFORT:-}
 pos1=
 pos2=
 pos3=
+pos4=
+design_ref=
+transcript=
+run_id=
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -50,6 +55,8 @@ while [ $# -gt 0 ]; do
         pos2=$1
       elif [ -z "$pos3" ]; then
         pos3=$1
+      elif [ -z "$pos4" ]; then
+        pos4=$1
       else
         echo "pi-review: too many arguments: $1" >&2
         exit 2
@@ -61,17 +68,17 @@ done
 
 type=$pos1
 doc=$pos2
-design_ref=$pos3
 
 if [ -z "$type" ] || [ -z "$doc" ]; then
   echo "usage: pi-review [--model M] [--effort LEVEL] design <doc-path>" >&2
   echo "       pi-review [--model M] [--effort LEVEL] plan <doc-path> <design-ref-path>" >&2
+  echo "       pi-review [--model M] [--effort LEVEL] trail <log-path> <transcript-path> <run-id>" >&2
   exit 2
 fi
 
 case "$type" in
   design)
-    if [ -n "$design_ref" ]; then
+    if [ -n "$pos3" ] || [ -n "$pos4" ]; then
       echo "pi-review: design review does not take a design-ref-path" >&2
       exit 2
     fi
@@ -80,6 +87,8 @@ case "$type" in
     template="$repo_root/skills/brainstorming/design-document-template.md"
     ;;
   plan)
+    design_ref=$pos3
+    [ -z "$pos4" ] || { echo "pi-review: plan review takes only <doc-path> <design-ref-path>" >&2; exit 2; }
     if [ -z "$design_ref" ]; then
       echo "pi-review: plan review requires a design-ref-path (the design doc the plan must align with)" >&2
       exit 2
@@ -88,28 +97,42 @@ case "$type" in
     placeholder="[PLAN_FILE_PATH]"
     template=
     ;;
+  trail)
+    [ -n "$pos3" ] && [ -n "$pos4" ] || { echo "pi-review: trail requires <log-path> <transcript-path> <run-id>" >&2; exit 2; }
+    prompt="$repo_root/skills/show-me-your-work/references/trail-reviewer-prompt.md"
+    placeholder=
+    template=
+    transcript=$pos3
+    run_id=$pos4
+    ;;
   *)
-    echo "pi-review: type must be 'design' or 'plan', got '$type'" >&2
+    echo "pi-review: type must be 'design', 'plan' or 'trail', got '$type'" >&2
     exit 2
     ;;
 esac
+
+[ -n "$effort" ] || effort=$([ "$type" = trail ] && echo low || echo high)
 
 # pi exits 0 even when an @-file does not exist, so a typo'd path would
 # otherwise produce a "successful" run containing no review. Fail fast on
 # anything unreadable, including the prompt and design templates owned by
 # another skill.
-for f in "$prompt" "$doc" ${design_ref:+"$design_ref"} ${template:+"$template"}; do
+for f in "$prompt" "$doc" ${design_ref:+"$design_ref"} ${template:+"$template"} ${transcript:+"$transcript"}; do
   [ -r "$f" ] || { echo "pi-review: cannot read $f" >&2; exit 2; }
 done
 
-directive="Resolve the prompt's $placeholder placeholder to $doc."
-if [ -n "$design_ref" ]; then
-  directive="$directive Resolve the prompt's [DESIGN_FILE_PATH] placeholder to $design_ref."
+if [ "$type" = trail ]; then
+  directive="Log path: $doc. Transcript path: $transcript. Run id: $run_id. Review only rows whose run cell is that id. Return only the Attention block."
+else
+  directive="Resolve the prompt's $placeholder placeholder to $doc."
+  if [ -n "$design_ref" ]; then
+    directive="$directive Resolve the prompt's [DESIGN_FILE_PATH] placeholder to $design_ref."
+  fi
+  if [ -n "$template" ]; then
+    directive="$directive Resolve the prompt's [TEMPLATE_FILE_PATH] placeholder to $template."
+  fi
+  directive="$directive Ignore the subagent-dispatch framing in the prompt file -- you are not dispatching a subagent, you are the reviewer. Review the document directly and emit only the Status block (Status, Issues, Planning questions where the prompt asks for them, Recommendations) as your entire response."
 fi
-if [ -n "$template" ]; then
-  directive="$directive Resolve the prompt's [TEMPLATE_FILE_PATH] placeholder to $template."
-fi
-directive="$directive Ignore the subagent-dispatch framing in the prompt file -- you are not dispatching a subagent, you are the reviewer. Review the document directly and emit only the Status block (Status, Issues, Planning questions where the prompt asks for them, Recommendations) as your entire response."
 
 set -- pi -p --no-session --no-context-files --no-extensions --no-skills --approve -t read,grep,find,ls
 if [ -n "$model" ]; then
@@ -123,5 +146,23 @@ if [ -n "$template" ]; then
   set -- "$@" "@$template"
 fi
 set -- "$@" "$directive"
+
+if [ "$type" = trail ]; then
+  label_provider=
+  label_model=
+  if [ -n "$model" ]; then
+    case "$model" in
+      */*) label_provider=${model%%/*}; label_model=${model#*/} ;;
+      *) label_model=$model ;;
+    esac
+  elif command -v jq >/dev/null 2>&1 && [ -r "$HOME/.pi/agent/settings.json" ]; then
+    label_provider=$(jq -r '.defaultProvider // empty' "$HOME/.pi/agent/settings.json" 2>/dev/null || true)
+    label_model=$(jq -r '.defaultModel // empty' "$HOME/.pi/agent/settings.json" 2>/dev/null || true)
+  fi
+  label_model=${label_model%%:*}
+  [ -n "$label_provider" ] || label_provider=unknown
+  [ -n "$label_model" ] || label_model=unknown
+  printf 'reviewed by %s/%s\n' "$label_provider" "$label_model"
+fi
 
 exec "$@"

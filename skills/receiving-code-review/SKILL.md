@@ -13,7 +13,7 @@ Communicate disagreements directly, using implementer or reviewer evidence as ne
 
 Fix genuine code defects, verify and re-review until clean. Escalate actual blockers; under a formal plan the five-round cap in `../subagent-driven-development/review-handling.md` ends the loop by putting the open findings to the user. Agree repairs beyond approved scope with the user. Continue independent authorised work; resolve failures before delivery unless the user explicitly accepts a stated limitation.
 
-Rule on each Declined-to-judge line the approved design settles: set it aside when the design excludes the behaviour, or turn it into a finding graded by its effect on a reasonable user when the design requires it. Record `Ruling: <what> because <design clause>` in `.agents/sdd/progress.md` under a formal plan, otherwise in your report. List the remaining lines for the user. A ruling never adds behaviour.
+Rule on each Declined-to-judge line the approved design settles: set it aside when the design excludes the behaviour, or turn it into a finding graded by its effect on a reasonable user when the design requires it. Log a `ruling` row under a formal plan or when a trail exists (see `../show-me-your-work/SKILL.md`), otherwise state the ruling in your report. List the remaining lines for the user. A ruling never adds behaviour.
 
 ## Evaluate feedback
 

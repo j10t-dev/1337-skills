@@ -27,5 +27,6 @@ Use [the shared verification policy](../shared/verification.md) for evidence reu
 | Regression test works | Observed red-green cycle, not a single pass |
 | Agent completed | Reported check results and required review verdicts |
 | Requirements met | Check each binding requirement, not just test results |
+| Feature works for a user | A drive through `<repo>/.agents/skills/verify-<app>/` where it exists, with evidence at the location that skill names |
 
 For an existing regression test, a permitted temporary removal of the fix can establish failure before restoration and a passing run. Preserve tool and edit permissions. Confidence, fatigue, partial checks and agent assurances are not substitutes for evidence. Claim only what the checks establish.

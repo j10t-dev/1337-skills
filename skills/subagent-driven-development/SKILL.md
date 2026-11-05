@@ -11,7 +11,7 @@ Dispatch a fresh implementer and task reviewer for each task, then a final whole
 
 The approved design is the source of truth. Follow the plan; ask before adding behaviour or architecture. Execute authorised tasks without routine continuation prompts.
 
-Rule on conflicts, ambiguities and reviewer findings that the approved design settles, and record each ruling in `progress.md` as one line, `Ruling: <what> because <design clause>`. A ruling never adds behaviour. Ask the user about anything the design leaves open, about a `BLOCKED` you cannot resolve, and at the fix cap.
+Rule on conflicts, ambiguities and reviewer findings that the approved design settles, and log each as a `ruling` row in `.agents/sdd/decisions.tsv` under `../show-me-your-work/SKILL.md`. A ruling never adds behaviour. Ask the user about anything the design leaves open, about a `BLOCKED` you cannot resolve, and at the fix cap.
 
 ## Dispatch
 
@@ -50,10 +50,11 @@ Task 1 -> change <full change ID>, commit <full commit ID> (complete)
 Task 2 -> in progress (fix round 2 of 5)
 Task 3 -> pending
 Final review -> pending | in progress | complete
-Ruling: <what> because <design clause>
 ```
 
-Create the file when starting a plan and update it as work progresses. The task line carries `fix round N of 5` while fixes run; `Ruling:` lines are appended at the end in the order made, one line each, and are the only record of rulings.
+Create the file when starting a plan and update it as work progresses. The task line carries `fix round N of 5` while fixes run. Rulings and checkpoints go to the trail, `.agents/sdd/decisions.tsv`, under `../show-me-your-work/SKILL.md`; `progress.md` records state, the trail records why.
+
+Log a row at baseline, task acceptance (verdict summary and commit ID), each fix round opened, each reviewer wait that exceeds its expected time, each blocker, and each stop. The expected time is the elapsed time of the previous dispatch of the same role in this run, or 15 minutes for the first; write a wait row when a dispatch passes it and again at each doubling, with decision "<role> dispatch running", why "expected <m> min (previous dispatch | first dispatch)", evidence "<pid or id>, elapsed <m>" and result "open". Fix rounds use phase `fix`. Every row carries this run's id and the plan path as scope; after a compaction keep the run id from context.
 
 ## Task loop
 

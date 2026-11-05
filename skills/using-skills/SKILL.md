@@ -11,6 +11,8 @@ Before responding or acting, invoke skills requested by the user, matching the c
 
 Use process skills before implementation skills. Invoke `brainstorming` before entering plan mode if brainstorming has not already occurred. Follow skills without announcing invocation. Track applicable checklists in the harness, or briefly in chat if no tracker exists, unless the active skill specifies a durable progress file.
 
+Route "how does X work" and placement questions to `how`, "why is it like this" to `why`, and "teach me" or "help me understand" to `teach`.
+
 ## Code principles
 
 Before making or reviewing code decisions, map the task's concerns to the applicable principles:
